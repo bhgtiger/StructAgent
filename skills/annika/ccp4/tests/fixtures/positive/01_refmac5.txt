@@ -1,0 +1,1 @@
+Run refmac5 on model.pdb with data.mtz at 2.1 Å, 10 macrocycles, label F=F SIGF=SIGF FREE=FreeR_flag.

@@ -1,0 +1,1 @@
+Generate restraints for ligand LIG with acedrg from this SMILES: CC(=O)Oc1ccccc1C(=O)O.

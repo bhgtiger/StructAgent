@@ -1,0 +1,16 @@
+{
+  "resultFile": "/tmp/chimerax_edit/result.json",
+  "commands": [
+    "close all",
+    "open /path/to/protein.cif",
+    "delete solvent",
+    {"cmd": "delete /C", "abort": false},
+    "swapaa ARG /A:57 criteria p",
+    "addh #1",
+    "renumber /A start 1 relative false",
+    "changechains /A X",
+    "open /path/to/ligand.sdf",
+    "combine #1,2 modelId 10 name final_complex close false",
+    "save /path/to/final.cif #10"
+  ]
+}

@@ -1,0 +1,7 @@
+scattering_table = electron
+macro_cycles = 5
+nproc = 4
+run = minimization_global
+rotamer_restraints = True
+ramachandran_restraints = True
+c_beta_restraints = True

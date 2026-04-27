@@ -1,0 +1,10 @@
+refinement {
+  refine {
+    strategy = individual_sites+individual_adp
+  }
+}
+main {
+  number_of_macro_cycles = 3
+  ordered_solvent = False
+}
+nproc = 4

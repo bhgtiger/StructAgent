@@ -1,0 +1,1 @@
+My MTZ has no FreeR column — please run freerflag to add one and write data_with_free.mtz.

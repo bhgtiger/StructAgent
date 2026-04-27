@@ -1,0 +1,12 @@
+# AceDRG — default option set
+# Used by run_acedrg.sh as the baseline command. Each line is a flag passed to
+# the underlying `acedrg` invocation; the wrapper appends input-mode flags
+# (--smi, --mol, etc.) and -r/-o based on --resname / --out-prefix.
+#
+# Comment lines (starting with #) and blank lines are ignored.
+
+# Use the standard CCP4 monomer library when looking for matching codes.
+--no-output-clean=false
+
+# Verbose enough to see what AceDRG decided about charge / protonation.
+-v 1

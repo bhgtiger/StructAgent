@@ -1,0 +1,11 @@
+{
+  "resultFile": "/tmp/chimerax_fitmap/result.json",
+  "commands": [
+    "close all",
+    "open /path/to/model.cif",
+    "open /path/to/map.mrc",
+    {"cmd": "fitmap #1 inMap #2 resolution 3.5", "capture": true},
+    "save /path/to/fitted.cif #1",
+    "log save /tmp/chimerax_fitmap/log.html"
+  ]
+}

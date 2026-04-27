@@ -1,0 +1,1 @@
+Open Coot --no-graphics and run fit-ligand on model.pdb to dock ADP.
