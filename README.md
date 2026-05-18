@@ -2,6 +2,27 @@
 
 StructAgent is a two-agent structural-biology assistant system for cryo-EM model building, refinement, validation, ligand fitting, and ion-site audit workflows.
 
+## Citation
+
+If you use StructAgent in your research, please cite the accompanying preprint:
+
+> Guo, X. *et al.* StructAgent: a two-agent system for cryo-EM structural biology. *bioRxiv* (2026). doi:[10.64898/2026.05.18.725842](https://doi.org/10.64898/2026.05.18.725842)
+
+Preprint: https://www.biorxiv.org/content/10.64898/2026.05.18.725842v1
+
+BibTeX:
+
+```bibtex
+@article{structagent2026,
+  title   = {StructAgent: a two-agent system for cryo-EM structural biology},
+  author  = {Guo, Xiaohu and others},
+  journal = {bioRxiv},
+  year    = {2026},
+  doi     = {10.64898/2026.05.18.725842},
+  url     = {https://www.biorxiv.org/content/10.64898/2026.05.18.725842v1}
+}
+```
+
 This release contains two usable layers:
 
 1. **Complete agent system** — an Annika/Maria/A2A architecture for separating scientific reasoning from execution control.
