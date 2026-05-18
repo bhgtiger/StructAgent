@@ -16,7 +16,21 @@ architecture/                 System architecture and collaboration protocol
 docs/                         Installation, implementation, privacy, versions, release scope
 scripts/                      Sanitized helper templates for A2A messaging/setup
 skills/annika/                Execution-side structural-biology skills/protocols
+  ├── ccp4/                   Refmac5, AceDRG, CCP4 suite orchestration
+  ├── chimerax/               UCSF ChimeraX model editing and map fitting
+  ├── coot/                   Coot model building and local refinement
+  ├── emerald/                Rosetta EMERALD ligand docking into cryo-EM density (NEW)
+  ├── isolde/                 ISOLDE interactive refinement in ChimeraX
+  ├── phenix/                 Phenix real-space and reciprocal-space refinement
+  ├── annika-log/             Auditable project/job logging for reproducibility (NEW)
+  ├── structural-strategy/    Decision-making for fitting, refinement, validation
+  └── structural_build/       End-to-end model building orchestration
 skills/maria/                 Reading/reasoning/database/review skills
+  ├── database/               Literature database query and cross-reference
+  ├── discovery/              Gap-driven literature expansion via Semantic Scholar
+  ├── distill/                Session distillation
+  ├── paper-reader/           Primary paper reading and filing
+  └── review-paper/           Review/tutorial paper reading
 examples/                     Placeholder and reviewer-bundle notes only
 reviewer_bundle_manifest.md   What belongs in the confidential reviewer bundle
 LICENSE                       Apache-2.0
@@ -41,6 +55,16 @@ Connect them with an A2A JSON-RPC gateway or equivalent message bus. Use the tem
 
 See [`docs/full_system_implementation.md`](docs/full_system_implementation.md).
 
+## Changelog
+
+### v2 (2026-05-18)
+- **Added** `skills/annika/emerald/` — Rosetta EMERALD ligand docking into cryo-EM density maps (GALigandDock + density-weighted scoring). Includes wrapper scripts, presets, CLI reference, and installation guide.
+- **Added** `skills/annika/annika-log/` — auditable project/job folder discipline. Provides canonical logging layout, error/lesson export for Supp. Table 3, integrity auditing, and paper-traceability mapping.
+- Updated repository layout documentation.
+
+### v1 (2025-05-18)
+- Initial release with core structural-biology skills (ChimeraX, Coot, CCP4, ISOLDE, Phenix, structural-strategy, structural_build) and literature skills (database, discovery, distill, paper-reader, review-paper).
+
 ## Status
 
-This is an initial private release archive. The software/protocol release is present, but paper-submission readiness still depends on completing the confidential reviewer evidence bundle and resolving manuscript blockers documented outside this public repo.
+Active development. The software/protocol release is present and expanding as new tool integrations are validated. Paper-submission readiness depends on completing the confidential reviewer evidence bundle.

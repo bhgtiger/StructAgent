@@ -1,0 +1,24 @@
+# EMERALD flags file — pass via `@emerald_flags.txt`.
+# Included options duplicate what run_emerald.sh assembles on the command line;
+# use this only when driving rosetta_scripts directly.
+
+-gen_potential
+-score::gen_bonded_params_file scoring/score_functions/generic_potential/generic_bonded.round6p.txt
+
+# Density scoring
+-edensity::grid_spacing 1.0
+-edensity::sliding_window 1
+-edensity::score_sliding_window_context
+-edensity::atom_mask 2
+
+# Required at the CLI (no sensible default here):
+#   -edensity::mapfile <map.mrc>
+#   -edensity::mapreso <local_Å>
+#   -in:file:extra_res_fa <LIG.params>
+#   -s <receptor.pdb>
+#   -parser:protocol <emerald.xml>
+#   -nstruct <N>
+
+# Output
+-out:file:scorefile emerald.sc
+-overwrite
