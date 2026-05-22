@@ -30,6 +30,10 @@ This release contains two usable layers:
 
 The public repository intentionally excludes private identities, tokens, chat routing configuration, raw session logs, and example structural datasets. Reviewer-only evidence bundles are tracked separately.
 
+## Third-party software notice
+
+StructAgent is independent and unofficial. It is not affiliated with, endorsed by, sponsored by, or approved by the developers or owners of the third-party scientific software it can help orchestrate. Product names and trademarks belong to their respective owners. Users must obtain and comply with all upstream software licenses, documentation terms, and citation requirements. See [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
+
 ## Repository layout
 
 ```text
@@ -40,7 +44,7 @@ skills/annika/                Execution-side structural-biology skills/protocols
   ├── ccp4/                   Refmac5, AceDRG, CCP4 suite orchestration
   ├── chimerax/               UCSF ChimeraX model editing and map fitting
   ├── coot/                   Coot model building and local refinement
-  ├── cryosparc/              cryoSPARC SPA processing, troubleshooting, and cautious automation (NEW)
+  ├── cryosparc/              Unofficial cryoSPARC workflow guidance and cautious automation (NEW)
   ├── emerald/                Rosetta EMERALD ligand docking into cryo-EM density (NEW)
   ├── isolde/                 ISOLDE interactive refinement in ChimeraX
   ├── phenix/                 Phenix real-space and reciprocal-space refinement
@@ -55,7 +59,8 @@ skills/maria/                 Reading/reasoning/database/review skills
   └── review-paper/           Review/tutorial paper reading
 examples/                     Placeholder and reviewer-bundle notes only
 reviewer_bundle_manifest.md   What belongs in the confidential reviewer bundle
-LICENSE                       Apache-2.0
+LICENSE                       Apache-2.0 for original StructAgent material
+THIRD_PARTY_NOTICES.md        Unofficial status, trademarks, upstream-license notice
 ```
 
 ## Quick start
@@ -80,8 +85,8 @@ See [`docs/full_system_implementation.md`](docs/full_system_implementation.md).
 ## Changelog
 
 ### v3 (2026-05-22)
-- **Added** `skills/annika/cryosparc/` — self-contained cryoSPARC SPA advisor/automation skill covering import, preprocessing, picking, 2D/3D workflows, refinement, 3DVA/3DFlex, masks, helical processing, CryoSPARC Live, `cryosparc-tools`, `cryosparcm`, GPU lanes/queues, storage, RELION interop, troubleshooting, and error lookup. Includes bundled reference corpus and a dry-run-first `scripts/cryosparc_harness.py` helper for cautious local automation.
-- **Added** `docs/cryosparc_skill_example/` — sanitized public usage page showing the cryoSPARC agent skill as a Claude/Codex-style implementation pattern that can also be adapted to other agent runtimes.
+- **Added** `skills/annika/cryosparc/` — self-contained, unofficial cryoSPARC SPA advisor/automation skill covering import, preprocessing, picking, 2D/3D workflows, refinement, 3DVA/3DFlex, masks, helical processing, CryoSPARC Live, `cryosparc-tools`, `cryosparcm`, GPU lanes/queues, storage, RELION interop, troubleshooting, and error lookup. Includes synthesized workflow references and a dry-run-first `scripts/cryosparc_harness.py` helper for cautious local automation.
+- **Added** `docs/cryosparc_skill_example/` — sanitized public usage page showing the unofficial cryoSPARC workflow assistant skill as a Claude/Codex-style implementation pattern that can also be adapted to other agent runtimes.
 
 ### v2 (2026-05-18)
 - **Added** `skills/annika/emerald/` — Rosetta EMERALD ligand docking into cryo-EM density maps (GALigandDock + density-weighted scoring). Includes wrapper scripts, presets, CLI reference, and installation guide.

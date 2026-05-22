@@ -5,14 +5,14 @@ How CryoSPARC schedules and runs work: the master / worker / lane / target / que
 
 What lives elsewhere:
 
-- `cryosparcm` / `cryosparcw` command surface, restart and instance-state runbooks, log layout, and the *exact* CLI syntax disclaimer — `14_cli_admin.md` and the version-matched references under `docs/per_page/setup-configuration-and-management__management-and-monitoring-v5.0/…` and `…__management-and-monitoring-4.7/…`.
+- `cryosparcm` / `cryosparcw` command surface, restart and instance-state runbooks, log layout, and the *exact* CLI syntax disclaimer — `14_cli_admin.md` and the version-matched references under `official cryoSPARC documentation` and `…__management-and-monitoring-4.7/…`.
 - SSD and project storage planning, sizing, archival, cleanup — `24_disk_and_storage.md` (this page only covers cache *behavior* visible to the scheduler).
 - Python orchestration via `cryosparc-tools` — `13_cryosparc_tools_api.md`.
 - Install / connect-worker mechanics end-to-end and worker prerequisites — `01_installation_admin.md`.
 - Algorithmic parameter tuning (do *not* tune parameters to compensate for a scheduling problem) — `16_tuning_recipes.md`.
 - Error-string lookup → `17_error_lookup.md`; decision-tree routing → `18_decision_trees.md`; debugging mental model → `15_troubleshooting.md`.
 
-Exact CLI flags differ between v5.0+ and v4.7-and-earlier (`docs/per_page/setup-configuration-and-management__management-and-monitoring-v5.0__cryosparcm-cli-reference-v5.0.md` notes that `cryosparcm cli` arguments may change between versions). When a recipe requires precise syntax, identify the instance version first and then read `cryosparcm COMMAND --help` / `cryosparcw COMMAND --help` on the target host.
+Exact CLI flags differ between v5.0+ and v4.7-and-earlier (`official cryoSPARC documentation` notes that `cryosparcm cli` arguments may change between versions). When a recipe requires precise syntax, identify the instance version first and then read `cryosparcm COMMAND --help` / `cryosparcw COMMAND --help` on the target host.
 
 ---
 
@@ -30,8 +30,8 @@ The CryoSPARC scheduler has five layers that are easy to confuse. Naming them up
 
 Two consequences fall out of the model and are worth committing to memory:
 
-1. **A job queued to lane X stays queued to X even if a different lane has idle resources.** That is intentional. Multi-node lanes pool resources; single-node lanes give predictable placement at the cost of cross-lane idle time (`docs/per_page/setup-configuration-and-management__hardware-and-system-requirements.md`).
-2. **GPUs are addressed by index from `0` on the worker.** When CryoSPARC requests N GPUs from a cluster, it will internally try device IDs `[0, … N-1]`. The cluster is responsible for setting `CUDA_VISIBLE_DEVICES` (e.g. via SLURM GRES + cgroups) so the right physical devices are exposed (`docs/per_page/setup-configuration-and-management__how-to-download-install-and-configure__cryosparc-cluster-integration-script-examples.md`).
+1. **A job queued to lane X stays queued to X even if a different lane has idle resources.** That is intentional. Multi-node lanes pool resources; single-node lanes give predictable placement at the cost of cross-lane idle time (`official cryoSPARC documentation`).
+2. **GPUs are addressed by index from `0` on the worker.** When CryoSPARC requests N GPUs from a cluster, it will internally try device IDs `[0, … N-1]`. The cluster is responsible for setting `CUDA_VISIBLE_DEVICES` (e.g. via SLURM GRES + cgroups) so the right physical devices are exposed (`official cryoSPARC documentation`).
 
 ---
 
@@ -55,18 +55,18 @@ Operational rule: **if a parameter change is being proposed to fix something the
 
 | Surface | Use it for | Source |
 |---|---|---|
-| Resource Manager → **Current Jobs** | Running and queued jobs, per-job priority, kill button | `docs/per_page/guides-for-v3__user-interface-and-usage-guide__resource-manager.md` |
+| Resource Manager → **Current Jobs** | Running and queued jobs, per-job priority, kill button | `official cryoSPARC documentation` |
 | Resource Manager → **Instance Information** | Lanes, worker bin path, host name, SSD cache path, cache quota | same |
 | Resource Manager → **Job History** | Past job priority and lane assignment | same |
-| Job card status color | Purple = building, teal = queued, gray = started, blue = running, green = complete, orange = killed, red = failed | `docs/per_page/guides-for-v3__user-interface-and-usage-guide__queue-job-inspect-job-and-other-job-actions.md` |
-| `cryosparcm resources [LANE_NAME]` | Formatted table of scheduler targets and their declared resources | `docs/per_page/setup-configuration-and-management__management-and-monitoring-v5.0__cryosparcm-reference-v5.0.md` |
+| Job card status color | Purple = building, teal = queued, gray = started, blue = running, green = complete, orange = killed, red = failed | `official cryoSPARC documentation` |
+| `cryosparcm resources [LANE_NAME]` | Formatted table of scheduler targets and their declared resources | `official cryoSPARC documentation` |
 | `cryosparcm status` | Master process / supervisor / DB state | same |
 | `cryosparcm log command_core` | Worker launch / scheduler / SSH attempts | `17_error_lookup.md` |
-| `cryosparcw info --gpu` (on worker) | Lists the GPUs the worker can see | `docs/per_page/setup-configuration-and-management__management-and-monitoring-v5.0__cryosparcw-reference-v5.0.md` |
+| `cryosparcw info --gpu` (on worker) | Lists the GPUs the worker can see | `official cryoSPARC documentation` |
 | `cryosparcw env` (on worker) | Dumps the env vars the worker uses (`eval $(cryosparcw env)` to activate) | same |
 | Cluster scheduler log (`squeue` / `qstat` / job `slurm.out`) | Anything cryoSPARC has handed off to a cluster — including OOM-kill, which the master sees only as a heartbeat loss | `17_error_lookup.md` |
 
-**v5.0+** surfaces lane / target resource exhaustion more clearly in the UI than older versions did, so when triaging a queued job on a recent instance, check the Queue Modal / Resource Manager *before* opening logs (`reference/release_notes/markdown/v5.0.md`, `15_troubleshooting.md`).
+**v5.0+** surfaces lane / target resource exhaustion more clearly in the UI than older versions did, so when triaging a queued job on a recent instance, check the Queue Modal / Resource Manager *before* opening logs (`public cryoSPARC release notes v5.0`, `15_troubleshooting.md`).
 
 ---
 
@@ -74,14 +74,14 @@ Operational rule: **if a parameter change is being proposed to fix something the
 
 ### Lane shape
 
-- A lane can hold one or many workers; a worker belongs to one lane (`docs/per_page/setup-configuration-and-management__hardware-and-system-requirements.md`).
-- The lane named `default` is created if no lane is specified at `cryosparcw connect` time (`--lane TEXT [default: default]`, `docs/per_page/setup-configuration-and-management__management-and-monitoring-v5.0__cryosparcw-reference-v5.0.md`).
+- A lane can hold one or many workers; a worker belongs to one lane (`official cryoSPARC documentation`).
+- The lane named `default` is created if no lane is specified at `cryosparcw connect` time (`--lane TEXT [default: default]`, `official cryoSPARC documentation`).
 - Single-node lanes are preferable when hardware (GPU VRAM, RAM, CPU count) varies meaningfully between hosts — Hetero Refine on a 24GB card and a 11GB card on the same lane is asking for trouble.
 - Multi-node lanes are preferable when hosts are homogeneous and you do not care which one runs a job.
 
 ### Per-user lane assignment (v4.1+)
 
-CryoSPARC users have explicit lane access. New users inherit access to all lanes; new lanes are assigned to all users by default. Access is editable from the admin panel's "Lane Restrictions" tab and from the CLI (`docs/per_page/setup-configuration-and-management__software-system-guides__guide-lane-assignments-and-restrictions.md`):
+CryoSPARC users have explicit lane access. New users inherit access to all lanes; new lanes are assigned to all users by default. Access is editable from the admin panel's "Lane Restrictions" tab and from the CLI (`official cryoSPARC documentation`):
 
 | Operation | v5 | v4 |
 |---|---|---|
@@ -92,13 +92,13 @@ A user who is not assigned to a lane cannot queue jobs there. This is one of the
 
 ### Live's three lane types
 
-CryoSPARC Live operates against **three** task types that are mapped onto lanes per session (`docs/per_page/live__prerequisites-and-compute-resources-setup.md`):
+CryoSPARC Live operates against **three** task types that are mapped onto lanes per session (`official cryoSPARC documentation`):
 
 1. **Preprocessing lane** — motion, CTF, picking, extraction. Each Live preprocessing worker pins one GPU. Memory bandwidth >100 GB/s is recommended.
 2. **Reconstruction lane** — Streaming 2D / Streaming Refinement.
 3. **Auxiliary lane** — transient jobs (template-creation 2D, ab-initio).
 
-**v5.0+** adds a `Workers per GPU` setting for Live preprocessing — running more than one Live worker per GPU can improve throughput on some systems (`reference/release_notes/markdown/v5.0.md`).
+**v5.0+** adds a `Workers per GPU` setting for Live preprocessing — running more than one Live worker per GPU can improve throughput on some systems (`public cryoSPARC release notes v5.0`).
 
 ### Verify before changing
 
@@ -113,7 +113,7 @@ Before changing a lane's worker membership or a user's lane access:
 
 ## 5. Worker registration concepts
 
-`cryosparcw connect` is the registration entry point (run *on the worker*, as the cryoSPARC owner). The full option list is in `docs/per_page/setup-configuration-and-management__management-and-monitoring-v5.0__cryosparcw-reference-v5.0.md`; the operationally important ones:
+`cryosparcw connect` is the registration entry point (run *on the worker*, as the cryoSPARC owner). The full option list is in `official cryoSPARC documentation`; the operationally important ones:
 
 | Flag | What it declares |
 |---|---|
@@ -127,7 +127,7 @@ Before changing a lane's worker membership or a user's lane access:
 | `--gpu / --no-gpu` | CPU-only worker (`--no-gpu`); cannot combine with `--gpus` |
 | `--ssdpath`, `--ssdquota`, `--ssdreserve` | Local SSD scratch path; cache quota; minimum free space (default reserve 10000 MB) |
 
-The official example (`docs/per_page/setup-configuration-and-management__management-and-monitoring-v5.0__cryosparcw-reference-v5.0.md`):
+The official example (`official cryoSPARC documentation`):
 
 ```bash
 cryosparcw connect \
@@ -151,11 +151,11 @@ Operational notes:
 | `CRYOSPARC_LICENSE_ID` | `cryosparc_worker/config.sh` | License key |
 | `CRYOSPARC_USE_GPU` | `cryosparc_worker/config.sh` | Enable GPU |
 | `CRYOSPARC_CUDA_PATH` | `cryosparc_worker/config.sh` | CUDA install |
-| `CRYOSPARC_SSD_PATH` | `cryosparc_worker/config.sh` | Cache path. Can be set to another shell variable (e.g. `$CUSTOM_DYNAMIC_SSD_PATH`) to use a per-job dynamically-allocated SSD path (`docs/per_page/setup-configuration-and-management__software-system-guides__tutorial-ssd-particle-caching-in-cryosparc.md`). |
+| `CRYOSPARC_SSD_PATH` | `cryosparc_worker/config.sh` | Cache path. Can be set to another shell variable (e.g. `$CUSTOM_DYNAMIC_SSD_PATH`) to use a per-job dynamically-allocated SSD path (`official cryoSPARC documentation`). |
 | `CRYOSPARC_SSD_CACHE_LIFETIME_DAYS` | `cryosparc_master/config.sh` | Cache file lifetime (default 30 days; v3.3+) |
-| `CRYOSPARC_CLI_SKIP_ACCESS_CHECK=true` | both master and worker (v5.0+) | Bypass UNIX-permission reachability checks when reported permissions are misleading (`reference/release_notes/markdown/v5.0.md`) |
+| `CRYOSPARC_CLI_SKIP_ACCESS_CHECK=true` | both master and worker (v5.0+) | Bypass UNIX-permission reachability checks when reported permissions are misleading (`public cryoSPARC release notes v5.0`) |
 
-**Deprecated**: `CRYOSPARC_DISABLE_IMPORT_ON_MASTER` is no longer used as of v4.3 — import / utility jobs can be launched on any worker lane (`reference/release_notes/markdown/v4.3.md`). If a recipe online still references it, the recipe is stale.
+**Deprecated**: `CRYOSPARC_DISABLE_IMPORT_ON_MASTER` is no longer used as of v4.3 — import / utility jobs can be launched on any worker lane (`public cryoSPARC release notes v4.3`). If a recipe online still references it, the recipe is stale.
 
 Do **not** invent env-var names; if a user proposes one not on the list above (or in the version-matched docs), look it up before applying it.
 
@@ -163,7 +163,7 @@ Do **not** invent env-var names; if a user proposes one not on the list above (o
 
 ## 6. Cluster integration
 
-For cluster lanes the lane is described by two files (`docs/per_page/setup-configuration-and-management__how-to-download-install-and-configure__cryosparc-cluster-integration-script-examples.md`):
+For cluster lanes the lane is described by two files (`official cryoSPARC documentation`):
 
 - `cluster_info.json` — name, worker bin path, submit/poll/cancel/info command templates, optional cache path.
 - `cluster_script.sh` — submission script template the master fills in per job.
@@ -172,7 +172,7 @@ The official documentation provides SLURM, PBS, and Gridengine examples; the age
 
 ### Reserved cluster template variables
 
-These variables are filled in by CryoSPARC and **cannot be overridden** by custom variables (`docs/per_page/setup-configuration-and-management__software-system-guides__guide-configuring-custom-variables-for-cluster-job-submission-scripts.md`):
+These variables are filled in by CryoSPARC and **cannot be overridden** by custom variables (`official cryoSPARC documentation`):
 
 ```
 {{ run_cmd }}           {{ num_cpu }}          {{ num_gpu }}
@@ -184,7 +184,7 @@ These variables are filled in by CryoSPARC and **cannot be overridden** by custo
 
 ### Custom variables (v4.1+)
 
-User-defined variables can be injected into the cluster submission template at three scopes — **instance**, **target**, **job** — with job > target > instance precedence. Use them to adjust requested RAM / GPU type / queue partition / accounting key per job without rewriting the template (`docs/per_page/setup-configuration-and-management__software-system-guides__guide-configuring-custom-variables-for-cluster-job-submission-scripts.md`).
+User-defined variables can be injected into the cluster submission template at three scopes — **instance**, **target**, **job** — with job > target > instance precedence. Use them to adjust requested RAM / GPU type / queue partition / accounting key per job without rewriting the template (`official cryoSPARC documentation`).
 
 ### GPU allocation rule on clusters
 
@@ -196,12 +196,12 @@ CryoSPARC requests `num_gpu` GPUs and then uses device indices starting from `0`
 
 ### Queueing a job
 
-1. Job Builder → Queue. Pick the lane (default: current active workspace's last-used lane on v4.4+). Optionally set priority. Click Create (`docs/per_page/guides-for-v3__user-interface-and-usage-guide__queue-job-inspect-job-and-other-job-actions.md`).
+1. Job Builder → Queue. Pick the lane (default: current active workspace's last-used lane on v4.4+). Optionally set priority. Click Create (`official cryoSPARC documentation`).
 2. The scheduler matches the job's resource request against the lane's free slots in priority order.
 
 ### Job chaining
 
-Downstream jobs can be queued before upstream outputs exist. They sit in **"Queued — waiting because inputs are not ready"** until the upstream job emits the relevant output group, then start automatically (`docs/per_page/guides-for-v3__user-interface-and-usage-guide__queue-job-inspect-job-and-other-job-actions.md`). This is the canonical way to assemble a multi-step pipeline through the GUI without `cryosparc-tools`.
+Downstream jobs can be queued before upstream outputs exist. They sit in **"Queued — waiting because inputs are not ready"** until the upstream job emits the relevant output group, then start automatically (`official cryoSPARC documentation`). This is the canonical way to assemble a multi-step pipeline through the GUI without `cryosparc-tools`.
 
 ### Status colors at a glance
 
@@ -210,13 +210,13 @@ Purple build / teal queued / gray started / blue running / green complete / oran
 ### Killing / clearing a job
 
 - Kill from Resource Manager → Current Jobs.
-- "Clear" wipes results and outputs but preserves inputs and parameters — useful for re-running with one parameter change. Also resets queued jobs to building state (`docs/per_page/guides-for-v3__user-interface-and-usage-guide__queue-job-inspect-job-and-other-job-actions.md`).
+- "Clear" wipes results and outputs but preserves inputs and parameters — useful for re-running with one parameter change. Also resets queued jobs to building state (`official cryoSPARC documentation`).
 
 ---
 
 ## 8. Priority queue
 
-Priority (v3.0+) is a per-job integer 0–100, sorted descending; ties broken by queue-entry time ascending (`docs/per_page/setup-configuration-and-management__software-system-guides__tutorial-priority-job-queuing.md`).
+Priority (v3.0+) is a per-job integer 0–100, sorted descending; ties broken by queue-entry time ascending (`official cryoSPARC documentation`).
 
 - New jobs inherit **user default** if set, else **instance default**, else 0.
 - Admins control who can modify priority in the Admin Panel → Manage Users → "Job Priority Management" column.
@@ -225,7 +225,7 @@ Priority (v3.0+) is a per-job integer 0–100, sorted descending; ties broken by
 
 Advisor framing for multi-user contention: priority is the right knob; **changing lane membership to "fix" priority is usually wrong**, because it permanently rebalances resources rather than just reordering the queue.
 
-**v4.1.1 fix** worth remembering on older instances: prior to v4.1.1, restarted GPU jobs could jump to the front of the queue on the specified lane, defeating priority (`reference/release_notes/markdown/v4.1.md`). If a user is on a pre-v4.1.1 instance and asks why priority "doesn't work" after a restart, update before debugging.
+**v4.1.1 fix** worth remembering on older instances: prior to v4.1.1, restarted GPU jobs could jump to the front of the queue on the specified lane, defeating priority (`public cryoSPARC release notes v4.1`). If a user is on a pre-v4.1.1 instance and asks why priority "doesn't work" after a restart, update before debugging.
 
 ---
 
@@ -235,9 +235,9 @@ Advisor framing for multi-user contention: priority is the right knob; **changin
 
 ### Which jobs use it
 
-Cache is intended for "classification, refinement, and reconstruction jobs that deal with particles" — jobs with random-access patterns over the particle stack. Preprocessing nodes (motion, CTF, picking) do **not** need an SSD (`docs/per_page/setup-configuration-and-management__software-system-guides__tutorial-ssd-particle-caching-in-cryosparc.md`).
+Cache is intended for "classification, refinement, and reconstruction jobs that deal with particles" — jobs with random-access patterns over the particle stack. Preprocessing nodes (motion, CTF, picking) do **not** need an SSD (`official cryoSPARC documentation`).
 
-A dedicated **Cache Particles on SSD** utility job exists for pre-warming the cache without holding a GPU (`docs/per_page/processing-data__all-job-types-in-cryosparc__utilities__job-cache-particles-on-ssd.md`).
+A dedicated **Cache Particles on SSD** utility job exists for pre-warming the cache without holding a GPU (`official cryoSPARC documentation`).
 
 ### Cache size rule of thumb
 
@@ -245,7 +245,7 @@ A dedicated **Cache Particles on SSD** utility job exists for pre-warming the ca
 Dataset Size = (4 * box_size^2 + nsymbt + header_length) * num_particles
 ```
 
-Example: 1,000,000 particles at box 256 ≈ 263.3 GB. 2TB SSDs are recommended for the largest stacks (`docs/per_page/setup-configuration-and-management__software-system-guides__tutorial-ssd-particle-caching-in-cryosparc.md`).
+Example: 1,000,000 particles at box 256 ≈ 263.3 GB. 2TB SSDs are recommended for the largest stacks (`official cryoSPARC documentation`).
 
 ### Common runtime cache messages
 
@@ -270,13 +270,13 @@ The SSD cache layer was substantially rewritten:
 - v4.4 / v4.5 / v4.6: progressive robustness improvements on cluster filesystems; "File not found" during caching should no longer occur on v4.6.
 - v5.0: silent SSD-cache copy-failure fallback improved; some NFS permission issues fixed; `CRYOSPARC_CLI_SKIP_ACCESS_CHECK=true` added for misleading-permissions environments.
 
-If a user is more than two minor versions behind and reports a cache problem, update before debugging (`reference/release_notes/markdown/v4.1.md` … `v5.0.md`, `15_troubleshooting.md`).
+If a user is more than two minor versions behind and reports a cache problem, update before debugging (`public cryoSPARC release notes v4.1` … public cryoSPARC release notes v5.0, `15_troubleshooting.md`).
 
 ---
 
 ## 10. GPU memory and box size
 
-GPU OOM during refinement / reconstruction is almost always a box-size vs VRAM mismatch. The reference table for Homogeneous, Helical, and Local Refinement (with non-uniform regularization disabled) is (`docs/per_page/processing-data__tutorials-and-case-studies__performance-metrics.md`):
+GPU OOM during refinement / reconstruction is almost always a box-size vs VRAM mismatch. The reference table for Homogeneous, Helical, and Local Refinement (with non-uniform regularization disabled) is (`official cryoSPARC documentation`):
 
 | GPU VRAM (GB) | Approx. max volume box size (px) |
 |---|---|
@@ -298,11 +298,11 @@ Mitigation knobs (in order of preference):
 
 | Symptom | Cause / fix | Source |
 |---|---|---|
-| `cufftAllocFailed` / `cufftInternalError` during extraction | Pre-v4.1 Extract from Micrographs used excessive GPU memory. Update. | `reference/release_notes/markdown/v4.1.md`, `16_tuning_recipes.md` |
-| Blank / faint 2D classes on multi-GPU | Pre-v4.2 multi-GPU 2D bug; v4.6 improves CPU requests for multi-GPU 2D classification. | `reference/release_notes/markdown/v4.2.md`, `v4.6.md` |
-| Reference-Based Motion Correction fails on GPUs in `EXCLUSIVE_PROCESS` mode | Pre-v4.4.1+240110 bug; fixed. | `reference/release_notes/markdown/v4.4.md` |
-| Worker processes slow / unstable on multi-GPU nodes with many simultaneous jobs | v4.6.2 changed workers to request *not always* transparent hugepages; the OS "always THP" setting also produces a job-log warning now. | `reference/release_notes/markdown/v4.6.md` |
-| 3D Flex Generator OOM on large datasets | v4.5.3+240807 fixed an OOM in 3D Flex Generator. | `reference/release_notes/markdown/v4.5.md` |
+| `cufftAllocFailed` / `cufftInternalError` during extraction | Pre-v4.1 Extract from Micrographs used excessive GPU memory. Update. | `public cryoSPARC release notes v4.1`, `16_tuning_recipes.md` |
+| Blank / faint 2D classes on multi-GPU | Pre-v4.2 multi-GPU 2D bug; v4.6 improves CPU requests for multi-GPU 2D classification. | `public cryoSPARC release notes v4.2`, public cryoSPARC release notes v4.6 |
+| Reference-Based Motion Correction fails on GPUs in `EXCLUSIVE_PROCESS` mode | Pre-v4.4.1+240110 bug; fixed. | `public cryoSPARC release notes v4.4` |
+| Worker processes slow / unstable on multi-GPU nodes with many simultaneous jobs | v4.6.2 changed workers to request *not always* transparent hugepages; the OS "always THP" setting also produces a job-log warning now. | `public cryoSPARC release notes v4.6` |
+| 3D Flex Generator OOM on large datasets | v4.5.3+240807 fixed an OOM in 3D Flex Generator. | `public cryoSPARC release notes v4.5` |
 
 ---
 
@@ -313,25 +313,25 @@ When a user says "it's slow," resist the urge to tune algorithms first. The actu
 | Layer | Symptoms | First checks |
 |---|---|---|
 | **GPU** | OOM, `cufft*` errors; long iterations on small datasets; can't fit box | Box vs VRAM table; batch size; `nvidia-smi`; multi-GPU compat for the version installed |
-| **CPU** | GPUs idle but queue is long; multi-GPU jobs underperform | CPU starvation — cryoSPARC needs enough CPU per GPU to feed work. `cryosparcm resources` for declared CPU slots; per-job CPU request; v4.6 improved CPU requests for multi-GPU 2D (`16_tuning_recipes.md`, `reference/release_notes/markdown/v4.6.md`) |
-| **RAM** | Job log warns about insufficient RAM; OS swaps; hostnode OOM-kills the process (cluster shows OOM-kill in scheduler log, master sees only heartbeat loss) | Job's declared `ram_gb`; lane RAM-slot accounting; OS / cgroup limits; transparent hugepages (`reference/release_notes/markdown/v4.6.md`) |
+| **CPU** | GPUs idle but queue is long; multi-GPU jobs underperform | CPU starvation — cryoSPARC needs enough CPU per GPU to feed work. `cryosparcm resources` for declared CPU slots; per-job CPU request; v4.6 improved CPU requests for multi-GPU 2D (`16_tuning_recipes.md`, `public cryoSPARC release notes v4.6`) |
+| **RAM** | Job log warns about insufficient RAM; OS swaps; hostnode OOM-kills the process (cluster shows OOM-kill in scheduler log, master sees only heartbeat loss) | Job's declared `ram_gb`; lane RAM-slot accounting; OS / cgroup limits; transparent hugepages (`public cryoSPARC release notes v4.6`) |
 | **Disk / network / SSD cache** | Extraction is slower than expected; "waiting for unlocked files"; cache messages; long initial cache copy then fast iterations | Cache hit/miss; project filesystem vs SSD; cluster NFS latency; **older instances** had cache reliability issues (see §9) |
 | **Box size / particle count** | Per-iteration time scales superlinearly when box grows; resolution near Nyquist | Box vs VRAM table; Downsample Particles; whether the question requires that box size |
 | **Algorithm choice** | Slow but *correct* output | Last resort — only after the above are clean. Then `16_tuning_recipes.md`. |
 
 ### Use the Benchmark job before claiming "slow"
 
-The **Benchmark** job (v4.3+) runs CPU, Filesystem, and GPU benchmarks in series on a worker lane and writes JSON + CSV results into the job directory. The benchmark data package (~17 GB) is auto-downloaded if missing (`docs/per_page/setup-configuration-and-management__software-system-guides__guide-performance-benchmarking-v4.3.md`).
+The **Benchmark** job (v4.3+) runs CPU, Filesystem, and GPU benchmarks in series on a worker lane and writes JSON + CSV results into the job directory. The benchmark data package (~17 GB) is auto-downloaded if missing (`official cryoSPARC documentation`).
 
 - Compare to the Structura reference results and to past runs of your own.
-- v4.4 added a `class3D-small` benchmark for minimum hardware (32GB DRAM, 11GB VRAM) — useful as a floor (`reference/release_notes/markdown/v4.4.md`).
+- v4.4 added a `class3D-small` benchmark for minimum hardware (32GB DRAM, 11GB VRAM) — useful as a floor (`public cryoSPARC release notes v4.4`).
 - **v5.0+ benchmarks are not backward compatible**: downgrade drops them. Do not mix v4 and v5 benchmark results in a single comparison.
 
 For end-to-end realism, the **Extensive Validation** job (formerly Extensive Workflow, v4.3+) exercises a full processing chain.
 
 ### Live throughput reference points
 
-For comparison when a Live session feels slow (`docs/per_page/live__performance-metrics.md`):
+For comparison when a Live session feels slow (`official cryoSPARC documentation`):
 
 - K3: 450+ exposures / hour / GPU (1,800+ on a 4-GPU machine).
 - K2 / Falcon: 650+ exposures / hour / GPU.
@@ -346,24 +346,24 @@ If a Live instance is well below these per-GPU numbers and storage I/O is health
 
 | Symptom | Likely layer | First check | Escalation / source |
 |---|---|---|---|
-| `non-zero exit status 255` on worker launch | SSH from master to worker — banner / MOTD / login-shell output | Run `ssh worker "true"` non-interactively as the cryoSPARC owner; inspect `cryosparcm log command_core` | Silence `.bashrc` / `.profile`; passwordless SSH; v5.0 fixed worker launch on `tcsh` and extra shell-startup output (`17_error_lookup.md`, `reference/release_notes/markdown/v5.0.md`) |
+| `non-zero exit status 255` on worker launch | SSH from master to worker — banner / MOTD / login-shell output | Run `ssh worker "true"` non-interactively as the cryoSPARC owner; inspect `cryosparcm log command_core` | Silence `.bashrc` / `.profile`; passwordless SSH; v5.0 fixed worker launch on `tcsh` and extra shell-startup output (`17_error_lookup.md`, `public cryoSPARC release notes v5.0`) |
 | `non-zero exit status 1` / `FAILED TO LAUNCH ON WORKER NODE return code 1` | Worker env / shell after SSH succeeded | `cryosparcm log command_core`; manually `eval $(cryosparcw env); bin/cryosparcw …` as cryoSPARC owner | `17_error_lookup.md` |
 | `Job must be queued on the master node` | Interactive job (Select 2D, Curate Exposures, interactive Volume Tools) queued to a non-master lane | Route to the master lane | `18_decision_trees.md` |
 | `pymongo … ServerSelectionTimeoutError`, `database: ERROR (spawn error)` | Master Mongo / supervisor | `cryosparcm status`; `cryosparcm log database`; `cryosparcm log supervisord` | `14_cli_admin.md` |
 | Job "stuck" on cluster with no traceback | SLURM/PBS OOM-kill — master only sees heartbeat loss | `squeue` / `qstat`; cluster job's `.out`/`.err`; node OOM-killer logs | `17_error_lookup.md` |
-| Job queued forever, workers idle in matched lane | Lane assignment / per-user lane access / resource slot mismatch | `cryosparcm resources`; user's lane list; required GPU / CPU / RAM vs declared | this page §4, `docs/per_page/setup-configuration-and-management__software-system-guides__guide-lane-assignments-and-restrictions.md` |
+| Job queued forever, workers idle in matched lane | Lane assignment / per-user lane access / resource slot mismatch | `cryosparcm resources`; user's lane list; required GPU / CPU / RAM vs declared | this page §4, `official cryoSPARC documentation` |
 | Job queued forever, workers visibly busy | Working as intended — queue ordering or no free slots | Priority; running-job ETAs; consider a different lane | this page §8 |
 | Lane visible to admin but not user | User not assigned to that lane (v4.1+) | `api.users.get_lanes(…)` / `get_user_lanes(…)` | this page §4 |
-| GPU not detected on worker | Driver / CUDA / `--gpus` mask | `cryosparcw info --gpu`; `nvidia-smi`; check `--gpus` argument when worker was connected | `docs/per_page/setup-configuration-and-management__management-and-monitoring-v5.0__cryosparcw-reference-v5.0.md` |
-| Wrong GPU used on cluster | `CUDA_VISIBLE_DEVICES` not set by cluster; cryoSPARC starts at device 0 | Inspect cluster GRES / cgroup setup | `docs/per_page/setup-configuration-and-management__how-to-download-install-and-configure__cryosparc-cluster-integration-script-examples.md` |
+| GPU not detected on worker | Driver / CUDA / `--gpus` mask | `cryosparcw info --gpu`; `nvidia-smi`; check `--gpus` argument when worker was connected | `official cryoSPARC documentation` |
+| Wrong GPU used on cluster | `CUDA_VISIBLE_DEVICES` not set by cluster; cryoSPARC starts at device 0 | Inspect cluster GRES / cgroup setup | `official cryoSPARC documentation` |
 | GPU OOM at large box | Box vs VRAM mismatch | Reduce batch size → Downsample → larger VRAM worker | this page §10 |
-| `cufftAllocFailed` / `cufftInternalError` (extraction) | Pre-v4.1 GPU memory issue | Update | `reference/release_notes/markdown/v4.1.md` |
-| Blank / faint 2D classes on multi-GPU | Pre-v4.2 multi-GPU bug; v4.6 CPU requests | Update | `reference/release_notes/markdown/v4.2.md`, `v4.6.md` |
+| `cufftAllocFailed` / `cufftInternalError` (extraction) | Pre-v4.1 GPU memory issue | Update | `public cryoSPARC release notes v4.1` |
+| Blank / faint 2D classes on multi-GPU | Pre-v4.2 multi-GPU bug; v4.6 CPU requests | Update | `public cryoSPARC release notes v4.2`, public cryoSPARC release notes v4.6 |
 | SSD cache hangs / "waiting for unlocked files" | Lock contention with another in-flight job (often legitimate) | Wait for holder; verify holding process; v4.4–v4.6 cache rewrites | this page §9 |
 | `cache does not have enough space … nothing to delete` | Non-cryoSPARC file occupying SSD, or another active job | Manually clean non-cryoSPARC content; wait if cryoSPARC owns the space | this page §9 |
-| "File not found" during caching on cluster filesystems | Pre-v4.6 NFS/cluster-FS cache bug | Update to v4.6+ | `reference/release_notes/markdown/v4.6.md` |
-| Master and worker see different paths for the same string | Namespace / mount / permission mismatch — not a cryoSPARC bug | Resolve the path from the worker shell as the cryoSPARC owner; `CRYOSPARC_CLI_SKIP_ACCESS_CHECK=true` on v5.0+ if reported UNIX permissions are misleading | `17_error_lookup.md`, `reference/release_notes/markdown/v5.0.md` |
-| Transparent hugepages warning in job log | OS set to "always" THP | v4.6.2 mitigation — worker now requests "not always THP"; OS warning is still surfaced | `reference/release_notes/markdown/v4.6.md` |
+| "File not found" during caching on cluster filesystems | Pre-v4.6 NFS/cluster-FS cache bug | Update to v4.6+ | `public cryoSPARC release notes v4.6` |
+| Master and worker see different paths for the same string | Namespace / mount / permission mismatch — not a cryoSPARC bug | Resolve the path from the worker shell as the cryoSPARC owner; `CRYOSPARC_CLI_SKIP_ACCESS_CHECK=true` on v5.0+ if reported UNIX permissions are misleading | `17_error_lookup.md`, `public cryoSPARC release notes v5.0` |
+| Transparent hugepages warning in job log | OS set to "always" THP | v4.6.2 mitigation — worker now requests "not always THP"; OS warning is still surfaced | `public cryoSPARC release notes v4.6` |
 
 ---
 
@@ -481,40 +481,6 @@ If a Live instance is well below these per-GPU numbers and storage I/O is health
 
 ---
 
-## Source basis
+## Sources consulted
 
-The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
-
-- `topic_plan.md`
-- `plan.md`
-- `13_cryosparc_tools_api.md`
-- `14_cli_admin.md`
-- `15_troubleshooting.md`
-- `16_tuning_recipes.md`
-- `18_decision_trees.md`
-- `17_error_lookup.md`
-- `docs/per_page/setup-configuration-and-management__hardware-and-system-requirements.md`
-- `docs/per_page/setup-configuration-and-management__software-system-guides__guide-lane-assignments-and-restrictions.md`
-- `docs/per_page/setup-configuration-and-management__software-system-guides__tutorial-priority-job-queuing.md`
-- `docs/per_page/setup-configuration-and-management__software-system-guides__tutorial-ssd-particle-caching-in-cryosparc.md`
-- `docs/per_page/setup-configuration-and-management__software-system-guides__guide-performance-benchmarking-v4.3.md`
-- `docs/per_page/setup-configuration-and-management__software-system-guides__guide-configuring-custom-variables-for-cluster-job-submission-scripts.md`
-- `docs/per_page/setup-configuration-and-management__how-to-download-install-and-configure__cryosparc-cluster-integration-script-examples.md`
-- `docs/per_page/setup-configuration-and-management__management-and-monitoring-v5.0__cryosparcm-reference-v5.0.md`
-- `docs/per_page/setup-configuration-and-management__management-and-monitoring-v5.0__cryosparcw-reference-v5.0.md`
-- `docs/per_page/guides-for-v3__user-interface-and-usage-guide__resource-manager.md`
-- `docs/per_page/guides-for-v3__user-interface-and-usage-guide__queue-job-inspect-job-and-other-job-actions.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__utilities__job-cache-particles-on-ssd.md`
-- `docs/per_page/processing-data__tutorials-and-case-studies__performance-metrics.md`
-- `docs/per_page/live__prerequisites-and-compute-resources-setup.md`
-- `docs/per_page/live__performance-metrics.md`
-- `reference/release_notes/markdown/v4.0.md`
-- `reference/release_notes/markdown/v4.1.md`
-- `reference/release_notes/markdown/v4.2.md`
-- `reference/release_notes/markdown/v4.3.md`
-- `reference/release_notes/markdown/v4.4.md`
-- `reference/release_notes/markdown/v4.5.md`
-- `reference/release_notes/markdown/v4.6.md`
-- `reference/release_notes/markdown/v5.0.md`
-- `docs/forum_threads/digests/forum_troubleshooting.md`
-- `docs/forum_threads/digests/forum_installation.md`
+This reference is original synthesized workflow guidance prepared from public cryoSPARC guide pages, public release notes, public forum reports, public tutorials/webinars, relevant papers, and public `cryosparc-tools` documentation/API material. Raw upstream documents, transcripts, forum posts, screenshots, and datasets are not bundled here. For authoritative and current details, consult the official cryoSPARC documentation, release notes, discussion forum, and upstream project documentation.

@@ -44,7 +44,7 @@ This is the part most easily skipped and most easily punishes you later.
 - **Re-centering.** If the ROI sits well off the box center, the search range and box-edge effects work against you. Re-center on the ROI (typically by recomputing particle origins so the ROI is in the middle of the new box) before extracting at the local-refinement box.
 - **Re-extract at a sensible box.** For a small ROI, a smaller, ROI-centered box reduces memory, lets you use a tighter search, and reduces the risk that off-mask density dominates alignment. For a large ROI inside a larger complex, you usually want to keep the full box so the surrounding density can still help anchor poses through subtraction.
 - **Match pixel size and box across inputs.** Particles, starting volume, and any mask you supply must agree on pixel size and box size. A mismatched mask is the single most common silent failure — cryoSPARC will run, the result will look almost right, and the alignment will be subtly wrong.
-- **Grid consistency for subtraction.** If you subtract density elsewhere in the box, the subtraction mask, the local-refinement mask, the starting volume, and the particles all need to live on the same grid. Masks generated in ChimeraX from a cropped selected region usually come out at the wrong box and must be **resampled onto the original grid** before they are usable (see `videos/notes/10_mask_creation_in_chimerax.notes.md`).
+- **Grid consistency for subtraction.** If you subtract density elsewhere in the box, the subtraction mask, the local-refinement mask, the starting volume, and the particles all need to live on the same grid. Masks generated in ChimeraX from a cropped selected region usually come out at the wrong box and must be **resampled onto the original grid** before they are usable (see `public cryoSPARC tutorial/webinar notes`).
 - **Do not re-bin partway through.** Changing pixel size mid-workflow between extraction, subtraction, and local refinement invalidates inherited shifts. If you must re-bin, redo the chain: re-extract, regenerate masks at the new grid, re-run subtraction, then local-refine.
 
 ## Masks and subtraction strategy
@@ -194,15 +194,6 @@ If a user asks "should I do local refinement here?":
 - `15_troubleshooting.md` — debugging mental model.
 - `17_error_lookup.md` — error-string lookup.
 
-## Source basis
+## Sources consulted
 
-The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
-
-- `videos/notes/05_fanac1_and_discrete_heterogeneity.notes.md`
-- `videos/notes/10_mask_creation_in_chimerax.notes.md`
-- `docs/forum_threads/digests/forum_3d-reconstruction.md`
-- `docs/forum_threads/digests/forum_3d-classification.md`
-- `docs/forum_threads/digests/forum_troubleshooting.md`
-- `reference/release_notes/markdown/v4.0.md`
-- `reference/release_notes/markdown/v4.5.md`
-- `reference/release_notes/markdown/v5.0.md`
+This reference is original synthesized workflow guidance prepared from public cryoSPARC guide pages, public release notes, public forum reports, public tutorials/webinars, relevant papers, and public `cryosparc-tools` documentation/API material. Raw upstream documents, transcripts, forum posts, screenshots, and datasets are not bundled here. For authoritative and current details, consult the official cryoSPARC documentation, release notes, discussion forum, and upstream project documentation.

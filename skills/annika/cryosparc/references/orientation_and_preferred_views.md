@@ -176,17 +176,6 @@ When advising on preferred orientation:
 6. Prefer upstream mitigation over postprocessing: repick, diversify templates, alter 2D strategy, rebalance, collect tilt, or change sample prep.
 7. Warn if the user is trying to fix anisotropy with sharpening, local filtering, or a tighter mask.
 
-## Source basis
+## Sources consulted
 
-The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
-
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__utilities__job-orientation-diagnostics.md`
-- `docs/per_page/processing-data__tutorials-and-case-studies__tutorial-orientation-diagnostics.md`
-- `docs/per_page/processing-data__tutorials-and-case-studies__case-study-picking-induced-orientation-bias-in-ha-trimer-empiar-10096-and-10097.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__particle-curation__job-rebalance-orientations.md`
-- `docs/per_page/processing-data__tutorials-and-case-studies__tutorial-common-cryosparc-plots.md`
-- `04_picking.md`
-- `05_extraction_2d.md`
-- `07_refinement.md`
-- `10_postprocessing.md`
-- `version_caveats.md`
+This reference is original synthesized workflow guidance prepared from public cryoSPARC guide pages, public release notes, public forum reports, public tutorials/webinars, relevant papers, and public `cryosparc-tools` documentation/API material. Raw upstream documents, transcripts, forum posts, screenshots, and datasets are not bundled here. For authoritative and current details, consult the official cryoSPARC documentation, release notes, discussion forum, and upstream project documentation.

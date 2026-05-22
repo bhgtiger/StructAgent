@@ -12,7 +12,7 @@ What lives elsewhere — do not duplicate:
 - Error-string lookup — `17_error_lookup.md`. Debugging mental model — `15_troubleshooting.md`. Decision-tree routing — `18_decision_trees.md`.
 - Live preprocessing/extraction streaming and session UI — `25_cryosparc_live.md`. This page owns Live *data on disk* (compaction, raw vs micrographs vs particles vs metadata cells, archived/active state, restoration).
 
-Version disclaimer: data-management GUI, cleanup-tool checkboxes, database utilities, and recovery utilities all evolved across v4.0 → v5.0. Where behavior differs the page calls out the version. When a precise command is needed the agent should always confirm against the version-matched reference (`docs/per_page/setup-configuration-and-management__management-and-monitoring-v5.0__cryosparcm-reference-v5.0.md`, or the `…__management-and-monitoring-4.7/…` equivalents) and `cryosparcm COMMAND --help` on the target instance, exactly as in `14_cli_admin.md`.
+Version disclaimer: data-management GUI, cleanup-tool checkboxes, database utilities, and recovery utilities all evolved across v4.0 → v5.0. Where behavior differs the page calls out the version. When a precise command is needed the agent should always confirm against the version-matched reference (`official cryoSPARC documentation`, or the `…__management-and-monitoring-4.7/…` equivalents) and `cryosparcm COMMAND --help` on the target instance, exactly as in `14_cli_admin.md`.
 
 ---
 
@@ -95,11 +95,11 @@ That formula governs both the project-directory footprint of an extraction and t
 - Default cache lifetime is **30 days** (since v3.3); tune via `CRYOSPARC_SSD_CACHE_LIFETIME_DAYS` in `cryosparc_master/config.sh`. Shorter for short-cycle facilities; longer for long-running projects.
 - Multi-threaded copy is on by default (v4.3.0+), 2 threads; tune via `CRYOSPARC_CACHE_NUM_THREADS` (set `=1` to disable multithreading).
 - **The cache holds the *entire referenced stack*, not the subset you selected.** If 2D Selection picked 30% of a 1.5 TB stack, the cache will still request the full 1.5 TB unless you **Downsample Particles** or **Restack Particles** to materialize a subset (`…tutorial-ssd-particle-caching-in-cryosparc.md` §Consolidating a Particle Stack, `…guide-data-cleanup-v4.3.md` §Restack particles).
-- Cluster filesystems: from v4.6.2 the cache system retries on transient failures and produces additional diagnostics; from v4.2.1+230427 it computes free space correctly to avoid the infinite-cache-hang regression (`reference/release_notes/markdown/v4.6.md`, `reference/release_notes/markdown/v4.2.md`).
+- Cluster filesystems: from v4.6.2 the cache system retries on transient failures and produces additional diagnostics; from v4.2.1+230427 it computes free space correctly to avoid the infinite-cache-hang regression (`public cryoSPARC release notes v4.6`, `public cryoSPARC release notes v4.2`).
 
 ### 3.4 Live session footprint
 
-Live sessions carry their own per-session subdirectory inside the project directory, holding five distinguishable data categories that the data-management UI tracks separately (`…cryosparc-live-session-data-management-4.7.md`, `docs/per_page/application-guide__managing-data.md`):
+Live sessions carry their own per-session subdirectory inside the project directory, holding five distinguishable data categories that the data-management UI tracks separately (`…cryosparc-live-session-data-management-4.7.md`, `official cryoSPARC documentation`):
 
 - Raw imported data (symlinks — not deletable from CryoSPARC; "Available for all categories except for *raw data*")
 - Motion-corrected micrographs
@@ -107,7 +107,7 @@ Live sessions carry their own per-session subdirectory inside the project direct
 - Extracted particles
 - Session metadata (DB-side)
 
-Per-session sizes are **out of date by default** in the management table — refresh via the Actions column before reasoning about them (`docs/per_page/application-guide__managing-data.md`).
+Per-session sizes are **out of date by default** in the management table — refresh via the Actions column before reasoning about them (`official cryoSPARC documentation`).
 
 ### 3.5 Database growth
 
@@ -120,9 +120,9 @@ The MongoDB database grows roughly with:
 
 Notable knobs that affect DB growth:
 
-- v4.2.1 added a **project-level toggle** for whether jobs save intermediate results at all (default on; turning it off saves disk without needing post-hoc cleanup) (`reference/release_notes/markdown/v4.2.md`, `…guide-data-management-in-cryosparc-v4.0.md` §4).
+- v4.2.1 added a **project-level toggle** for whether jobs save intermediate results at all (default on; turning it off saves disk without needing post-hoc cleanup) (`public cryoSPARC release notes v4.2`, `…guide-data-management-in-cryosparc-v4.0.md` §4).
 - v4.3 default: automatic deletion of intermediate results is **enabled** for new jobs in all projects (`…guide-data-cleanup-v4.3.md`).
-- v4.4.1 Live reduced per-micrograph DB plot footprint by ~10% (`reference/release_notes/markdown/v4.4.md`).
+- v4.4.1 Live reduced per-micrograph DB plot footprint by ~10% (`public cryoSPARC release notes v4.4`).
 - v4.4.1 turned on **MongoDB journaling** by default — increases durability, slightly increases disk use.
 
 ### 3.6 Backups and exports
@@ -131,7 +131,7 @@ Two artifacts every running instance produces on its own, both of which the agen
 
 | Artifact | Purpose | Cadence |
 |---|---|---|
-| `cryosparc_master/run/cryosparc_instance_config_*.tar` | Snapshot of lanes, targets, users, project attachments, sched config — required input to `cryosparcm recover` (v5.0+) | Hourly by default (`CRYOSPARC_AUTO_EXPORT_INSTANCE_CONFIG_INTERVAL_HOURS = 1`, `…environment-variables-v5.0.md`). v5.0.5 also packages Live session profiles in this snapshot (`reference/release_notes/markdown/v5.0.md`). |
+| `cryosparc_master/run/cryosparc_instance_config_*.tar` | Snapshot of lanes, targets, users, project attachments, sched config — required input to `cryosparcm recover` (v5.0+) | Hourly by default (`CRYOSPARC_AUTO_EXPORT_INSTANCE_CONFIG_INTERVAL_HOURS = 1`, `…environment-variables-v5.0.md`). v5.0.5 also packages Live session profiles in this snapshot (`public cryoSPARC release notes v5.0`). |
 | `cryosparcm backup` output | Full MongoDB dump for `cryosparcm restore` | On demand. Required before every update, `compact`, restore, or migration; explicitly recommended in `…guide-updating-to-cryosparc-v4.md`, `…guide-reduce-database-size-v4.3.md`, `…tutorial-migrating-your-cryosparc-instance.md`. |
 
 Both must be **copied off the master host** for the disaster cases they exist for. A local-only backup against database corruption is the most common false-safety pattern.
@@ -152,23 +152,23 @@ Cleanup in CryoSPARC is multi-layered and the layers are not interchangeable. Ch
 | **Clear non-final jobs** (Cleanup Data tool) | Every job in scope not marked **final** and not an ancestor of a final job | Final jobs and their ancestors (with v5.0+ exception for the "Include final ancestor jobs" toggle) | `…guide-data-cleanup-v4.3.md` §Clear non-final results |
 | **Clear pre-processing jobs** (Cleanup Data tool) | Deterministic preprocessing outputs (motion, CTF, extraction) that can be re-run; restack particles **not cleared** by default | DB metadata; downstream particles if you restacked them first | `…guide-data-cleanup-v4.3.md` §Clear preprocessing jobs |
 | **Clear killed / failed jobs** | Partial outputs from non-completed runs | DB metadata; can be re-run | `…guide-data-cleanup-v4.3.md` |
-| **Restack Particles** | Nothing on its own | *Adds* a new, dense particle stack containing only your kept subset, so subsequent Clear of upstream extraction is safe | `…guide-data-cleanup-v4.3.md` §Restack particles; v4.1.2 added the job (`reference/release_notes/markdown/v4.1.md`) |
+| **Restack Particles** | Nothing on its own | *Adds* a new, dense particle stack containing only your kept subset, so subsequent Clear of upstream extraction is safe | `…guide-data-cleanup-v4.3.md` §Restack particles; v4.1.2 added the job (`public cryoSPARC release notes v4.1`) |
 | **Compact Live Session** (v4.3+) | Motion-corrected micrographs and extracted particles for the session | Saved particle locations and parameters needed to *restore* the session later | `…guide-data-cleanup-v4.3.md` §Compacting a Live session |
 | **Restore Live Session** | Re-runs preprocessing/extraction to recreate compacted data | — | same |
 | **SSD cache cleanup** (manual / automatic) | Cached copies of particle files on the worker SSD; safe to delete any time | The originals in the project directory (which are the source) | `…tutorial-ssd-particle-caching-in-cryosparc.md` FAQ |
 | **Detach Project** | Removes lock file; project disappears from active UI lists | All project data on disk; can be attached anywhere | `…guide-data-management-in-cryosparc-v4.0.md` §Detach |
 | **Archive Project** | Marks project read-only in the UI; nothing on disk | Lock file still in place; project visible but immutable | same §Archive |
-| **Delete Project** (GUI) | **Erases the entire project directory from disk** *and* removes it from the DB | Nothing project-related | `docs/per_page/application-guide__managing-data.md` warning hint |
-| **Delete Project from Database** (v4.1.2+, on already-detached projects) | DB-side records remaining after detach | Project directory on disk untouched | `reference/release_notes/markdown/v4.1.md`, `…guide-data-management-in-cryosparc-v4.0.md` §Detach |
+| **Delete Project** (GUI) | **Erases the entire project directory from disk** *and* removes it from the DB | Nothing project-related | `official cryoSPARC documentation` warning hint |
+| **Delete Project from Database** (v4.1.2+, on already-detached projects) | DB-side records remaining after detach | Project directory on disk untouched | `public cryoSPARC release notes v4.1`, `…guide-data-management-in-cryosparc-v4.0.md` §Detach |
 | **`cryosparcm compact`** | Defragments MongoDB collection files | All data — but **not guaranteed to actually shrink files** | `…guide-reduce-database-size-v4.3.md` Option 1 |
 | **`cryosparcm backup` → `cryosparcm restore`** to a fresh DB directory | Re-writes the DB from a dump; usually shrinks to the dump's size | All data | `…guide-reduce-database-size-v4.3.md` Option 2 |
-| **`delete_output_result_files(...)`** (v5.0+ CLI) | One specific output-result group within a job (e.g. `micrographs_non_dw`) | Other outputs in the same job | `reference/release_notes/markdown/v5.0.md` |
+| **`delete_output_result_files(...)`** (v5.0+ CLI) | One specific output-result group within a job (e.g. `micrographs_non_dw`) | Other outputs in the same job | `public cryoSPARC release notes v5.0` |
 
 ### 4.2 "Final" marking is your safety net
 
 The Cleanup Data tool only protects jobs that have been explicitly marked as **final** (and their ancestors). Forgetting to mark before bulk cleanup is the canonical destructive mistake (`…guide-data-cleanup-v4.3.md` §Clear non-final results: "It is best to mark important jobs as final before performing data cleanup actions"). Linked jobs across workspaces are particularly easy to lose — a job that is **also** in another workspace is still treated as part of the workspace you are cleaning, and will be cleared there (`…guide-data-cleanup-v4.3.md`).
 
-In v5.0+ the **"Include final ancestor jobs"** toggle further controls whether preprocessing jobs that are ancestors of finals get cleared by preprocessing-clear actions — a knob that lets the agent reclaim significant additional space *only when* the raw data is still around to regenerate them (`…guide-data-cleanup-v4.3.md` §1, `reference/release_notes/markdown/v5.0.md`).
+In v5.0+ the **"Include final ancestor jobs"** toggle further controls whether preprocessing jobs that are ancestors of finals get cleared by preprocessing-clear actions — a knob that lets the agent reclaim significant additional space *only when* the raw data is still around to regenerate them (`…guide-data-cleanup-v4.3.md` §1, `public cryoSPARC release notes v5.0`).
 
 ### 4.3 Determinism caveat — what you can safely Clear and re-run
 
@@ -185,8 +185,8 @@ The cache is a separate layer with its own failure modes and its own safety rule
 - **File-locking under concurrent jobs**: `cache waiting for requested files to become unlocked` is a *normal* transient — one job is copying, another is waiting on the same files; the waiter unblocks when the first finishes (same source).
 - **Cache files are addressed by path + size + modtime**, so pre-caching via symlinks works — the cache will skip the copy if a file already exists at the expected path (`…tutorial-ssd-particle-caching-in-cryosparc.md` FAQ).
 - **Manual cache deletion is safe** at any time — cache files are read-only mirrors. But manual deletion is rarely the right answer; let LRU + lifetime handle it unless the SSD is shared with other workloads.
-- v4.6.2 added robustness for cluster filesystems and improved diagnostics; `File not found` errors during caching on cluster FS should no longer occur (`reference/release_notes/markdown/v4.6.md`).
-- **`Cache Particles on SSD` (Utility job)** is a stand-alone job that fronts the cache copy so the GPU isn't held by the next job during the copy (`docs/per_page/processing-data__all-job-types-in-cryosparc__utilities__job-cache-particles-on-ssd.md`). Useful when the user complains "my Refinement was on the GPU for an hour but didn't start" — the GPU was held during cache copy.
+- v4.6.2 added robustness for cluster filesystems and improved diagnostics; `File not found` errors during caching on cluster FS should no longer occur (`public cryoSPARC release notes v4.6`).
+- **`Cache Particles on SSD` (Utility job)** is a stand-alone job that fronts the cache copy so the GPU isn't held by the next job during the copy (`official cryoSPARC documentation`). Useful when the user complains "my Refinement was on the GPU for an hour but didn't start" — the GPU was held during cache copy.
 
 ---
 
@@ -205,7 +205,7 @@ This is the most reliably misunderstood surface in CryoSPARC operations. The act
 
 Rules that go with these actions (`…guide-data-management-in-cryosparc-v4.0.md`, `…application-guide__projects-workspaces-and-live-sessions.md`):
 
-- **Never `rm -rf` a project directory that is attached.** Both `docs/per_page/application-guide__managing-data.md` and `…guide-data-management-in-cryosparc-v4.0.md` open with this warning. Always *Detach* or *Delete Project* first.
+- **Never `rm -rf` a project directory that is attached.** Both `official cryoSPARC documentation` and `…guide-data-management-in-cryosparc-v4.0.md` open with this warning. Always *Detach* or *Delete Project* first.
 - **Never modify a project directory outside CryoSPARC** while archived. Unarchiving a modified directory leads to DB/disk inconsistency and "can lead to CryoSPARC malfunction and data loss" (`…guide-data-management-in-cryosparc-v4.0.md` §Archive).
 - **A project can only be attached to one instance at a time.** The lock file enforces this. The recovery flow (§7.3) is the only sanctioned way to bypass it.
 - **Use `tar -cv` (no `-h`)** when consolidating a project directory. `-h` dereferences symlinks and explodes the tar to include all raw movies plus duplicates of internal symlinks (`…guide-data-management-in-cryosparc-v4.0.md` §7).
@@ -222,11 +222,11 @@ The v4.0 directory-naming change is worth flagging: project directories are name
 
 ### 7.1 Export & download (single-job, single-output, single-project)
 
-In current versions (`docs/per_page/application-guide__downloading-and-exporting-data.md`):
+In current versions (`official cryoSPARC documentation`):
 
 - **CSV of projects / workspaces / sessions / jobs**: footer button in browse views; respects filters; v5.0+ supports info-tag inclusion and selection-only.
-- **Job outputs**: any output group or individual `.cs` / `.map` / volume can be downloaded from the Outputs tab, including per-iteration variants (`docs/per_page/application-guide__inspecting-job-data.md`).
-- **Event log PDF / Job Error Report**: per-job, GUI-button. Job Error Report is the canonical "ship this for debugging" artifact — it bundles event log + job log + browser + last week of system logs (`docs/per_page/application-guide__downloading-and-exporting-data.md`, `14_cli_admin.md` §3.9).
+- **Job outputs**: any output group or individual `.cs` / `.map` / volume can be downloaded from the Outputs tab, including per-iteration variants (`official cryoSPARC documentation`).
+- **Event log PDF / Job Error Report**: per-job, GUI-button. Job Error Report is the canonical "ship this for debugging" artifact — it bundles event log + job log + browser + last week of system logs (`official cryoSPARC documentation`, `14_cli_admin.md` §3.9).
 - **Exporting individual jobs / output groups** for sharing or re-import: unchanged behavior since v2.11+ (`…guide-data-management-in-cryosparc-v4.0.md` §5–§6; legacy detail in `…guides-for-v3__tutorial-data-management-in-cryosparc.md`).
 - **Exporting an entire project**: in v4.0+ this is the *detach + copy* flow above. Continuous export means the on-disk project directory is always a valid, self-contained, attachable copy.
 
@@ -261,7 +261,7 @@ All of these benefit from `cryosparcm backup` *before* anything else.
 
 If the project directories are intact and a recent `cryosparc_master/run/cryosparc_instance_config_*.tar` is available, full recovery is one command (`…guide-instance-recovery-v5.0.md`):
 
-1. `cryosparcm stop`; confirm no orphan `supervisord` / `mongod` (`docs/per_page/setup-configuration-and-management__troubleshooting.md` "Incomplete CryoSPARC shutdown").
+1. `cryosparcm stop`; confirm no orphan `supervisord` / `mongod` (`official cryoSPARC documentation` "Incomplete CryoSPARC shutdown").
 2. **Copy the latest `cryosparc_instance_config_*.tar` to a path outside the master install** before doing anything else to that install.
 3. Make a fresh empty directory for the new DB; update `CRYOSPARC_DB_PATH` in `cryosparc_master/config.sh`.
 4. `cryosparcm start` (will come up empty).
@@ -306,7 +306,7 @@ Capture the symptom precisely before acting.
 1. **Identify which volume is full** — DB volume vs project storage vs SSD vs raw. `df` on each. If multiple volumes share a filesystem, identify the largest contributor with directory-level sizing (the GUI's Project Data table also surfaces project sizes once refreshed).
 2. **If the master is down because `CRYOSPARC_DB_MIN_SPACE_GB` tripped**: free space on the DB volume *first*. The master refuses to start otherwise (`14_cli_admin.md`).
 3. **If projects are the cause**:
-   - Refresh project sizes in the Project Data table (`docs/per_page/application-guide__managing-data.md`).
+   - Refresh project sizes in the Project Data table (`official cryoSPARC documentation`).
    - Mark finals across the project; preview Cleanup Data; clear intermediate results / non-final jobs at *workspace* scope to start.
    - If that is not enough, restack-and-clear: Restack Particles on the kept subset, then clear extraction.
    - If still not enough, compact all completed Live sessions.
@@ -386,7 +386,7 @@ Three messages, three different actions (`…tutorial-ssd-particle-caching-in-cr
 | `cache waiting for requested files to become unlocked` | Another job is mid-copy of the same files | Wait; second job unblocks when first finishes copy. Normal. |
 | `cache does not have enough space for download... but there are no files that can be deleted` | A non-CryoSPARC application is holding the SSD | Confirm with `du`/`ls` on `ssd_path`; have the user free the space or move CryoSPARC to a different SSD |
 | `cache requires NNN MB more on the SSD for files to be downloaded` (sizes look too large for your selection) | Cache is requesting the entire upstream stack, not your selected subset | Consolidate the stack — Downsample Particles or Restack Particles |
-| `File not found` during caching on cluster FS | Pre-v4.6.2 cache fragility on cluster FS | Update to v4.6.2+ (`reference/release_notes/markdown/v4.6.md`) |
+| `File not found` during caching on cluster FS | Pre-v4.6.2 cache fragility on cluster FS | Update to v4.6.2+ (`public cryoSPARC release notes v4.6`) |
 
 If a worker shows persistent SSD problems, also confirm: `--ssdpath` points to a real local SSD; `--ssdquota` / `--ssdreserve` are sane; `nvidia-smi` and `df -h` agree on what storage is available; `CRYOSPARC_SSD_PATH` env var is set correctly if the dynamic-path mechanism is in use.
 
@@ -398,7 +398,7 @@ If a worker shows persistent SSD problems, also confirm: `--ssdpath` points to a
 |---|---|---|---|
 | Master refuses to start, "DB free space" error | DB volume | `df` the volume holding `CRYOSPARC_DB_PATH`; default floor is `CRYOSPARC_DB_MIN_SPACE_GB = 5` | `14_cli_admin.md`; `…environment-variables-v5.0.md` |
 | Master starts but UI is slow / DB-on-disk huge | DB | Compare DB dir size to a fresh `cryosparcm backup` size | `…guide-reduce-database-size-v4.3.md` |
-| Project disk usage growing without obvious cause | Project tree (intermediates) | Project-level *Generate Intermediate Results* toggle; per-job intermediate clearing; v4.3+ default is on for new jobs | `…guide-data-management-in-cryosparc-v4.0.md` §4, `reference/release_notes/markdown/v4.2.md` |
+| Project disk usage growing without obvious cause | Project tree (intermediates) | Project-level *Generate Intermediate Results* toggle; per-job intermediate clearing; v4.3+ default is on for new jobs | `…guide-data-management-in-cryosparc-v4.0.md` §4, `public cryoSPARC release notes v4.2` |
 | Job fails with "file not found" on rerun after a move | Raw data symlinks | `ls -l` the job's `imported/`; broken symlinks are visible immediately | `…tutorial-migrating-your-cryosparc-instance.md` §A |
 | Job sits in queue with "SSD cache: waiting for unlocked" | Cache (cooperating with scheduler) | Normal — wait. Confirm another job on same worker is copying same particles | `…tutorial-ssd-particle-caching-in-cryosparc.md` |
 | Cache request sizes much larger than dataset size | Cache (still seeing whole upstream stack) | Confirm with the Inspect Picks / Select 2D filter step; consolidate via Downsample / Restack | same |
@@ -407,13 +407,13 @@ If a worker shows persistent SSD problems, also confirm: `--ssdpath` points to a
 | Cannot attach a project — "already locked to another instance" | Lifecycle | Another instance still owns the `cs.lock`; either detach there, or run the *rescue from inoperable instance* flow | `…guide-data-management-in-cryosparc-v4.0.md`; recovery output in `…guide-instance-recovery-v5.0.md` |
 | `cryosparcm recover` skipped projects with "Could not access project document" | Recovery — project directory missing or has no `project.json` | Verify the project directory is mounted at the original path before re-running | `…guide-instance-recovery-v5.0.md` |
 | `cryosparcm recover` saved an archived project as "detached" | Recovery — expected behavior in v5.0+ | Re-attach the original project directory after recovery to restore processing metadata | same |
-| Live session shows "Stale" or "out of date" sizes | Live data management | Refresh project / session stats from the Actions column | `docs/per_page/application-guide__managing-data.md` |
+| Live session shows "Stale" or "out of date" sizes | Live data management | Refresh project / session stats from the Actions column | `official cryoSPARC documentation` |
 | `TIFFReadDirectory ... Input/output error` on Live worker | Raw data filesystem, not CryoSPARC | Worker `dmesg`, `mount`; sshfs/NFS flakiness | `17_error_lookup.md` |
 | Multi-user can read but cannot modify each other's exports | Filesystem permissions | Shared `cryosparc` group + group-write on the relevant directories | `…unix-permissions-and-data-access-control.md` |
 | User reports "I deleted the cache and now jobs are slow" | Cache (intentional purge) | Normal — cache re-warms on next run; no data loss | `…tutorial-ssd-particle-caching-in-cryosparc.md` FAQ |
 | User reports "I deleted intermediate results and downstream re-run fails" | Intermediate-results semantics | Final-iteration data should be kept by *Clear Intermediate Results*; if downstream depended on an *intermediate* iteration explicitly, that path was always fragile | `…guide-data-cleanup-v4.3.md` |
-| User reports "I `rm -rf`'d a project and now the GUI is broken" | Wrong cleanup primitive | The GUI assumed the directory existed (continuous export); detach if still possible, otherwise *Delete Project from Database* on the detached stub (v4.1.2+) | `docs/per_page/application-guide__managing-data.md` warning |
-| Repeated Reference-Based Motion Correction + refinement appears to mix half-sets | Workflow bug fixed in version | v4.5.3 changed refinement defaults to inherit half-set split from input particles | `reference/release_notes/markdown/v4.5.md` |
+| User reports "I `rm -rf`'d a project and now the GUI is broken" | Wrong cleanup primitive | The GUI assumed the directory existed (continuous export); detach if still possible, otherwise *Delete Project from Database* on the detached stub (v4.1.2+) | `official cryoSPARC documentation` warning |
+| Repeated Reference-Based Motion Correction + refinement appears to mix half-sets | Workflow bug fixed in version | v4.5.3 changed refinement defaults to inherit half-set split from input particles | `public cryoSPARC release notes v4.5` |
 
 ---
 
@@ -460,42 +460,6 @@ Red flags — stop the user before they continue:
 
 ---
 
-## Source basis
+## Sources consulted
 
-The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
-
-- `topic_plan.md`
-- `plan.md`
-- `13_cryosparc_tools_api.md`
-- `14_cli_admin.md`
-- `15_troubleshooting.md`
-- `16_tuning_recipes.md`
-- `18_decision_trees.md`
-- `21_gpu_lane_queue.md`
-- `17_error_lookup.md`
-- `reference/release_notes/markdown/v4.0.md`
-- `reference/release_notes/markdown/v4.1.md`
-- `reference/release_notes/markdown/v4.2.md`
-- `reference/release_notes/markdown/v4.3.md`
-- `reference/release_notes/markdown/v4.4.md`
-- `reference/release_notes/markdown/v4.5.md`
-- `reference/release_notes/markdown/v4.6.md`
-- `reference/release_notes/markdown/v5.0.md`
-- `docs/per_page/application-guide__downloading-and-exporting-data.md`
-- `docs/per_page/application-guide__inspecting-job-data.md`
-- `docs/per_page/application-guide__managing-data.md`
-- `docs/per_page/application-guide__projects-workspaces-and-live-sessions.md`
-- `docs/per_page/guides-for-v3__tutorial-data-management-in-cryosparc.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__utilities__job-cache-particles-on-ssd.md`
-- `docs/per_page/setup-configuration-and-management__management-and-monitoring-v5.0__cryosparcm-reference-v5.0.md`
-- `docs/per_page/setup-configuration-and-management__software-system-guides__cryosparc-live-session-data-management-4.7.md`
-- `docs/per_page/setup-configuration-and-management__software-system-guides__guide-data-cleanup-v4.3.md`
-- `docs/per_page/setup-configuration-and-management__software-system-guides__guide-data-management-in-cryosparc-v4.0.md`
-- `docs/per_page/setup-configuration-and-management__software-system-guides__guide-instance-recovery-v5.0.md`
-- `docs/per_page/setup-configuration-and-management__software-system-guides__guide-reduce-database-size-v4.3.md`
-- `docs/per_page/setup-configuration-and-management__software-system-guides__tutorial-migrating-your-cryosparc-instance.md`
-- `docs/per_page/setup-configuration-and-management__software-system-guides__tutorial-ssd-particle-caching-in-cryosparc.md`
-- `docs/per_page/setup-configuration-and-management__software-system-guides__unix-permissions-and-data-access-control.md`
-- `docs/per_page/setup-configuration-and-management__troubleshooting.md`
-- `docs/forum_threads/digests/forum_troubleshooting.md`
-- `docs/forum_threads/digests/forum_installation.md`
+This reference is original synthesized workflow guidance prepared from public cryoSPARC guide pages, public release notes, public forum reports, public tutorials/webinars, relevant papers, and public `cryosparc-tools` documentation/API material. Raw upstream documents, transcripts, forum posts, screenshots, and datasets are not bundled here. For authoritative and current details, consult the official cryoSPARC documentation, release notes, discussion forum, and upstream project documentation.

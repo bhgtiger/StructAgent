@@ -71,7 +71,7 @@ Advisor-side routing trees for the most common "what next?" questions in cryoSPA
 - Crop more aggressively at extraction for early speed; re-extract full-size before resolution approaches cropped Nyquist.
 - Use Restack Particles after heavy curation; reclaim disk and speed up caching.
 
-**Cross-links:** `04_picking.md`, `05_extraction_2d.md`, `videos/notes/02_trpv1_and_a_standard_workflow.notes.md`.
+**Cross-links:** `04_picking.md`, `05_extraction_2d.md`, `public cryoSPARC tutorial/webinar notes`.
 
 ---
 
@@ -194,7 +194,7 @@ Advisor-side routing trees for the most common "what next?" questions in cryoSPA
 - Preserve `alignments3D/split` through Refinement → RBMC → Refinement → Classification loops.
 - Per-class FSC and class-specific reconstructed volumes (not weighted blends) are the right diagnostics.
 
-**Cross-links:** `08_classification_3d.md`, `26_continuous_heterogeneity.md`, `07_refinement.md`, `videos/notes/05_fanac1_and_discrete_heterogeneity.notes.md`, `videos/notes/06_fanac1_and_continuous_heterogeneity.notes.md`.
+**Cross-links:** `08_classification_3d.md`, `26_continuous_heterogeneity.md`, `07_refinement.md`, `public cryoSPARC tutorial/webinar notes`, `public cryoSPARC tutorial/webinar notes`.
 
 ---
 
@@ -361,27 +361,6 @@ Advisor-side routing trees for the most common "what next?" questions in cryoSPA
 
 ---
 
-## Source basis
+## Sources consulted
 
-The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
-
-- `topic_plan.md`
-- `17_error_lookup.md`
-- `02_import.md`
-- `03_preprocessing.md`
-- `04_picking.md`
-- `05_extraction_2d.md`
-- `06_abinitio.md`
-- `07_refinement.md`
-- `08_classification_3d.md`
-- `09_local_refinement.md`
-- `10_postprocessing.md`
-- `15_troubleshooting.md`
-- `16_tuning_recipes.md`
-- `19_symmetry.md`
-- `20_masks.md`
-- `25_cryosparc_live.md`
-- `26_continuous_heterogeneity.md`
-- `videos/notes/02_trpv1_and_a_standard_workflow.notes.md`
-- `videos/notes/05_fanac1_and_discrete_heterogeneity.notes.md`
-- `videos/notes/06_fanac1_and_continuous_heterogeneity.notes.md`
+This reference is original synthesized workflow guidance prepared from public cryoSPARC guide pages, public release notes, public forum reports, public tutorials/webinars, relevant papers, and public `cryosparc-tools` documentation/API material. Raw upstream documents, transcripts, forum posts, screenshots, and datasets are not bundled here. For authoritative and current details, consult the official cryoSPARC documentation, release notes, discussion forum, and upstream project documentation.

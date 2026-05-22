@@ -224,30 +224,6 @@ If a user asks "the refinement finished — what now?":
 - `orientation_and_preferred_views.md` — diagnosing preferred orientation and angular coverage.
 - `version_caveats.md` — version-specific behavior changes that matter for postprocessing.
 
-## Source basis
+## Sources consulted
 
-The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
-
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__post-processing.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__post-processing__job-sharpening-tools.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__post-processing__job-validation-fsc.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__post-processing__job-local-resolution-estimation.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__post-processing__job-local-filtering.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__post-processing__job-reslog-analysis.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__post-processing__job-deepemhancer-wrapper.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__post-processing__job-threedfsc-wrapper-legacy.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__utilities__job-orientation-diagnostics.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__3d-refinement__job-homogeneous-refinement.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__3d-refinement__job-non-uniform-refinement-new.md`
-- `docs/per_page/processing-data__tutorials-and-case-studies__tutorial-dynamic-masking-in-refinements-v5.0.md`
-- `docs/per_page/processing-data__tutorials-and-case-studies__tutorial-orientation-diagnostics.md`
-- `docs/per_page/processing-data__tutorials-and-case-studies__tutorial-common-cryosparc-plots.md`
-- `docs/forum_threads/digests/forum_features-and-functionality.md`
-- `docs/forum_threads/digests/forum_3d-reconstruction.md`
-- `docs/forum_threads/digests/forum_3d-classification.md`
-- `docs/forum_threads/digests/forum_particle-curation.md`
-- `docs/forum_threads/digests/forum_cryo-em-data-processing.md`
-- `reference/release_notes/markdown/v4.4.md`
-- `reference/release_notes/markdown/v4.5.md`
-- `reference/release_notes/markdown/v4.6.md`
-- `reference/release_notes/markdown/v5.0.md`
+This reference is original synthesized workflow guidance prepared from public cryoSPARC guide pages, public release notes, public forum reports, public tutorials/webinars, relevant papers, and public `cryosparc-tools` documentation/API material. Raw upstream documents, transcripts, forum posts, screenshots, and datasets are not bundled here. For authoritative and current details, consult the official cryoSPARC documentation, release notes, discussion forum, and upstream project documentation.
