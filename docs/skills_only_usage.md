@@ -22,8 +22,6 @@ Restart or rescan your agent so it indexes the skills.
 
 - `skills/annika/cryosparc`
 
-Worked example: [`docs/cryosparc_skill_example/`](cryosparc_skill_example/) shows a Claude/Codex-style implementation and how to adapt the same skill package to another agent runtime.
-
 ### Cryo-EM model building / refinement
 
 - `skills/annika/cryosparc` — upstream SPA processing/reconstruction guidance when cryoSPARC is involved
