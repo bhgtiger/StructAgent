@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>cryoSPARC Agent Skill — Consult Workflows, Inspect Results, Launch Jobs</title>
+<meta name="description" content="A StructAgent cryoSPARC agent skill for Claude, Codex, and other tool-using agents: consult on workflows, inspect job results, and launch jobs against a live instance with explicit confirmation." />
+<style>
+  :root {
+    --bg:#0d1117; --panel:#161b22; --code:#1c2128; --border:#30363d;
+    --text:#e6edf3; --muted:#9da7b3; --faint:#6e7681;
+    --accent:#58a6ff; --good:#7ee787; --warn:#f0883e; --bad:#ff7b72;
+    --purple:#d2a8ff; --orange:#ffa657;
+  }
+  @media (prefers-color-scheme: light) {
+    :root { --bg:#fff; --panel:#f6f8fa; --code:#f6f8fa; --border:#d0d7de;
+      --text:#1f2328; --muted:#4b5563; --faint:#6e7681; --accent:#0969da;
+      --good:#1a7f37; --warn:#9a6700; --bad:#cf222e; --purple:#6639ba; --orange:#bc4c00; }
+  }
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font:16px/1.62 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+  .page{max-width:1180px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:230px 1fr;gap:46px}
+  header{grid-column:1/-1;padding:56px 0 26px;border-bottom:1px solid var(--border);margin-bottom:38px}
+  .eyebrow{color:var(--accent);font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
+  h1{font-size:38px;line-height:1.15;margin:0 0 16px;letter-spacing:-.02em} .lede{font-size:18px;max-width:840px;color:var(--muted);margin:0}
+  .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}.meta span{font-size:13px;color:var(--faint);padding:4px 10px;background:var(--panel);border:1px solid var(--border);border-radius:999px}
+  nav{position:sticky;top:24px;align-self:start;max-height:calc(100vh - 48px);overflow:auto;font-size:14px}.toc-label{color:var(--faint);font-size:12px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
+  nav ol{list-style:none;margin:0;padding:0;counter-reset:s}nav li{counter-increment:s;margin-bottom:10px}nav a{display:block;color:var(--muted);text-decoration:none;padding-left:8px;border-left:2px solid transparent;line-height:1.35}nav a:before{content:counter(s) ". ";color:var(--faint)}nav a:hover{color:var(--accent);border-left-color:var(--accent)}
+  main{min-width:0;padding-bottom:80px} h2{margin:54px 0 16px;padding-bottom:8px;border-bottom:1px solid var(--border);font-size:26px;letter-spacing:-.01em}h3{margin:30px 0 12px;font-size:18px}h4{margin:0 0 8px;font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}p{margin:0 0 14px}a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  code{font:13px/1.45 ui-monospace,"SF Mono",Menlo,Consolas,monospace;background:var(--code);border:1px solid var(--border);border-radius:4px;padding:2px 6px;color:var(--text)}
+  pre{background:var(--code);border:1px solid var(--border);border-radius:9px;padding:14px 16px;overflow:auto;font:13px/1.5 ui-monospace,"SF Mono",Menlo,Consolas,monospace;margin:0 0 16px}pre code{background:transparent;border:0;padding:0}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px 22px;margin:0 0 20px}.card.good{border-left:4px solid var(--good)}.card.warn{border-left:4px solid var(--warn)}.card.bad{border-left:4px solid var(--bad)}.card.info{border-left:4px solid var(--accent)}
+  .three{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:0 0 24px}@media(max-width:780px){.three{grid-template-columns:1fr}}
+  .three .card{margin:0}.three h4{color:var(--accent)}.three p{margin:0;color:var(--muted);font-size:14px}
+  table{width:100%;border-collapse:collapse;margin:0 0 20px;font-size:14px}th,td{border:1px solid var(--border);padding:8px 12px;text-align:left;vertical-align:top}th{background:var(--panel)}tr:nth-child(even) td{background:var(--panel)}
+  .tag{display:inline-block;font-size:12px;font-weight:700;color:var(--bg);background:var(--accent);border-radius:999px;padding:2px 8px;margin-right:6px}.ok{color:var(--good)}.warn{color:var(--warn)}.bad{color:var(--bad)}.dim{color:var(--faint)}.prompt{color:var(--good);font-weight:700}.comment{color:var(--faint)}
+  .chat{display:grid;gap:14px;margin:18px 0}.msg{border:1px solid var(--border);border-radius:10px;background:var(--panel);overflow:hidden}.who{padding:8px 12px;border-bottom:1px solid var(--border);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}.msg.user .who{color:var(--purple)}.msg.agent .who{color:var(--orange)}.body{padding:14px 16px}.body blockquote{margin:0;color:var(--muted);border-left:3px solid var(--accent);padding-left:12px;font-style:italic}
+  figure{margin:18px 0 22px;text-align:center}figure img{max-width:100%;border:1px solid var(--border);border-radius:8px;box-shadow:0 4px 22px rgba(0,0,0,.25)}figcaption{margin-top:8px;font-size:13px;color:var(--faint);font-style:italic}
+  footer{grid-column:2;margin:20px 0 70px;padding-top:18px;border-top:1px solid var(--border);color:var(--faint);font-size:14px}
+  @media(max-width:900px){.page{display:block}.page header{margin-bottom:22px}nav{position:static;max-height:none;margin-bottom:24px}footer{grid-column:auto}h1{font-size:31px}}
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <div class="eyebrow">StructAgent · skill example</div>
+  <h1>cryoSPARC Agent Skill — Consult Workflows, Inspect Results, Launch Jobs</h1>
+  <p class="lede">A StructAgent skill that gives Claude, Codex, or any tool-using agent three capabilities against a live cryoSPARC instance: <strong>consult</strong> on workflow and parameter questions, <strong>inspect</strong> completed-job results, and <strong>launch</strong> new jobs only with explicit confirmation.</p>
+  <div class="meta">
+    <span>Part of <a href="https://github.com/bhgtiger/StructAgent" target="_blank" rel="noopener">StructAgent</a></span>
+    <span>Paper: <a href="https://www.biorxiv.org/content/10.64898/2026.05.18.725842v1" target="_blank" rel="noopener">Guo, bioRxiv 2026</a></span>
+    <span>Runtime-agnostic</span>
+    <span>32 reference pages</span>
+    <span><code>cryosparc-tools</code> helper included</span>
+  </div>
+</header>
+
+<nav>
+  <div class="toc-label">On this page</div>
+  <ol>
+    <li><a href="#what">What the skill does</a></li>
+    <li><a href="#install">Install</a></li>
+    <li><a href="#site-config">Configure for your site</a></li>
+    <li><a href="#example">Example session</a></li>
+    <li><a href="#snippets">Snippets</a></li>
+  </ol>
+</nav>
+
+<main>
+
+<!-- ========================================================= -->
+<section id="what">
+  <h2>What the skill does</h2>
+  <div class="three">
+    <div class="card">
+      <h4>Consult</h4>
+      <p>Answer cryoSPARC questions grounded in 32 reference pages: parameters, workflows, masks, symmetry, orientations, troubleshooting, RELION interop.</p>
+    </div>
+    <div class="card">
+      <h4>Inspect results</h4>
+      <p>Pull a finished job&rsquo;s assets through <code>cryosparc-tools</code> &mdash; FSC, cFSC, viewing-direction, B-factor, scale-factor &mdash; and summarise what they mean.</p>
+    </div>
+    <div class="card">
+      <h4>Launch jobs safely</h4>
+      <p>Build, launch, and chain new jobs against a live cryoSPARC instance, with explicit user confirmation of project / workspace / lane / params before anything starts.</p>
+    </div>
+  </div>
+
+  <p>The skill is one folder of plain Markdown plus a Python helper. There is no hidden server component and no model-specific glue.</p>
+</section>
+
+<!-- ========================================================= -->
+<section id="install">
+  <h2>Install</h2>
+
+  <p>The skill ships as part of <a href="https://github.com/bhgtiger/StructAgent" target="_blank" rel="noopener">StructAgent</a> &mdash; see the accompanying paper, <a href="https://www.biorxiv.org/content/10.64898/2026.05.18.725842v1" target="_blank" rel="noopener"><em>StructAgent: Orchestrating Cryo-EM Model Building and Refinement with a Multi-Agent LLM System</em></a> (Guo, bioRxiv 2026), for the broader system. The cryoSPARC skill itself is self-contained and can be dropped into any coding-agent runtime that can load an instruction file and run shell or Python tools.</p>
+
+  <h3>Claude Code</h3>
+  <pre><code><span class="prompt">$</span> git clone https://github.com/bhgtiger/StructAgent.git
+<span class="prompt">$</span> mkdir -p ~/.claude/skills
+<span class="prompt">$</span> cp -R StructAgent/skills/annika/cryosparc ~/.claude/skills/</code></pre>
+
+  <h3>Codex CLI / other agent runtimes</h3>
+  <p>Point the runtime at the same folder; the only requirement is that it can read the files on demand and run an approved Python script.</p>
+  <pre><code><span class="prompt">$</span> cp -R StructAgent/skills/annika/cryosparc &lt;your-agent-skills-dir&gt;/</code></pre>
+
+  <h3>Resulting layout</h3>
+  <pre><code>cryosparc/
+├── SKILL.md                    <span class="comment"># entrypoint, routing, safety rules</span>
+├── lessons.md                  <span class="comment"># site/user lessons placeholder</span>
+├── references/                 <span class="comment"># 32 markdown reference files</span>
+└── scripts/
+    └── cryosparc_harness.py    <span class="comment"># read-only by default; --commit to queue</span></code></pre>
+
+  <table>
+    <thead><tr><th>Concept</th><th>Mapping in any agent runtime</th></tr></thead>
+    <tbody>
+      <tr><td><code>SKILL.md</code></td><td>System / tool instruction module loaded when the user asks about cryoSPARC.</td></tr>
+      <tr><td><code>references/</code></td><td>On-demand reference files loaded only when relevant.</td></tr>
+      <tr><td><code>lessons.md</code></td><td>Writable memory for confirmed local lessons.</td></tr>
+      <tr><td><code>scripts/cryosparc_harness.py</code></td><td>Tool wrapper. Read-only by default; queueing requires explicit flags.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ========================================================= -->
+<section id="site-config">
+  <h2>Configure for your site</h2>
+  <p>The skill becomes useful only after it learns the local deployment. Create a local, non-public <code>site_config.md</code> next to <code>SKILL.md</code>. Do not commit it.</p>
+
+  <pre><code># ~/.claude/skills/cryosparc/site_config.md
+# Local file. Do not commit credentials.
+
+## cryoSPARC instance
+- master_url:           http://xxx:xxx
+- master_version:       v5.x
+- license_id:           xxx
+- cryosparc_tools_env:  ~/.venvs/cs-tools-v5/bin/python
+- default_lane:         xxx
+
+## Access rules
+- Read-only inspection first.
+- Queue only after explicit user confirmation of project_uid,
+  workspace_uid, lane, and params.
+- Never store passwords or session tokens here.</code></pre>
+
+  <p>Credentials are passed via environment variables at run time, never written into the skill folder:</p>
+  <pre><code>export CRYOSPARC_HOST='xxx'
+export CRYOSPARC_BASE_PORT='xxx'
+export CRYOSPARC_EMAIL='xxx@xxx'
+read -s CRYOSPARC_PASSWORD
+export CRYOSPARC_PASSWORD</code></pre>
+</section>
+
+<!-- ========================================================= -->
+<section id="example">
+  <h2>Example session</h2>
+  <p>A short happy-path session against project <code>Pxxx</code>, showing the three capabilities back-to-back. The baseline is an existing local-refinement job, <code>J{baseline}</code>.</p>
+
+  <h3>1. Consult — what parameters did this job change?</h3>
+  <div class="chat">
+    <div class="msg user"><div class="who">User</div><div class="body"><blockquote>Check <code>J{baseline}</code> &mdash; what parameters did it change, and what could we try?</blockquote></div></div>
+    <div class="msg agent"><div class="who">Agent</div><div class="body">
+      <p>Pulled <code>J{baseline}</code>&rsquo;s params via <code>cryosparc-tools</code> and diffed against defaults. 5 of 78 parameters were non-default:</p>
+      <table>
+        <thead><tr><th>Param</th><th>This job</th><th>Default</th></tr></thead>
+        <tbody>
+          <tr><td><code>use_alignment_prior</code></td><td>True</td><td>False</td></tr>
+          <tr><td><code>sigma_prior_r</code></td><td>10&deg;</td><td>15&deg;</td></tr>
+          <tr><td><code>sigma_prior_s</code></td><td>10 &Aring;</td><td>7 &Aring;</td></tr>
+          <tr><td><code>refine_res_init</code></td><td>3.6 &Aring;</td><td>12 &Aring;</td></tr>
+          <tr><td><code>refine_scale_min</code></td><td>True</td><td>False</td></tr>
+        </tbody>
+      </table>
+      <p>Reference <code>09_local_refinement.md</code> gives a documented &ldquo;small ROI&rdquo; recipe of <strong>3&deg; / 1 &Aring; priors + 9&deg; / 3 &Aring; explicit search extent</strong>. Three variants worth trying: <em>tight</em> (recipe values), <em>medium</em> (between recipe and current), <em>reseed</em> (same params, different random seed).</p>
+    </div></div>
+  </div>
+
+  <h3>2. Check results — read the existing plots</h3>
+  <div class="chat">
+    <div class="msg user"><div class="who">User</div><div class="body"><blockquote>What do <code>J{baseline}</code>&rsquo;s plots say?</blockquote></div></div>
+    <div class="msg agent"><div class="who">Agent</div><div class="body">
+      <p>Downloaded the iteration-2 plots via <code>job.download_asset()</code> and read them:</p>
+      <ul>
+        <li><strong>GSFSC 3.22 &Aring;</strong> with the auto-tightened mask (iter-0 3.05 &Aring; with the input mask, no oscillation between halves).</li>
+        <li><strong>cFAR 0.72</strong>, cone resolutions <strong>2.95 &Aring; (best) &rarr; 3.39 &Aring; (worst)</strong>. The 3.22 &Aring; headline is a geometric average over an anisotropic map.</li>
+        <li><strong>B-factor 106.5 &Aring;<sup>2</sup></strong> from the Guinier plot &mdash; healthy for a ~3.2 &Aring; map.</li>
+        <li><strong>Per-particle scale factors</strong> are a clean near-Gaussian around 1.0 (mean 1.008), so <code>refine_scale_min</code> was safe.</li>
+        <li><strong>Viewing-direction distribution</strong> has a hot spot and a sparse zone &mdash; the anisotropy is driven by preferred orientation, not by the local-refine settings.</li>
+      </ul>
+      <p>The headline number is honest at the average; the limiting feature is the orientation distribution upstream, not the local-refine dialog. Two options: <em>(a)</em> accept the anisotropy and tune locally with the 3-variant sweep above, or <em>(b)</em> rebalance the orientation distribution upstream and re-run with the same params, to isolate the effect.</p>
+    </div></div>
+  </div>
+
+  <h3>3. Run — rebalance, then redo the local refinement</h3>
+  <div class="chat">
+    <div class="msg user"><div class="who">User</div><div class="body"><blockquote>Do option (b): rebalance, then redo the local refinement with the same params.</blockquote></div></div>
+    <div class="msg agent"><div class="who">Agent</div><div class="body">
+      <p>Confirming before queueing:</p>
+      <ul>
+        <li><strong>Step 1</strong> &mdash; <code>rebalance_3D</code> on <code>J{baseline}</code>&rsquo;s input particles, default params.</li>
+        <li><strong>Step 2</strong> &mdash; <code>new_local_refine</code> on step-1 output + same volume / mask as <code>J{baseline}</code>, params verbatim.</li>
+        <li>Workspace <code>Wxxx</code>, lane <code>xxx</code> (matches <code>J{baseline}</code>&rsquo;s <code>resources_allocated.lane</code>).</li>
+        <li>Sequential with <code>wait_for_done()</code> between steps. ETA ~20 min.</li>
+      </ul>
+      <p>OK to queue?</p>
+    </div></div>
+    <div class="msg user"><div class="who">User</div><div class="body"><blockquote>Yes.</blockquote></div></div>
+    <div class="msg agent"><div class="who">Agent</div><div class="body">
+      <p>Queued. Status:</p>
+      <table>
+        <thead><tr><th>Job</th><th>Title</th><th>Status</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>J{baseline}</td><td>baseline local refine</td><td>completed</td><td>GSFSC 3.22 &Aring;, cFAR 0.72</td></tr>
+          <tr><td>J{rebalance}</td><td>Rebalance Orientations</td><td>&#10003; completed</td><td>55,715 / 80,164 particles kept (69.5%)</td></tr>
+          <tr><td>J{redo}</td><td>post-rebalance local refine</td><td>completed</td><td>finished at 3.30 &Aring;</td></tr>
+        </tbody>
+      </table>
+    </div></div>
+  </div>
+
+  <figure>
+    <img src="Screenshot 2026-05-22 at 10.37.36.png" alt="cryoSPARC web UI tile view showing the rebalance and post-rebalance local-refine jobs completing, with FSC curves and density thumbnails." />
+    <figcaption>cryoSPARC web UI &mdash; the rebalance and post-rebalance local-refine tiles after the protocol completed.</figcaption>
+  </figure>
+
+  <div class="card info">
+    <h4>What this shows</h4>
+    <p>One short conversation covered all three capabilities: pulling parameters and recommending alternatives (<em>consult</em>), downloading and interpreting job assets (<em>check</em>), and queueing a multi-step protocol after explicit confirmation (<em>run</em>). The agent never touched anything destructive without asking.</p>
+  </div>
+</section>
+
+<!-- ========================================================= -->
+<section id="snippets">
+  <h2>Snippets</h2>
+
+  <h3>Connect from Python</h3>
+  <pre><code>import os
+from cryosparc.tools import CryoSPARC
+
+cs = CryoSPARC(
+    license  = os.environ["CRYOSPARC_LICENSE"],  # xxx-xxx-xxx
+    host     = os.environ["CRYOSPARC_HOST"],     # xxx
+    base_port= int(os.environ["CRYOSPARC_BASE_PORT"]),  # xxx
+    email    = os.environ["CRYOSPARC_EMAIL"],
+    password = os.environ["CRYOSPARC_PASSWORD"],
+)
+assert cs.test_connection()</code></pre>
+
+  <h3>Inspect a job&rsquo;s params and assets</h3>
+  <pre><code>project = cs.find_project("Pxxx")
+job     = project.find_job("Jxxx")
+
+# Parameters (full dict, including defaults)
+params = job.doc["params_spec"]
+
+# Asset listing (PNG / PDF plots, logs, ...)
+for asset in job.list_assets():
+    print(asset["filename"], asset["_id"])
+
+# Download one asset
+job.download_asset(asset_id, "/tmp/out.png")</code></pre>
+
+  <h3>Queue safely via the harness</h3>
+  <pre><code><span class="comment"># default: dry-run JSON only; no job is queued</span>
+<span class="prompt">$</span> python scripts/cryosparc_harness.py create-job \
+    --project-uid Pxxx --workspace-uid Wxxx \
+    --job-type new_local_refine \
+    --params-json '{"use_alignment_prior": true}'
+
+<span class="comment"># real queue only with explicit commit + queue + lane + confirmation word</span>
+<span class="prompt">$</span> python scripts/cryosparc_harness.py create-job \
+    --project-uid Pxxx --workspace-uid Wxxx \
+    --job-type new_local_refine \
+    --lane xxx --commit --queue --queue-confirm QUEUE</code></pre>
+</section>
+
+</main>
+
+<footer>
+  <p>Public example for the StructAgent cryoSPARC skill. Server name, port, license, account, project, and workspace identifiers have been replaced with <code>xxx</code>. The cryoSPARC web-UI screenshot shows generic job tiles.</p>
+  <p>Repository: <a href="https://github.com/bhgtiger/StructAgent" target="_blank" rel="noopener">github.com/bhgtiger/StructAgent</a></p>
+  <p>Paper: Guo, X. <em>StructAgent: Orchestrating Cryo-EM Model Building and Refinement with a Multi-Agent LLM System.</em> bioRxiv (2026). doi:<a href="https://doi.org/10.64898/2026.05.18.725842" target="_blank" rel="noopener">10.64898/2026.05.18.725842</a></p>
+</footer>
+
+</div>
+</body>
+</html>
