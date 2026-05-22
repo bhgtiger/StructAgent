@@ -156,7 +156,10 @@ If a user asks "I just finished ab-initio cleanup, what next?":
 - `orientation_and_preferred_views.md` — diagnosing and mitigating preferred orientation.
 - `version_caveats.md` — version-mixed forum advice and known regressions.
 
-## Sources
+## Source basis
+
+The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
+
 - `docs/per_page/processing-data__all-job-types-in-cryosparc__3d-refinement.md`
 - `docs/per_page/processing-data__all-job-types-in-cryosparc__3d-refinement__job-homogeneous-refinement.md`
 - `docs/per_page/processing-data__all-job-types-in-cryosparc__3d-refinement__job-homogeneous-refinement-legacy.md`

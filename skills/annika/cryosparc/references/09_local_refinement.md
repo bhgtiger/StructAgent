@@ -194,7 +194,10 @@ If a user asks "should I do local refinement here?":
 - `15_troubleshooting.md` — debugging mental model.
 - `17_error_lookup.md` — error-string lookup.
 
-## Sources
+## Source basis
+
+The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
+
 - `videos/notes/05_fanac1_and_discrete_heterogeneity.notes.md`
 - `videos/notes/10_mask_creation_in_chimerax.notes.md`
 - `docs/forum_threads/digests/forum_3d-reconstruction.md`

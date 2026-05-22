@@ -152,7 +152,9 @@ Treat `mask_base.mrc` as the proposal, not the final cryoSPARC mask, unless dila
 - **v4.5** — Volume Tools reports centre of mass when input volume is a mask.
 - **v5.0** — Default lowpass filter changed to **Butterworth order 8** (was rectangular order 10); dynamic refinement masks made robust and resolution-scaled.
 
-## Sources
+## Source basis
+
+The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
 
 - `docs/per_page/processing-data__tutorials-and-case-studies__mask-selection-and-generation-in-ucsf-chimera.md`
 - `docs/per_page/processing-data__tutorials-and-case-studies__tutorial-dynamic-masking-in-refinements-v5.0.md`

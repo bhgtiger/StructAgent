@@ -351,7 +351,9 @@ Cluster / lane tuning is out of scope at parameter level — see the planned `21
 - Continuous heterogeneity (3DVA / 3DFlex): `26_continuous_heterogeneity.md`
 - Error string lookup: `17_error_lookup.md`
 
-## Sources
+## Source basis
+
+The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
 
 - 02_import.md
 - 03_preprocessing.md

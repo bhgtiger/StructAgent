@@ -305,7 +305,9 @@ Crisp rules for any future assistant driving cryosparc-tools:
 - Live session handoff to production projects: `25_cryosparc_live.md`
 - Import / preprocessing prerequisites for any scripted pipeline: `02_import.md`, `03_preprocessing.md`
 
-## Sources
+## Source basis
+
+The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
 
 - `docs/per_page/processing-data__cryosparc-tools.md`
 - `docs/per_page/application-guide__creating-and-running-jobs.md`

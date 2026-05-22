@@ -170,7 +170,10 @@ Common first questions the advisor should ask before committing to a recommendat
 
 When the user is about to run something irreversible (delete project, force-restart, push a workflow to a cluster lane, run RBMC on the last copy of raw movies), name the action explicitly and confirm scope before executing.
 
-## Sources
+## Source basis
+
+The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
+
 - `topic_plan.md`
 - `02_import.md`
 - `03_preprocessing.md`

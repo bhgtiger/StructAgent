@@ -185,7 +185,10 @@ If a user asks "how should I pick particles?":
 - `particle_set_operations.md` — union/dedup semantics for picks across jobs.
 - `version_caveats.md` — version-fixed picking bugs.
 
-## Sources
+## Source basis
+
+The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
+
 - `docs/per_page/processing-data__all-job-types-in-cryosparc__particle-picking.md`
 - `docs/per_page/processing-data__all-job-types-in-cryosparc__particle-picking__job-blob-picker.md`
 - `docs/per_page/processing-data__all-job-types-in-cryosparc__particle-picking__job-blob-picker-tuner.md`

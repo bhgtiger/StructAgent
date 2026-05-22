@@ -157,7 +157,10 @@ When a user asks "should I use Homogeneous Ab-Initio Refinement?":
 - `16_tuning_recipes.md` — parameter cookbooks for small / symmetric / membrane targets.
 - `26_continuous_heterogeneity.md` — when continuous motion is the right interpretation rather than discrete classes.
 
-## Sources
+## Source basis
+
+The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
+
 - `docs/per_page/processing-data__all-job-types-in-cryosparc__3d-reconstruction__job-ab-initio-reconstruction.md`
 - `docs/per_page/processing-data__all-job-types-in-cryosparc__3d-reconstruction__job-homogeneous-ab-initio-refinement-beta.md`
 - `docs/per_page/processing-data__all-job-types-in-cryosparc__3d-refinement__job-heterogeneous-refinement.md`

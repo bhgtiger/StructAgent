@@ -316,7 +316,9 @@ See Section 3.4 above for the full version. Compressed checklist:
 
 ---
 
-## Sources
+## Source basis
+
+The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
 
 - `topic_plan.md`
 - `plan.md`

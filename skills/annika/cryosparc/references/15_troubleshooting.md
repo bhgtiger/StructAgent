@@ -342,7 +342,10 @@ If a user asks “how do I debug this?”
 4. try the **smallest corrective action** first
 5. update before deep workaround-hunting if a matching fix already exists upstream
 
-## Sources
+## Source basis
+
+The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
+
 - `docs/forum_threads/digests/forum_troubleshooting.md`
 - `docs/forum_threads/digests/forum_import.md`
 - `docs/forum_threads/digests/forum_hardware-and-performance.md`

@@ -224,7 +224,10 @@ If a user asks "the refinement finished — what now?":
 - `orientation_and_preferred_views.md` — diagnosing preferred orientation and angular coverage.
 - `version_caveats.md` — version-specific behavior changes that matter for postprocessing.
 
-## Sources
+## Source basis
+
+The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
+
 - `docs/per_page/processing-data__all-job-types-in-cryosparc__post-processing.md`
 - `docs/per_page/processing-data__all-job-types-in-cryosparc__post-processing__job-sharpening-tools.md`
 - `docs/per_page/processing-data__all-job-types-in-cryosparc__post-processing__job-validation-fsc.md`

@@ -173,7 +173,10 @@ When a user asks "what should I try first?":
 - `orientation_and_preferred_views.md` — diagnosing pose-anisotropy bias upstream of classification.
 - `particle_set_operations.md` — splitting, merging, balancing half-sets across classification loops.
 
-## Sources
+## Source basis
+
+The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
+
 - `docs/per_page/processing-data__all-job-types-in-cryosparc__variability__job-3d-classification-beta.md`
 - `docs/per_page/processing-data__all-job-types-in-cryosparc__3d-refinement__job-heterogeneous-refinement.md`
 - `docs/per_page/processing-data__all-job-types-in-cryosparc__3d-refinement__job-heterogeneous-reconstruction-only.md`

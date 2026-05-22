@@ -433,7 +433,9 @@ If any of these are true, **stop and escalate** rather than firing the next comm
 
 ---
 
-## Sources
+## Source basis
+
+The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
 
 - `docs/per_page/setup-configuration-and-management__management-and-monitoring-v5.0.md`
 - `docs/per_page/setup-configuration-and-management__management-and-monitoring-v5.0__cryosparcm-reference-v5.0.md`

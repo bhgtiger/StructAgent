@@ -156,7 +156,10 @@ Two cautions on rebalancing:
 - `17_error_lookup.md` — exact strings for extraction/2D/cache failures.
 - `particle_set_operations.md` — intersect/union/dedup patterns for combining particle sets across pickers or branches.
 
-## Sources
+## Source basis
+
+The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
+
 - `docs/per_page/processing-data__all-job-types-in-cryosparc__extraction.md`
 - `docs/per_page/processing-data__all-job-types-in-cryosparc__extraction__job-extract-from-micrographs.md`
 - `docs/per_page/processing-data__all-job-types-in-cryosparc__extraction__job-downsample-particles.md`

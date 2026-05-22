@@ -13,6 +13,8 @@ Use this skill for cryoSPARC advice, troubleshooting, parameter recommendations,
 
 For user questions, do **not** load the whole corpus. Pick the smallest relevant reference file(s) from `references/` and answer with version-aware caveats. The bundled corpus covers cryoSPARC **v4.0 through v5.0**; flag uncertainty when the user is on an earlier or later release than that window. If the user gives an exact error string, start with `17_error_lookup.md` and `15_troubleshooting.md`.
 
+The `Source basis` sections inside reference files are provenance notes from skill construction, not runtime dependencies. Do not try to load those raw source paths unless the user explicitly provides the original source corpus; the actionable guidance is contained in the bundled reference file itself.
+
 If acting on a live cryoSPARC instance, first identify:
 - cryoSPARC version;
 - whether the task is advisor-only or automation;

@@ -361,7 +361,10 @@ Advisor-side routing trees for the most common "what next?" questions in cryoSPA
 
 ---
 
-## Sources
+## Source basis
+
+The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
+
 - `topic_plan.md`
 - `17_error_lookup.md`
 - `02_import.md`

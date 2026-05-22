@@ -175,7 +175,10 @@ When a symmetric target also has preferred orientation, treat the two problems i
 - `26_continuous_heterogeneity.md` — 3DVA / 3DFlex on symmetry-expanded particles.
 - `orientation_and_preferred_views.md` — anisotropy diagnostics and mitigation.
 
-## Sources
+## Source basis
+
+The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
+
 - `06_abinitio.md`
 - `07_refinement.md`
 - `08_classification_3d.md`

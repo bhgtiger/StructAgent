@@ -162,7 +162,10 @@ The mesh is the regularizer: it forces deformations to be smooth on the scale of
 - `15_troubleshooting.md` — branch-agnostic debugging mental model.
 
 
-## Sources
+## Source basis
+
+The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
+
 - `docs/per_page/processing-data__all-job-types-in-cryosparc__variability.md`
 - `docs/per_page/processing-data__all-job-types-in-cryosparc__variability__job-3d-variability.md`
 - `docs/per_page/processing-data__all-job-types-in-cryosparc__variability__job-3d-variability-display.md`

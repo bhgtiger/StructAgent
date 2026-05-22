@@ -382,7 +382,10 @@ If a recent instance config export is not available, the fall-back is a fresh in
 - **Do not install third-party Python packages into the cryoSPARC env.** Use `cryosparc-tools` from a separate environment for scripting (`13_cryosparc_tools_api.md`).
 - **Confirm before exposing the GUI more widely.** Reverse proxy / VPN / SSH tunnel configurations have security implications that depend on institutional policy; record what the user already has rather than re-deploying it.
 
-## Sources
+## Source basis
+
+The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
+
 - `docs/per_page/readme.md`
 - `docs/per_page/licensing.md`
 - `docs/per_page/resources__questions-and-support.md`

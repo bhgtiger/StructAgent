@@ -176,7 +176,9 @@ When advising on preferred orientation:
 6. Prefer upstream mitigation over postprocessing: repick, diversify templates, alter 2D strategy, rebalance, collect tilt, or change sample prep.
 7. Warn if the user is trying to fix anisotropy with sharpening, local filtering, or a tighter mask.
 
-## Sources
+## Source basis
+
+The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
 
 - `docs/per_page/processing-data__all-job-types-in-cryosparc__utilities__job-orientation-diagnostics.md`
 - `docs/per_page/processing-data__tutorials-and-case-studies__tutorial-orientation-diagnostics.md`

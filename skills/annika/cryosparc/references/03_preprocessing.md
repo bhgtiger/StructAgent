@@ -167,7 +167,10 @@ If a user asks “how should I preprocess this dataset?”:
 - `17_error_lookup.md` — traceback/error string lookup.
 - `ctf_refinement_and_rbmc.md` — future targeted CTF/RBMC branch guide.
 
-## Sources
+## Source basis
+
+The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
+
 - `docs/per_page/processing-data__all-job-types-in-cryosparc__motion-correction__job-patch-motion-correction.md`
 - `docs/per_page/processing-data__all-job-types-in-cryosparc__motion-correction__job-reference-based-motion-correction-beta.md`
 - `docs/per_page/processing-data__all-job-types-in-cryosparc__ctf-estimation__job-patch-ctf-estimation.md`
