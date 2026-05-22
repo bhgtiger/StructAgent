@@ -48,6 +48,7 @@
   <p class="lede">A StructAgent skill that gives Claude, Codex, or any tool-using agent three capabilities against a live cryoSPARC instance: <strong>consult</strong> on workflow and parameter questions, <strong>inspect</strong> completed-job results, and <strong>launch</strong> new jobs only with explicit confirmation.</p>
   <div class="meta">
     <span>Part of <a href="https://github.com/bhgtiger/StructAgent" target="_blank" rel="noopener">StructAgent</a></span>
+    <span>Real skill folder: <a href="https://github.com/bhgtiger/StructAgent/tree/main/skills/annika/cryosparc" target="_blank" rel="noopener"><code>skills/annika/cryosparc</code></a></span>
     <span>Paper: <a href="https://www.biorxiv.org/content/10.64898/2026.05.18.725842v1" target="_blank" rel="noopener">Guo, bioRxiv 2026</a></span>
     <span>Runtime-agnostic</span>
     <span>32 reference pages</span>
@@ -94,6 +95,11 @@
   <h2>Install</h2>
 
   <p>The skill ships as part of <a href="https://github.com/bhgtiger/StructAgent" target="_blank" rel="noopener">StructAgent</a> &mdash; see the accompanying paper, <a href="https://www.biorxiv.org/content/10.64898/2026.05.18.725842v1" target="_blank" rel="noopener"><em>StructAgent: Orchestrating Cryo-EM Model Building and Refinement with a Multi-Agent LLM System</em></a> (Guo, bioRxiv 2026), for the broader system. The cryoSPARC skill itself is self-contained and can be dropped into any coding-agent runtime that can load an instruction file and run shell or Python tools.</p>
+
+  <div class="card info">
+    <h4>Actual skill files</h4>
+    <p>The installable skill lives here: <a href="https://github.com/bhgtiger/StructAgent/tree/main/skills/annika/cryosparc" target="_blank" rel="noopener"><code>github.com/bhgtiger/StructAgent/tree/main/skills/annika/cryosparc</code></a>.</p>
+  </div>
 
   <h3>Claude Code</h3>
   <pre><code><span class="prompt">$</span> git clone https://github.com/bhgtiger/StructAgent.git
@@ -280,6 +286,7 @@ job.download_asset(asset_id, "/tmp/out.png")</code></pre>
 <footer>
   <p>Public example for the StructAgent cryoSPARC skill. Server name, port, license, account, project, and workspace identifiers have been replaced with <code>xxx</code>. The cryoSPARC web-UI screenshot shows generic job tiles.</p>
   <p>Repository: <a href="https://github.com/bhgtiger/StructAgent" target="_blank" rel="noopener">github.com/bhgtiger/StructAgent</a></p>
+  <p>Actual skill folder: <a href="https://github.com/bhgtiger/StructAgent/tree/main/skills/annika/cryosparc" target="_blank" rel="noopener">github.com/bhgtiger/StructAgent/tree/main/skills/annika/cryosparc</a></p>
   <p>Paper: Guo, X. <em>StructAgent: Orchestrating Cryo-EM Model Building and Refinement with a Multi-Agent LLM System.</em> bioRxiv (2026). doi:<a href="https://doi.org/10.64898/2026.05.18.725842" target="_blank" rel="noopener">10.64898/2026.05.18.725842</a></p>
 </footer>
 
