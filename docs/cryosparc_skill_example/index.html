@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Unofficial cryoSPARC Workflow Assistant Skill — Consult, Inspect, Launch Safely</title>
-<meta name="description" content="An unofficial StructAgent cryoSPARC workflow assistant skill for Claude, Codex, and other tool-using agents: consult on workflows, inspect job results, and launch jobs with explicit confirmation." />
+<title>AI Agent Skill for cryoSPARC — Consult Workflows, Inspect Results, Launch Jobs</title>
+<meta name="description" content="An unofficial StructAgent AI agent skill for cryoSPARC, designed for Claude, Codex, and other tool-using agents to consult on workflows, inspect job results, and launch jobs with explicit confirmation." />
 <style>
   :root {
     --bg:#0d1117; --panel:#161b22; --code:#1c2128; --border:#30363d;
@@ -44,7 +44,7 @@
 
 <header>
   <div class="eyebrow">StructAgent · unofficial skill example</div>
-  <h1>Unofficial cryoSPARC Workflow Assistant Skill</h1>
+  <h1>AI Agent Skill for cryoSPARC</h1>
   <p class="lede">A StructAgent example that gives Claude, Codex, or any tool-using agent three capabilities against a live cryoSPARC instance: <strong>consult</strong> on workflow and parameter questions, <strong>inspect</strong> completed-job results, and <strong>launch</strong> new jobs only with explicit confirmation.</p>
   <div class="meta">
     <span>Part of <a href="https://github.com/bhgtiger/StructAgent" target="_blank" rel="noopener">StructAgent</a></span>
@@ -100,7 +100,7 @@
 <section id="install">
   <h2>Install</h2>
 
-  <p>This unofficial skill ships as part of <a href="https://github.com/bhgtiger/StructAgent" target="_blank" rel="noopener">StructAgent</a> &mdash; see the accompanying paper, <a href="https://www.biorxiv.org/content/10.64898/2026.05.18.725842v1" target="_blank" rel="noopener"><em>StructAgent: Orchestrating Cryo-EM Model Building and Refinement with a Multi-Agent LLM System</em></a> (bioRxiv 2026), for the broader system. The cryoSPARC workflow assistant itself is self-contained and can be dropped into any coding-agent runtime that can load an instruction file and run shell or Python tools.</p>
+  <p>This unofficial skill ships as part of <a href="https://github.com/bhgtiger/StructAgent" target="_blank" rel="noopener">StructAgent</a> &mdash; see the accompanying paper, <a href="https://www.biorxiv.org/content/10.64898/2026.05.18.725842v1" target="_blank" rel="noopener"><em>StructAgent: Orchestrating Cryo-EM Model Building and Refinement with a Multi-Agent LLM System</em></a> (bioRxiv 2026), for the broader system. The AI agent skill for cryoSPARC itself is self-contained and can be dropped into any coding-agent runtime that can load an instruction file and run shell or Python tools.</p>
 
   <div class="card info">
     <h4>Actual skill files</h4>
@@ -292,7 +292,7 @@ job.download_asset(asset_id, "/tmp/out.png")</code></pre>
 </main>
 
 <footer>
-  <p>Public example for the unofficial StructAgent cryoSPARC workflow assistant skill. Server name, port, license, account, project, and workspace identifiers have been replaced with <code>xxx</code>. The cryoSPARC web-UI screenshot shows generic job tiles.</p>
+  <p>Public example for the unofficial StructAgent AI agent skill for cryoSPARC. Server name, port, license, account, project, and workspace identifiers have been replaced with <code>xxx</code>. The cryoSPARC web-UI screenshot shows generic job tiles.</p>
   <p>Repository: <a href="https://github.com/bhgtiger/StructAgent" target="_blank" rel="noopener">github.com/bhgtiger/StructAgent</a></p>
   <p>Actual skill folder: <a href="https://github.com/bhgtiger/StructAgent/tree/main/skills/annika/cryosparc" target="_blank" rel="noopener">github.com/bhgtiger/StructAgent/tree/main/skills/annika/cryosparc</a></p>
   <p>Third-party notices: <a href="https://github.com/bhgtiger/StructAgent/blob/main/THIRD_PARTY_NOTICES.md" target="_blank" rel="noopener">THIRD_PARTY_NOTICES.md</a></p>

@@ -44,7 +44,7 @@ skills/annika/                Execution-side structural-biology skills/protocols
   ├── ccp4/                   Refmac5, AceDRG, CCP4 suite orchestration
   ├── chimerax/               UCSF ChimeraX model editing and map fitting
   ├── coot/                   Coot model building and local refinement
-  ├── cryosparc/              Unofficial cryoSPARC workflow guidance and cautious automation (NEW)
+  ├── cryosparc/              AI agent skill for cryoSPARC workflows and cautious automation (NEW)
   ├── emerald/                Rosetta EMERALD ligand docking into cryo-EM density (NEW)
   ├── isolde/                 ISOLDE interactive refinement in ChimeraX
   ├── phenix/                 Phenix real-space and reciprocal-space refinement
@@ -86,7 +86,7 @@ See [`docs/full_system_implementation.md`](docs/full_system_implementation.md).
 
 ### v3 (2026-05-22)
 - **Added** `skills/annika/cryosparc/` — self-contained, unofficial cryoSPARC SPA advisor/automation skill covering import, preprocessing, picking, 2D/3D workflows, refinement, 3DVA/3DFlex, masks, helical processing, CryoSPARC Live, `cryosparc-tools`, `cryosparcm`, GPU lanes/queues, storage, RELION interop, troubleshooting, and error lookup. Includes synthesized workflow references and a dry-run-first `scripts/cryosparc_harness.py` helper for cautious local automation.
-- **Added** `docs/cryosparc_skill_example/` — sanitized public usage page showing the unofficial cryoSPARC workflow assistant skill as a Claude/Codex-style implementation pattern that can also be adapted to other agent runtimes.
+- **Added** `docs/cryosparc_skill_example/` — sanitized public usage page showing the unofficial AI agent skill for cryoSPARC as a Claude/Codex-style implementation pattern that can also be adapted to other agent runtimes.
 
 ### v2 (2026-05-18)
 - **Added** `skills/annika/emerald/` — Rosetta EMERALD ligand docking into cryo-EM density maps (GALigandDock + density-weighted scoring). Includes wrapper scripts, presets, CLI reference, and installation guide.

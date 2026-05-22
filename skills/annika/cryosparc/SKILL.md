@@ -3,11 +3,11 @@ name: cryosparc
 description: Guide and automate cryoSPARC SPA processing: import/preprocessing, picking, extraction/2D, ab initio, homogeneous/heterogeneous/non-uniform refinement, 3D classification, 3DVA/3DFlex, local/focused refinement, masks, symmetry, helical, CryoSPARC Live, cryosparc-tools, cryosparcm admin, GPU lanes/queues, storage, RELION interop, troubleshooting, and error lookup. Covers tomography/cryo-ET only at the SPA boundary (e.g. tilted-SPA vs tilt-series, importing tomo-derived particles); it is not a native tomo/cryo-ET pipeline.
 ---
 
-# Unofficial cryoSPARC Workflow Assistant
+# AI Agent Skill for cryoSPARC
 
 Use this skill for cryoSPARC advice, troubleshooting, parameter recommendations, workflow planning, and cautious automation via `cryosparc-tools` / `cryosparcm` when the user explicitly wants commands run.
 
-This is an independent, unofficial workflow assistant. It is not affiliated with, endorsed by, sponsored by, or approved by Structura Biotechnology Inc. cryoSPARC and CryoSPARC Live are trademarks of Structura Biotechnology Inc. Always defer to the official cryoSPARC documentation and license terms for authoritative guidance.
+This is an independent, unofficial AI agent skill. It is not affiliated with, endorsed by, sponsored by, or approved by Structura Biotechnology Inc. cryoSPARC and CryoSPARC Live are trademarks of Structura Biotechnology Inc. Always defer to the official cryoSPARC documentation and license terms for authoritative guidance.
 
 **Scope.** SPA-focused. Tomography/cryo-ET is in-scope only where it touches SPA (tilted-SPA collection, importing tomo-derived particle stacks, boundary disambiguation) — see `12_tomography.md`. Native tilt-series alignment and subtomogram averaging pipelines are out of scope.
 

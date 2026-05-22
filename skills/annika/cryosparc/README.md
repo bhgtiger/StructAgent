@@ -1,8 +1,8 @@
-# Unofficial cryoSPARC Workflow Assistant Skill
+# AI Agent Skill for cryoSPARC
 
 **Consult workflows, inspect results, launch jobs safely.**
 
-This folder contains the StructAgent cryoSPARC workflow assistant skill: a self-contained 36-file agent skill folder with `README.md`, `SKILL.md`, `lessons.md`, 32 on-demand Markdown references, and a dry-run-first Python helper for cautious `cryosparc-tools` automation. It is designed for Claude/Codex-style coding agents, but the pattern is runtime-agnostic: any agent can use it if it can load instructions, read reference files on demand, and run approved shell/Python tools.
+This folder contains the StructAgent AI agent skill for cryoSPARC: a self-contained 36-file agent skill folder with `README.md`, `SKILL.md`, `lessons.md`, 32 on-demand Markdown references, and a dry-run-first Python helper for cautious `cryosparc-tools` automation. It is designed for Claude/Codex-style coding agents, but the pattern is runtime-agnostic: any agent can use it if it can load instructions, read reference files on demand, and run approved shell/Python tools.
 
 This is an independent, unofficial project. It is not affiliated with, endorsed by, sponsored by, or approved by Structura Biotechnology Inc. cryoSPARC and CryoSPARC Live are trademarks of Structura Biotechnology Inc. Users are responsible for complying with cryoSPARC licensing, documentation terms, and citation requirements.
 
