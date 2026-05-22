@@ -98,7 +98,7 @@
 
   <div class="card info">
     <h4>Actual skill files</h4>
-    <p>The installable skill lives here: <a href="https://github.com/bhgtiger/StructAgent/tree/main/skills/annika/cryosparc" target="_blank" rel="noopener"><code>github.com/bhgtiger/StructAgent/tree/main/skills/annika/cryosparc</code></a>.</p>
+    <p>The installable skill lives here: <a href="https://github.com/bhgtiger/StructAgent/tree/main/skills/annika/cryosparc" target="_blank" rel="noopener"><code>github.com/bhgtiger/StructAgent/tree/main/skills/annika/cryosparc</code></a>. The folder now includes its own <code>README.md</code> with install, porting, site-config, and safety instructions.</p>
   </div>
 
   <h3>Claude Code</h3>
@@ -112,6 +112,7 @@
 
   <h3>Resulting layout</h3>
   <pre><code>cryosparc/
+├── README.md                   <span class="comment"># install, porting, site-config, safety instructions</span>
 ├── SKILL.md                    <span class="comment"># entrypoint, routing, safety rules</span>
 ├── lessons.md                  <span class="comment"># site/user lessons placeholder</span>
 ├── references/                 <span class="comment"># 32 markdown reference files</span>
@@ -121,6 +122,7 @@
   <table>
     <thead><tr><th>Concept</th><th>Mapping in any agent runtime</th></tr></thead>
     <tbody>
+      <tr><td><code>README.md</code></td><td>Human-facing install, porting, local configuration, and safety instructions.</td></tr>
       <tr><td><code>SKILL.md</code></td><td>System / tool instruction module loaded when the user asks about cryoSPARC.</td></tr>
       <tr><td><code>references/</code></td><td>On-demand reference files loaded only when relevant.</td></tr>
       <tr><td><code>lessons.md</code></td><td>Writable memory for confirmed local lessons.</td></tr>
