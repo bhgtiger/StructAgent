@@ -40,6 +40,7 @@ skills/annika/                Execution-side structural-biology skills/protocols
   ├── ccp4/                   Refmac5, AceDRG, CCP4 suite orchestration
   ├── chimerax/               UCSF ChimeraX model editing and map fitting
   ├── coot/                   Coot model building and local refinement
+  ├── cryosparc/              cryoSPARC SPA processing, troubleshooting, and cautious automation (NEW)
   ├── emerald/                Rosetta EMERALD ligand docking into cryo-EM density (NEW)
   ├── isolde/                 ISOLDE interactive refinement in ChimeraX
   ├── phenix/                 Phenix real-space and reciprocal-space refinement
@@ -77,6 +78,9 @@ Connect them with an A2A JSON-RPC gateway or equivalent message bus. Use the tem
 See [`docs/full_system_implementation.md`](docs/full_system_implementation.md).
 
 ## Changelog
+
+### v3 (2026-05-22)
+- **Added** `skills/annika/cryosparc/` — self-contained cryoSPARC SPA advisor/automation skill covering import, preprocessing, picking, 2D/3D workflows, refinement, 3DVA/3DFlex, masks, helical processing, CryoSPARC Live, `cryosparc-tools`, `cryosparcm`, GPU lanes/queues, storage, RELION interop, troubleshooting, and error lookup. Includes bundled reference corpus and a dry-run-first `scripts/cryosparc_harness.py` helper for cautious local automation.
 
 ### v2 (2026-05-18)
 - **Added** `skills/annika/emerald/` — Rosetta EMERALD ligand docking into cryo-EM density maps (GALigandDock + density-weighted scoring). Includes wrapper scripts, presets, CLI reference, and installation guide.

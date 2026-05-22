@@ -10,6 +10,7 @@ Copy one or more skill folders into your agent's skill directory.
 # Example
 cp -R skills/annika/chimerax ~/.openclaw/workspace/skills/
 cp -R skills/annika/phenix ~/.openclaw/workspace/skills/
+cp -R skills/annika/cryosparc ~/.openclaw/workspace/skills/
 cp -R skills/maria/paper-reader ~/.openclaw/workspace/skills/
 ```
 
@@ -17,8 +18,13 @@ Restart or rescan your agent so it indexes the skills.
 
 ## Recommended bundles
 
+### cryoSPARC SPA processing / troubleshooting
+
+- `skills/annika/cryosparc`
+
 ### Cryo-EM model building / refinement
 
+- `skills/annika/cryosparc` — upstream SPA processing/reconstruction guidance when cryoSPARC is involved
 - `skills/annika/chimerax`
 - `skills/annika/isolde`
 - `skills/annika/phenix`
@@ -54,7 +60,7 @@ Restart or rescan your agent so it indexes the skills.
 Ask your agent in plain language. Example:
 
 ```text
-Use the PHENIX and ChimeraX skills to validate this model against this cryo-EM map. Report command lines, versions, CC, geometry outliers, and whether the result is publishable.
+Use the cryoSPARC skill to troubleshoot a failed non-uniform refinement, then use the PHENIX and ChimeraX skills to validate the resulting model against the cryo-EM map. Report command lines, versions, CC, geometry outliers, and whether the result is publishable.
 ```
 
 For paper reading:
