@@ -3,17 +3,19 @@ name: cryosparc
 description: Guide and automate cryoSPARC SPA processing: import/preprocessing, picking, extraction/2D, ab initio, homogeneous/heterogeneous/non-uniform refinement, 3D classification, 3DVA/3DFlex, local/focused refinement, masks, symmetry, helical, CryoSPARC Live, cryosparc-tools, cryosparcm admin, GPU lanes/queues, storage, RELION interop, troubleshooting, and error lookup. Covers tomography/cryo-ET only at the SPA boundary (e.g. tilted-SPA vs tilt-series, importing tomo-derived particles); it is not a native tomo/cryo-ET pipeline.
 ---
 
-# cryoSPARC
+# Unofficial cryoSPARC Workflow Assistant
 
 Use this skill for cryoSPARC advice, troubleshooting, parameter recommendations, workflow planning, and cautious automation via `cryosparc-tools` / `cryosparcm` when the user explicitly wants commands run.
+
+This is an independent, unofficial workflow assistant. It is not affiliated with, endorsed by, sponsored by, or approved by Structura Biotechnology Inc. cryoSPARC and CryoSPARC Live are trademarks of Structura Biotechnology Inc. Always defer to the official cryoSPARC documentation and license terms for authoritative guidance.
 
 **Scope.** SPA-focused. Tomography/cryo-ET is in-scope only where it touches SPA (tilted-SPA collection, importing tomo-derived particle stacks, boundary disambiguation) — see `12_tomography.md`. Native tilt-series alignment and subtomogram averaging pipelines are out of scope.
 
 ## First response rule
 
-For user questions, do **not** load the whole corpus. Pick the smallest relevant reference file(s) from `references/` and answer with version-aware caveats. The bundled corpus covers cryoSPARC **v4.0 through v5.0**; flag uncertainty when the user is on an earlier or later release than that window. If the user gives an exact error string, start with `17_error_lookup.md` and `15_troubleshooting.md`.
+For user questions, do **not** load the whole reference set. Pick the smallest relevant reference file(s) from `references/` and answer with version-aware caveats. The synthesized guidance was prepared against public cryoSPARC material spanning roughly **v4.0 through v5.0**; flag uncertainty when the user is on an earlier or later release than that window. If the user gives an exact error string, start with `17_error_lookup.md` and `15_troubleshooting.md`.
 
-The `Source basis` sections inside reference files are provenance notes from skill construction, not runtime dependencies. Do not try to load those raw source paths unless the user explicitly provides the original source corpus; the actionable guidance is contained in the bundled reference file itself.
+Reference files contain synthesized guidance, not raw upstream documentation. Do not assume the local source corpus is available; use current official cryoSPARC documentation and release notes for authoritative details.
 
 If acting on a live cryoSPARC instance, first identify:
 - cryoSPARC version;

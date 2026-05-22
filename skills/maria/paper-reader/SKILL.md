@@ -152,7 +152,7 @@ After producing the digest, add the paper to the project's YAML database. This c
 
 ### Directory Layout
 
-Each project database lives under its own root (e.g. `~/Documents/Maria_projects/database/`). Typical structure:
+Each project database lives under its own configured project root (for example, `$PAPER_DB_ROOT/database/`). Typical structure:
 
 ```
 database/

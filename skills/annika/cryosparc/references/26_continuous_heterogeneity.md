@@ -162,36 +162,6 @@ The mesh is the regularizer: it forces deformations to be smooth on the scale of
 - `15_troubleshooting.md` — branch-agnostic debugging mental model.
 
 
-## Source basis
+## Sources consulted
 
-The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
-
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__variability.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__variability__job-3d-variability.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__variability__job-3d-variability-display.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__variability__job-3d-flexible-refinement-3dflex-beta.md`
-- `docs/per_page/processing-data__tutorials-and-case-studies__tutorial-3d-variability-analysis-part-one.md`
-- `docs/per_page/processing-data__tutorials-and-case-studies__tutorial-3d-variability-analysis-part-two.md`
-- `docs/per_page/processing-data__tutorials-and-case-studies__tutorial-3d-flexible-refinement.md`
-- `docs/per_page/processing-data__tutorials-and-case-studies__tutorial-3d-flexible-refinement__installing-3dflex-dependencies.md`
-- `docs/per_page/processing-data__tutorials-and-case-studies__tutorial-3d-flex-mesh-preparation.md`
-- `docs/per_page/processing-data__tutorials-and-case-studies__case-study-discrete-and-continuous-heterogeneity-in-fanac1-empiar-11631-and-11632.md`
-- `videos/notes/06_fanac1_and_continuous_heterogeneity.notes.md`
-- `videos/notes/11_3dflex_custom_mesh_generation.notes.md`
-- `docs/forum_threads/digests/forum_3d-var.md`
-- `docs/forum_threads/digests/forum_3d-classification.md`
-- `docs/forum_threads/digests/forum_3d-reconstruction.md`
-- `docs/forum_threads/digests/forum_troubleshooting.md`
-- `17_error_lookup.md`
-- `07_refinement.md`
-- `08_classification_3d.md`
-- `09_local_refinement.md`
-- `10_postprocessing.md`
-- `15_troubleshooting.md`
-- `19_symmetry.md`
-- `20_masks.md`
-- `reference/release_notes/markdown/v4.1.md`
-- `reference/release_notes/markdown/v4.2.md`
-- `reference/release_notes/markdown/v4.4.md`
-- `reference/release_notes/markdown/v4.5.md`
-- `reference/release_notes/markdown/v5.0.md`
+This reference is original synthesized workflow guidance prepared from public cryoSPARC guide pages, public release notes, public forum reports, public tutorials/webinars, relevant papers, and public `cryosparc-tools` documentation/API material. Raw upstream documents, transcripts, forum posts, screenshots, and datasets are not bundled here. For authoritative and current details, consult the official cryoSPARC documentation, release notes, discussion forum, and upstream project documentation.

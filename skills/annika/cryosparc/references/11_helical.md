@@ -17,7 +17,7 @@ What lives elsewhere — do not duplicate:
 - RELION star-file round-tripping for filament metadata — `27_relion_interop.md`.
 - Tomography — `12_tomography.md` (helical reconstruction is for filaments in single-particle frames, not for tomograms).
 
-Version disclaimer: helical jobs are labeled **BETA** in the documentation as of the bundled v5.0 docs. Behavior, defaults, and even parameter names can change between releases. Verify against the local instance's job parameter list before scripting.
+Version disclaimer: helical jobs are labeled **BETA** in the documentation as of the v5.0 source window used to synthesize this skill. Behavior, defaults, and even parameter names can change between releases. Verify against the local instance's job parameter list before scripting.
 
 ---
 
@@ -38,7 +38,7 @@ Helical assemblies are continuous (or pseudo-continuous) polymers built from a r
 | Box / segment overlap | Avoid duplicate picks of the same particle | Adjacent segments are expected to share substantial particle content; **Number of times to apply helical symmetry** ties this to Δz |
 | Register / seam ambiguity | Usually irrelevant | Seam-like register ambiguity and polarity/hand ambiguity can survive apparently good FSC; resolve with independent biology/model evidence, not FSC alone |
 
-**Beta caveat.** Filament Tracer, Helical Refinement, and Symmetry Search Utility all carry the BETA label in the bundled docs. Average Power Spectra was added in v4.0 and is not labeled BETA, but its `.mrc`/`.cs` outputs are *not* registered as cryoSPARC outputs and only appear in the job directory. Plan exports accordingly.
+**Beta caveat.** Filament Tracer, Helical Refinement, and Symmetry Search Utility all carry the BETA label in the source window used to synthesize this skill. Average Power Spectra was added in v4.0 and is not labeled BETA, but its `.mrc`/`.cs` outputs are *not* registered as cryoSPARC outputs and only appear in the job directory. Plan exports accordingly.
 
 ---
 
@@ -508,11 +508,11 @@ Source-attested or source-implied failures, with the upstream lever that fixes t
 
 | Symptom | Version note | Source |
 |---|---|---|
-| Homogeneous Reconstruction Only fails on helical symmetry + custom box | Fixed in v4.1 | `reference/release_notes/markdown/v4.1.md` |
-| Homogeneous Ab-Initio Refinement `KeyError` on helical data | Fixed in v5.0 | `reference/release_notes/markdown/v5.0.md` |
-| Helical Refinement quick actions / info tags missing in UI | Added in v4.5; older versions show fewer tags but refinement still works | `reference/release_notes/markdown/v4.5.md` |
-| Non-Uniform-regularized helical refinement very slow | v4.4 made NU ~2× faster | `reference/release_notes/markdown/v4.4.md` |
-| `Force re-do FSC split` missing in 3D Classification | Added in v4.2 specifically to preserve helical refinement / symmetry-expansion splits | `reference/release_notes/markdown/v4.2.md` |
+| Homogeneous Reconstruction Only fails on helical symmetry + custom box | Fixed in v4.1 | `public cryoSPARC release notes v4.1` |
+| Homogeneous Ab-Initio Refinement `KeyError` on helical data | Fixed in v5.0 | `public cryoSPARC release notes v5.0` |
+| Helical Refinement quick actions / info tags missing in UI | Added in v4.5; older versions show fewer tags but refinement still works | `public cryoSPARC release notes v4.5` |
+| Non-Uniform-regularized helical refinement very slow | v4.4 made NU ~2× faster | `public cryoSPARC release notes v4.4` |
+| `Force re-do FSC split` missing in 3D Classification | Added in v4.2 specifically to preserve helical refinement / symmetry-expansion splits | `public cryoSPARC release notes v4.2` |
 | Forum thread recommends a parameter or workflow from before v4.0 | Predates Average Power Spectra; cross-check against current job pages | `version_caveats.md` (see also `17_error_lookup.md`) |
 
 When in doubt about a behavior described on the forum, verify against the local instance's job page and the bundled per-page docs; helical jobs are BETA and the parameter UI has shifted across minor releases.
@@ -546,7 +546,7 @@ When in doubt about a behavior described on the forum, verify against the local 
 
 ## 14. Version notes and beta caveats
 
-- Helical jobs are **BETA** in the bundled v5.0 documentation. Treat parameter names, defaults, and UI labels as version-dependent; verify against the local instance.
+- Helical jobs are **BETA** in the v5.0 source window used to synthesize this skill. Treat parameter names, defaults, and UI labels as version-dependent; verify against the local instance.
 - **v4.0** added the Average Power Spectra job and shipped the helical reconstruction branch as part of the main job catalog.
 - **v4.1** fixed a bug in Homogeneous Reconstruction Only with helical symmetry + custom box size, and reduced extraction GPU memory.
 - **v4.2** added 3D Classification's `Force re-do FSC split` parameter, which interoperates with helical refinement / symmetry expansion splits.
@@ -559,65 +559,6 @@ If a specific helical parameter or behavior is not in this page and not in the b
 
 ---
 
-## Source basis
+## Sources consulted
 
-The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
-
-Documentation pages (cryoSPARC guide, bundled per-page docs):
-
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__helical-reconstruction-beta.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__helical-reconstruction-beta__helical-symmetry-in-cryosparc.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__helical-reconstruction-beta__job-average-power-spectra.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__helical-reconstruction-beta__job-helical-refinement-beta.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__helical-reconstruction-beta__job-symmetry-search-utility-beta.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__particle-picking__job-filament-tracer-beta.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__particle-picking.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__particle-curation__job-2d-classification.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__3d-reconstruction__job-ab-initio-reconstruction.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__3d-refinement__job-homogeneous-refinement.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__utilities__job-symmetry-expansion.md`
-- `docs/per_page/processing-data__tutorials-and-case-studies__case-study-empiar-10031-mavs.md`
-
-Local topic and reference files:
-
-- `topic_plan.md`
-- `plan.md`
-- `00_overview.md`
-- `03_preprocessing.md`
-- `04_picking.md`
-- `05_extraction_2d.md`
-- `06_abinitio.md`
-- `07_refinement.md`
-- `10_postprocessing.md`
-- `16_tuning_recipes.md`
-- `18_decision_trees.md`
-- `19_symmetry.md`
-- `20_masks.md`
-- `21_gpu_lane_queue.md`
-- `24_disk_and_storage.md`
-- `27_relion_interop.md`
-- `17_error_lookup.md`
-
-Release notes:
-
-- `reference/release_notes/markdown/v4.0.md`
-- `reference/release_notes/markdown/v4.1.md`
-- `reference/release_notes/markdown/v4.2.md`
-- `reference/release_notes/markdown/v4.4.md`
-- `reference/release_notes/markdown/v4.5.md`
-- `reference/release_notes/markdown/v5.0.md`
-
-Video notes:
-
-- `videos/notes/01_introduction_and_cryoem_fundamentals.notes.md`
-- `videos/notes/02_trpv1_and_a_standard_workflow.notes.md`
-- `videos/notes/04_encapsulated_ferritin_and_non_point_group_symmetry.notes.md`
-- `videos/notes/08_reference_based_motion_correction.notes.md`
-
-Forum digests:
-
-- `docs/forum_threads/digests/forum_particle-picking.md`
-- `docs/forum_threads/digests/forum_2d-classification.md`
-- `docs/forum_threads/digests/forum_3d-reconstruction.md`
-- `docs/forum_threads/digests/forum_troubleshooting.md`
-- `docs/forum_threads/digests/forum_cryo-em-data-processing.md`
+This reference is original synthesized workflow guidance prepared from public cryoSPARC guide pages, public release notes, public forum reports, public tutorials/webinars, relevant papers, and public `cryosparc-tools` documentation/API material. Raw upstream documents, transcripts, forum posts, screenshots, and datasets are not bundled here. For authoritative and current details, consult the official cryoSPARC documentation, release notes, discussion forum, and upstream project documentation.

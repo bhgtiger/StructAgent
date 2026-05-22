@@ -9,7 +9,7 @@ Retrieval-first reference for late-stage CTF/motion polishing in cryoSPARC:
 
 Use this after the project already has a stable consensus refinement. These jobs do not rescue a bad particle stack, bad poses, mixed states, wrong metadata, or a poor reference. They are last-mile corrections that must be validated by matched before/after reconstruction or refinement.
 
-Primary sources: `docs/per_page/processing-data__all-job-types-in-cryosparc__ctf-refinement__job-local-ctf-refinement.md`, `...__job-global-ctf-refinement.md`, `docs/per_page/processing-data__tutorials-and-case-studies__tutorial-ctf-refinement.md`, `docs/per_page/processing-data__all-job-types-in-cryosparc__motion-correction__job-reference-based-motion-correction-beta.md`, `videos/notes/08_reference_based_motion_correction.notes.md`, `03_preprocessing.md`, `07_refinement.md`, `16_tuning_recipes.md`, `version_caveats.md`.
+Source note: original synthesis from public cryoSPARC guide/release notes/forum/tutorial materials and public `cryosparc-tools` documentation/API material; consult upstream documentation for authoritative details.
 
 ---
 
@@ -377,16 +377,6 @@ If asked “Should I run CTF refinement / RBMC?”:
 
 ---
 
-## Source inventory
+## Sources consulted
 
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__ctf-refinement__job-local-ctf-refinement.md` — Local CTF inputs/parameters/v5 scale optimization.
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__ctf-refinement__job-global-ctf-refinement.md` — Global CTF inputs/parameters/default fit terms.
-- `docs/per_page/processing-data__tutorials-and-case-studies__tutorial-ctf-refinement.md` — Local/Global CTF theory, diagnostics, exposure groups, Ewald, on-the-fly refinement.
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__motion-correction__job-reference-based-motion-correction-beta.md` — RBMC inputs, parameters, hyperparameters, dose weights, outputs.
-- `videos/notes/08_reference_based_motion_correction.notes.md` — RBMC video-derived practical heuristics.
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__motion-correction.md` — Patch/Local/RBMC motion-correction hierarchy and dose-weight context.
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__ctf-refinement__job-exposure-group-utilities.md` — exposure group split/combine/cluster tools.
-- `03_preprocessing.md` — early Patch Motion/Patch CTF and RBMC deferral logic.
-- `07_refinement.md` — consensus-refinement placement and late-stage correction branch.
-- `16_tuning_recipes.md` — tuning-order heuristics and split-preservation cautions.
-- `version_caveats.md` — version-specific CTF/RBMC behavior notes.
+This reference is original synthesized workflow guidance prepared from public cryoSPARC guide pages, public release notes, public forum reports, public tutorials/webinars, relevant papers, and public `cryosparc-tools` documentation/API material. Raw upstream documents, transcripts, forum posts, screenshots, and datasets are not bundled here. For authoritative and current details, consult the official cryoSPARC documentation, release notes, discussion forum, and upstream project documentation.

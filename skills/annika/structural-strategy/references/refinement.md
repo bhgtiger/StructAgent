@@ -64,7 +64,7 @@ phenix.real_space_refine model.pdb map.mrc resolution=X.X \
 3. **Relax:** Targeted ISOLDE 5min on outlier residues + 5.5Å zone
 4. **Polish:** Gentle Phenix (minimization_global only, macro_cycles=3)
 
-- After an ADP-enabled RSR pass, expect rotamer outlier creep of ~1–2%. Do a short follow-up (`refinement.run=minimization_global+local_grid_search+adp`, `rotamers.tuneup=outliers`, `rotamers.fit=outliers`, `macro_cycles=3`) before finalizing; FTCD improved outliers 3.09→1.72% and clashscore 7.49→5.82 with per-ligand CC drift <0.005.
+- After an ADP-enabled RSR pass, expect rotamer outlier creep of ~1–2%. Do a short follow-up (`refinement.run=minimization_global+local_grid_search+adp`, `rotamers.tuneup=outliers`, `rotamers.fit=outliers`, `macro_cycles=3`) before finalizing. In internal validation cases this recovered rotamer/clash metrics while keeping per-ligand CC drift negligible (<0.005).
 
 ### Post-ADP rotamer tuneup
 ADP refinement can loosen side-chain geometry by ~1–2% rotamer outliers. Before declaring final, run a short follow-up pass with ADP still enabled:

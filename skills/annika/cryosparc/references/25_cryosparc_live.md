@@ -175,17 +175,6 @@ If a user asks “how should I run Live?”
 7. use thresholds conservatively at first
 8. export accepted data and move to standard cryoSPARC for the serious refinement branch
 
-## Source basis
+## Sources consulted
 
-The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
-
-- `videos/notes/07_cryosparc_live_walkthrough.notes.md`
-- `docs/forum_threads/digests/forum_cryosparc-live.md`
-- `reference/release_notes/markdown/v4.0.md`
-- `reference/release_notes/markdown/v4.1.md`
-- `reference/release_notes/markdown/v4.2.md`
-- `reference/release_notes/markdown/v4.3.md`
-- `reference/release_notes/markdown/v4.4.md`
-- `reference/release_notes/markdown/v4.5.md`
-- `reference/release_notes/markdown/v4.6.md`
-- `reference/release_notes/markdown/v5.0.md`
+This reference is original synthesized workflow guidance prepared from public cryoSPARC guide pages, public release notes, public forum reports, public tutorials/webinars, relevant papers, and public `cryosparc-tools` documentation/API material. Raw upstream documents, transcripts, forum posts, screenshots, and datasets are not bundled here. For authoritative and current details, consult the official cryoSPARC documentation, release notes, discussion forum, and upstream project documentation.

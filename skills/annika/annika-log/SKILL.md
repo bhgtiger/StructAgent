@@ -1,6 +1,6 @@
 ---
 name: annika-log
-description: Enforce a uniform, fully-retrievable folder layout for every project under ~/Documents/Annika_projects/ so each job is self-contained, auditable, and feeds the cryoagent paper's reproducibility / failure-recovery / lesson-distill claims mechanically. Use when the user says "new job", "log this run", "init project", "create project folder", "audit project", "close job", "export failures", "export lessons", or when starting any tool run (ChimeraX / Phenix / Refmac / Coot / ISOLDE / Merizo / etc.) that produces files worth citing later. Also use when retrofitting an existing run into the standard layout, or when preparing Supp. Table 3 / lesson exports for the manuscript.
+description: Enforce a uniform, fully-retrievable folder layout for each structural-biology project so every job is self-contained, auditable, and feeds reproducibility / failure-recovery / lesson-distill claims mechanically. Use when the user says "new job", "log this run", "init project", "create project folder", "audit project", "close job", "export failures", "export lessons", or when starting any tool run (ChimeraX / Phenix / Refmac / Coot / ISOLDE / Merizo / etc.) that produces files worth citing later. Also use when retrofitting an existing run into the standard layout, or when preparing reviewer-facing failure/lesson exports.
 ---
 
 # annika-log
@@ -22,7 +22,7 @@ If a tool is run and **no `Job_NNN_*/` exists**, the run is undocumented. Redo i
 ## Core layout
 
 ```
-~/Documents/Annika_projects/<PROJECT>/
+$ANNIKA_PROJECTS_ROOT/<PROJECT>/
 ├── INDEX.md                  # registry of evidence units (machine-readable table)
 ├── PROJECT_NOTES.md          # free-form decisions / context
 ├── shared_inputs/
@@ -85,6 +85,6 @@ Use these tags so `dream_deep` / `skill-merge` can group cleanly. Full enum in `
 
 ## Notes
 
-- Design trail (Maria review rounds, locked v1.0): `~/Documents/Annika_projects/project_daily/annika_log_skill.md`.
+- Keep design-trail notes in the project root or a private project notebook; do not publish private review transcripts.
 - Skill output for `export-lessons` is the canonical input for `skill-merge`.
 - Add to AGENTS.md routing table once stable.

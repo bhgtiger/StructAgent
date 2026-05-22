@@ -167,27 +167,6 @@ If a user asks “how should I preprocess this dataset?”:
 - `17_error_lookup.md` — traceback/error string lookup.
 - `ctf_refinement_and_rbmc.md` — future targeted CTF/RBMC branch guide.
 
-## Source basis
+## Sources consulted
 
-The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
-
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__motion-correction__job-patch-motion-correction.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__motion-correction__job-reference-based-motion-correction-beta.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__ctf-estimation__job-patch-ctf-estimation.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__exposure-curation__interactive-job-manually-curate-exposures.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__exposure-curation__job-micrograph-denoiser-beta.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__exposure-curation__job-micrograph-junk-detector-beta.md`
-- `docs/per_page/processing-data__tutorials-and-case-studies__tutorial-patch-motion-and-patch-ctf.md`
-- `videos/notes/02_trpv1_and_a_standard_workflow.notes.md`
-- `videos/notes/08_reference_based_motion_correction.notes.md`
-- `docs/forum_threads/digests/forum_motion-correction.md`
-- `docs/forum_threads/digests/forum_ctf-estimation.md`
-- `17_error_lookup.md`
-- `reference/release_notes/markdown/v4.0.md`
-- `reference/release_notes/markdown/v4.1.md`
-- `reference/release_notes/markdown/v4.2.md`
-- `reference/release_notes/markdown/v4.3.md`
-- `reference/release_notes/markdown/v4.4.md`
-- `reference/release_notes/markdown/v4.5.md`
-- `reference/release_notes/markdown/v4.6.md`
-- `reference/release_notes/markdown/v5.0.md`
+This reference is original synthesized workflow guidance prepared from public cryoSPARC guide pages, public release notes, public forum reports, public tutorials/webinars, relevant papers, and public `cryosparc-tools` documentation/API material. Raw upstream documents, transcripts, forum posts, screenshots, and datasets are not bundled here. For authoritative and current details, consult the official cryoSPARC documentation, release notes, discussion forum, and upstream project documentation.

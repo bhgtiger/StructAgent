@@ -156,37 +156,6 @@ Two cautions on rebalancing:
 - `17_error_lookup.md` — exact strings for extraction/2D/cache failures.
 - `particle_set_operations.md` — intersect/union/dedup patterns for combining particle sets across pickers or branches.
 
-## Source basis
+## Sources consulted
 
-The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
-
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__extraction.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__extraction__job-extract-from-micrographs.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__extraction__job-downsample-particles.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__extraction__job-restack-particles.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__particle-curation.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__particle-curation__job-2d-classification.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__particle-curation__interactive-job-select-2d-classes.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__particle-curation__job-reference-based-auto-select-2d-beta.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__particle-curation__job-class-probability-filter.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__particle-curation__job-rebalance-2d-classes-beta.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__particle-curation__job-rebalance-orientations.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__particle-curation__job-reconstruct-2d-classes.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__particle-curation__job-subset-particles-by-statistic.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__utilities__job-remove-duplicate-particles.md`
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__utilities__job-particle-sets-tool.md`
-- `docs/per_page/processing-data__get-started-with-cryosparc-introductory-tutorial.md`
-- `docs/per_page/processing-data__tutorials-and-case-studies__case-study-dktx-bound-trpv1-empiar-10059.md`
-- `docs/per_page/processing-data__tutorials-and-case-studies__tutorial-common-cryosparc-plots.md`
-- `docs/forum_threads/digests/forum_2d-classification.md`
-- `docs/forum_threads/digests/forum_particle-curation.md`
-- `docs/forum_threads/digests/forum_particle-picking.md`
-- `videos/notes/02_trpv1_and_a_standard_workflow.notes.md`
-- `reference/release_notes/markdown/v4.0.md`
-- `reference/release_notes/markdown/v4.1.md`
-- `reference/release_notes/markdown/v4.2.md`
-- `reference/release_notes/markdown/v4.4.md`
-- `reference/release_notes/markdown/v4.5.md`
-- `reference/release_notes/markdown/v4.6.md`
-- `reference/release_notes/markdown/v5.0.md`
-- `17_error_lookup.md`
+This reference is original synthesized workflow guidance prepared from public cryoSPARC guide pages, public release notes, public forum reports, public tutorials/webinars, relevant papers, and public `cryosparc-tools` documentation/API material. Raw upstream documents, transcripts, forum posts, screenshots, and datasets are not bundled here. For authoritative and current details, consult the official cryoSPARC documentation, release notes, discussion forum, and upstream project documentation.

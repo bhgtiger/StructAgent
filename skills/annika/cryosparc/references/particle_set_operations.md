@@ -13,7 +13,7 @@ Use this when the question is:
 
 Core rule: **particle-set operations usually preserve metadata from a specific input. Know which input donates `blob`, `ctf`, `location`, `alignments2D`, `alignments3D`, class probabilities, and passthroughs before using the output.**
 
-Primary sources: `docs/per_page/processing-data__all-job-types-in-cryosparc__utilities__job-particle-sets-tool.md`, `...__job-remove-duplicate-particles.md`, `...__job-symmetry-expansion.md`, `...__particle-curation__job-subset-particles-by-statistic.md`, `...__job-rebalance-orientations.md`, `...__job-rebalance-2d-classes-beta.md`, `...__extraction__job-downsample-particles.md`, `...__extraction__job-restack-particles.md`, `05_extraction_2d.md`, `09_local_refinement.md`, `ui_to_api_crosswalk.md`.
+Source note: original synthesis from public cryoSPARC guide/release notes/forum/tutorial materials and public `cryosparc-tools` documentation/API material; consult upstream documentation for authoritative details.
 
 ---
 
@@ -412,16 +412,6 @@ assert final status == completed
 
 ---
 
-## Source inventory
+## Sources consulted
 
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__utilities__job-particle-sets-tool.md` — split/intersect/A-B/B-A semantics and metadata donor behavior.
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__utilities__job-remove-duplicate-particles.md` — duplicate removal, shift/score fields, undoing symmetry expansion.
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__particle-curation__job-subset-particles-by-statistic.md` — statistic modes, dataset fields, GMM/threshold curation, class probability semantics.
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__particle-curation__job-rebalance-orientations.md` — orientation-bin rebalancing and exclusion criteria.
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__particle-curation__job-rebalance-2d-classes-beta.md` — 2D superclass/rebalance behavior.
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__utilities__job-symmetry-expansion.md` — expansion semantics, allowed/forbidden next jobs, undo path.
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__extraction__job-downsample-particles.md` — downsample/crop/pad/recenter behavior.
-- `docs/per_page/processing-data__all-job-types-in-cryosparc__extraction__job-restack-particles.md` — consolidation/storage/cache behavior.
-- `05_extraction_2d.md` — extraction/2D cleanup loop, duplicate-removal and restack guidance.
-- `09_local_refinement.md` — local refinement, symmetry expansion, and particle-subtraction branch guardrails.
-- `ui_to_api_crosswalk.md` — API/slot/dataset field translation rules.
+This reference is original synthesized workflow guidance prepared from public cryoSPARC guide pages, public release notes, public forum reports, public tutorials/webinars, relevant papers, and public `cryosparc-tools` documentation/API material. Raw upstream documents, transcripts, forum posts, screenshots, and datasets are not bundled here. For authoritative and current details, consult the official cryoSPARC documentation, release notes, discussion forum, and upstream project documentation.

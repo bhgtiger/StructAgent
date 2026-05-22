@@ -12,7 +12,7 @@ Subcommands:
 
 Project root resolution:
   <project> may be a bare name (resolved against $ANNIKA_PROJECTS_ROOT or
-  ~/Documents/Annika_projects) or an absolute/relative path.
+  the default project root under the user's Documents folder) or an absolute/relative path.
 
 This script is intentionally dependency-free (stdlib only).
 """
