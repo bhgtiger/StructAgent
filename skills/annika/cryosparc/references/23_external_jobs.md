@@ -13,7 +13,7 @@ What lives elsewhere — do not duplicate:
 - RELION import/export round-trips — `27_relion_interop.md`.
 - Exact error strings — `17_error_lookup.md`.
 
-The exact `cryosparc-tools` method names referenced below (`create_external_job`, `connect`, `add_input`, `add_output`, `start`, `stop`, `clear`, `alloc_output`, `save_output`, `load_input`, `load_output`, `subprocess`, etc.) are attested in the local source bundle (`public cryosparc-tools documentation/API`). Their signatures evolve across minor releases (v4.x → v5.0 was a breaking change — see `public cryosparc-tools documentation/API`). **Before scripting against them, confirm the signature against the installed package or `https://tools.cryosparc.com/`.**
+The exact `cryosparc-tools` method names referenced below (`create_external_job`, `connect`, `add_input`, `add_output`, `start`, `stop`, `clear`, `alloc_output`, `save_output`, `load_input`, `load_output`, `subprocess`, etc.) are attested in the local source bundle (`reference/cryosparc-tools/…`). Their signatures evolve across minor releases (v4.x → v5.0 was a breaking change — see `reference/cryosparc-tools/CHANGELOG.md`). **Before scripting against them, confirm the signature against the installed package or `https://tools.cryosparc.com/`.**
 
 ---
 
@@ -51,7 +51,7 @@ All wrappers share the same install-and-license shape: the third-party tool is i
 
 ### 2.1 DeepEMhancer (Postprocessing)
 
-Source: `official cryoSPARC documentation`.
+Source: `docs/per_page/processing-data__all-job-types-in-cryosparc__post-processing__job-deepemhancer-wrapper.md`.
 
 | Aspect | Detail |
 |---|---|
@@ -60,7 +60,7 @@ Source: `official cryoSPARC documentation`.
 | Install constraint | Must use a **separate** conda environment from the one CryoSPARC bundles — CryoSPARC's bundled conda is destroyed and recreated on update, so anything installed into it can be wiped or break other jobs. |
 | Path constraint (master/worker or cluster) | The path to the conda installation must be **identical** on the master and every worker that runs the job. The common solution is a shared filesystem mounted at the same mount point everywhere. |
 | Common parameters | `Path to deepEMhancer executable`, `Path to deepEMhancer models`, `Use half maps`, `Normalization mode`. |
-| Project-level default | From v4.1+, the executable path can be set as a project-level parameter so new DeepEMhancer jobs autofill it (`public cryoSPARC release notes v4.1`). |
+| Project-level default | From v4.1+, the executable path can be set as a project-level parameter so new DeepEMhancer jobs autofill it (`reference/release_notes/markdown/v4.1.md`). |
 | Inputs | Volume (half maps or full map), optional mask. |
 | Outputs | `map_sharp` — a single sharpened volume. |
 | Scientific caveat | "Treating a more-sharpened version as evidence of more signal" is the canonical misuse — see `10_postprocessing.md`. The map is for figures, not for FSC claims. |
@@ -68,7 +68,7 @@ Source: `official cryoSPARC documentation`.
 
 ### 2.2 CTFFIND4 (CTF Estimation)
 
-Source: `official cryoSPARC documentation`.
+Source: `docs/per_page/processing-data__all-job-types-in-cryosparc__ctf-estimation__job-ctffind4-wrapper.md`.
 
 - Wraps CTFFIND4 (Rohou & Grigorieff 2015). Janelia license terms reproduced in the doc; user must read and accept.
 - Accepts either movies or micrographs (unlike CryoSPARC's native Patch CTF, which is micrograph-only after motion correction).
@@ -78,7 +78,7 @@ Source: `official cryoSPARC documentation`.
 
 ### 2.3 MotionCor2 (Motion Correction, BETA)
 
-Source: `official cryoSPARC documentation`.
+Source: `docs/per_page/processing-data__all-job-types-in-cryosparc__motion-correction__job-motioncor2-wrapper-beta.md`.
 
 - Wraps MotionCor2 (Zheng 2017). CryoSPARC does not distribute binaries; user must accept the MotionCor2 Non-Commercial Software License Agreement (for-profit users contact David Agard separately).
 - BETA-tagged. Treat its outputs as experimental and validate against Patch Motion on a pilot before committing a full dataset.
@@ -87,17 +87,17 @@ Source: `official cryoSPARC documentation`.
 
 ### 2.4 Gctf (CTF Estimation, Legacy)
 
-Source: `official cryoSPARC documentation`.
+Source: `docs/per_page/processing-data__all-job-types-in-cryosparc__ctf-estimation__job-gctf-wrapper-legacy.md`.
 
-- Legacy. Hidden from the default Job Builder; enable "Show legacy jobs" to find it (`official cryoSPARC documentation`).
+- Legacy. Hidden from the default Job Builder; enable "Show legacy jobs" to find it (`docs/per_page/application-guide__creating-and-running-jobs.md`).
 - Wraps Gctf (Zhang 2016). Binaries must be installed at `deps/external/gctf-1.06/bin/` inside the `cryosparc_worker` directory — note the **non-portable** install location that survives only as long as the worker install survives.
-- Requires a **CUDA 8** toolkit because public Gctf binaries only support CUDA ≤ 8. The user maintains a separate CUDA 8 toolkit (no root needed, runfile install) and points the wrapper at its `lib64`. v4.5 also fixed a bug where the wrapper failed if `LD_LIBRARY_PATH` was unset (`public cryoSPARC release notes v4.5`).
+- Requires a **CUDA 8** toolkit because public Gctf binaries only support CUDA ≤ 8. The user maintains a separate CUDA 8 toolkit (no root needed, runfile install) and points the wrapper at its `lib64`. v4.5 also fixed a bug where the wrapper failed if `LD_LIBRARY_PATH` was unset (`reference/release_notes/markdown/v4.5.md`).
 - Local-refinement of CTF parameters is only worth using when the consensus map is already ≤ ~4 Å.
 - Default to native Patch CTF over Gctf for any new project unless there is a specific reason. Reasons to keep Gctf around are basically reproducing a published Gctf-based result.
 
 ### 2.5 ThreeDFSC (Postprocessing, Legacy)
 
-Source: `official cryoSPARC documentation`.
+Source: `docs/per_page/processing-data__all-job-types-in-cryosparc__post-processing__job-threedfsc-wrapper-legacy.md`.
 
 - Legacy NYSBC/Salk tool for visualizing directional FSCs. MIT license.
 - Output is mostly streamlog-based: a histogram of FSCs in the streamlog, and instructions for opening the full ThreeDFSC outputs in Chimera.
@@ -119,7 +119,7 @@ Source: `official cryoSPARC documentation`.
 
 ## 3. The External-Job bridge via `cryosparc-tools`
 
-Source: `official cryoSPARC documentation`, `public cryosparc-tools documentation/API`, `public cryosparc-tools documentation/API`, `public cryosparc-tools documentation/API`, `public cryosparc-tools documentation/API`, `public cryosparc-tools documentation/API`.
+Source: `docs/per_page/processing-data__cryosparc-tools.md`, `reference/cryosparc-tools/docs/guides/jobs.ipynb`, `reference/cryosparc-tools/docs/examples/cryolo.ipynb`, `reference/cryosparc-tools/cryosparc/controllers/job.py`, `reference/cryosparc-tools/cryosparc/tools.py`, `reference/cryosparc-tools/cryosparc/models/external.py`.
 
 ### 3.1 What an External Job is
 
@@ -143,7 +143,7 @@ These method names are attested in the source bundle but their signatures move a
 | **Start, fill, save, stop** | `job.start()` marks the job running. The script either fills allocated datasets in place (`job.alloc_output(name, alloc=N)` returns a Dataset that the script writes to) or builds a Dataset externally and `job.save_output(name, dset)`. Files written into `job.dir` are visible from the GUI. `job.stop()` marks the job complete. | `controllers/job.py`, `examples/cryolo.ipynb`, `examples/custom-workflow.ipynb` |
 | **Inspect from CryoSPARC** | Once `stop()` returns, the External Job behaves like a native job in the GUI: outputs appear in the Outputs tab, connect to downstream jobs, show up in Workflows, get cleared/compacted by data-cleanup, get exported by `cryosparcm` data-management commands. | `application-guide__inspecting-job-data.md`, `24_disk_and_storage.md` |
 
-Note the **v5.0 lifecycle hardening** (`public cryosparc-tools documentation/API`):
+Note the **v5.0 lifecycle hardening** (`reference/cryosparc-tools/CHANGELOG.md`):
 
 - Inputs and outputs can no longer be added to an external job that is already completed — must call `job.clear()` first to return it to `building`.
 - Outputs can no longer be saved to a `building` *or* `completed` job — only between `start()` and `stop()`. Re-running means clear → start → save → stop.
@@ -171,13 +171,13 @@ Note the **v5.0 lifecycle hardening** (`public cryosparc-tools documentation/API
 
 ### 3.5 Workflow templating with External Jobs
 
-Workflows (`official cryoSPARC documentation`, `13_cryosparc_tools_api.md`) can contain External Jobs as part of a saved pipeline. The pattern is:
+Workflows (`docs/per_page/application-guide__workflows.md`, `13_cryosparc_tools_api.md`) can contain External Jobs as part of a saved pipeline. The pattern is:
 
 - Build the pipeline in the GUI with the External Job as a node (its inputs already wired to upstream outputs in the workspace).
 - Save the workflow JSON.
 - The "Queue on Apply" toggle queues the deterministic native jobs; the External Job still requires the driver script to attach and run when the workflow lands in a new workspace. This is the half of the workflow that is **not** click-to-apply, and it must be documented in the workflow's description.
 
-The GPCR automation workflow (`official cryoSPARC documentation`) is the source-attested example of an end-to-end workflow that mixes locked parameters, flagged dataset-specific knobs (extraction box size, blob diameter, exposure-group regex, reference paths), and a tools-side driver. Use it as the canonical reference when planning a multi-dataset external workflow.
+The GPCR automation workflow (`docs/per_page/processing-data__automated-workflows.md`) is the source-attested example of an end-to-end workflow that mixes locked parameters, flagged dataset-specific knobs (extraction box size, blob diameter, exposure-group regex, reference paths), and a tools-side driver. Use it as the canonical reference when planning a multi-dataset external workflow.
 
 ### 3.6 Re-import / export — when External-Job outputs need to leave and come back
 
@@ -189,7 +189,7 @@ Three common patterns:
 | **CryoSPARC → External → CryoSPARC** | A CryoSPARC dataset needs to be modified outside (e.g., custom QC, custom classifier) and reinserted. | External Job that `connect`s the upstream output, loads the dataset (`job.load_input`), mutates the metadata in Python or via a third-party tool, then `add_output`s a modified dataset that downstream jobs consume. |
 | **CryoSPARC → other package** | Output is needed in a different ecosystem (RELION, ChimeraX, Phenix). | This is a *download/export*, not an External Job; see `24_disk_and_storage.md` for export commands and `27_relion_interop.md` for RELION round-trips. Do not wrap a download-only operation in an External Job. |
 
-The crYOLO example in `public cryosparc-tools documentation/API` is the canonical CryoSPARC → External → CryoSPARC walkthrough.
+The crYOLO example in `reference/cryosparc-tools/docs/examples/cryolo.ipynb` is the canonical CryoSPARC → External → CryoSPARC walkthrough.
 
 ---
 
@@ -216,7 +216,7 @@ This is the layer where most "it worked yesterday" problems live. Treat every it
 
 ### 4.3 Version / schema drift
 
-The schema for inputs/outputs (slot names, dataset column conventions, group types) evolves across CryoSPARC versions. The `cryosparc-tools` library tracks the CryoSPARC minor version closely — `public cryosparc-tools documentation/API` documents that mismatches produce a warning at connection time and may produce hard errors at call time. Practical rules:
+The schema for inputs/outputs (slot names, dataset column conventions, group types) evolves across CryoSPARC versions. The `cryosparc-tools` library tracks the CryoSPARC minor version closely — `reference/cryosparc-tools/CHANGELOG.md` documents that mismatches produce a warning at connection time and may produce hard errors at call time. Practical rules:
 
 - Pin the `cryosparc-tools` version to the connected CryoSPARC minor version (`pip install --force cryosparc-tools~=<X.Y>.0`).
 - After a CryoSPARC update, regenerate any wrapper-shell-script absolute paths; CryoSPARC's bundled conda was rebuilt and `LD_LIBRARY_PATH` may have moved.
@@ -321,8 +321,8 @@ Checklist:
 | Tool runs, produces files in its own working dir, but the job has no outputs | The wrapper's expected output filenames did not match the tool's actual output (often a tool-version mismatch). Check the job's stdout/stderr in the event log against the tool's documented output paths for the installed version. |
 | DeepEMhancer-style env conflict ("module X not found", numpy version errors) | The wrapper inherited CryoSPARC's env vars. Install the wrapper shell script that explicitly deactivates CryoSPARC's conda env and re-activates the tool's. |
 | CTFFIND4 fails on every movie | Movies were imported with a separate gain reference — gain correction is not baked into the import for the wrapper to see. Use Patch CTF, or motion-correct first and feed micrographs. |
-| Gctf wrapper fails with `LD_LIBRARY_PATH` error | Update to v4.5+ which patched this (`public cryoSPARC release notes v4.5`), or `export LD_LIBRARY_PATH=` to a non-empty no-op value in the worker env. |
-| ThreeDFSC wrapper streamlog blank | Functionality is partial by design (`official cryoSPARC documentation`); use native Orientation Diagnostics for new work. |
+| Gctf wrapper fails with `LD_LIBRARY_PATH` error | Update to v4.5+ which patched this (`reference/release_notes/markdown/v4.5.md`), or `export LD_LIBRARY_PATH=` to a non-empty no-op value in the worker env. |
+| ThreeDFSC wrapper streamlog blank | Functionality is partial by design (`docs/per_page/.../job-threedfsc-wrapper-legacy.md`); use native Orientation Diagnostics for new work. |
 | Assertion error "No output result named `micrographs_fail.ctf`" after CTFFIND4 failures | All CTFFIND runs failed, so the failed-output result was never created (`17_error_lookup.md`). Check why the runs failed — usually gain-correction or path issues. |
 
 ### 5.6 Archiving provenance
@@ -368,18 +368,18 @@ Treat the project tree as the primary record; treat MongoDB GridFS assets and th
 |---|---|---|---|
 | `executable not found` at wrapper launch | Wrapper install / path | `ls -l <path>` as CryoSPARC user on both master and worker; confirm conda env active in the wrapper shell script | `15_troubleshooting.md` §2; DeepEMhancer install instructions |
 | Wrapper job starts then fails inside the tool with "module / numpy / version" error | Env contamination from CryoSPARC's bundled conda | Wrap tool in a `*.sh` script that `unset`s `PYTHONPATH`, `LD_LIBRARY_PATH`, `CONDA_*` and re-sources the tool's env | DeepEMhancer doc; `17_error_lookup.md` §4 (`numpy.float64` index error pattern) |
-| `LD_LIBRARY_PATH` empty → Gctf fails | Wrapper edge case | Update to v4.5+ (the env-var fix) or set a non-empty no-op value | `public cryoSPARC release notes v4.5` |
+| `LD_LIBRARY_PATH` empty → Gctf fails | Wrapper edge case | Update to v4.5+ (the env-var fix) or set a non-empty no-op value | `reference/release_notes/markdown/v4.5.md` |
 | CTFFIND4 wrapper fails on all movies | Wrapper input schema | Movies imported with separate gain ref — wrapper does not see gain. Use Patch CTF or motion-correct first | CTFFIND4 wrapper doc (gain-correction warning) |
 | `AssertionError: No output result named micrographs_fail.ctf` | Wrapper output-handling bug after all-fail input | All CTFFIND runs failed — fix the underlying input/path problem, not the assertion | `17_error_lookup.md` §4 |
 | External Job stuck `running` after script exits | External-Job lifecycle | Driver crashed without `job.stop()` — call `job.clear()` and re-run | `cryosparc-tools` `controllers/job.py` |
-| `cannot add input / output to completed external job` | External-Job lifecycle (v5.0+) | Lifecycle now enforces clear → start → save → stop | `public cryosparc-tools documentation/API` v5.0.0 |
+| `cannot add input / output to completed external job` | External-Job lifecycle (v5.0+) | Lifecycle now enforces clear → start → save → stop | `reference/cryosparc-tools/CHANGELOG.md` v5.0.0 |
 | External Job outputs OK but downstream job fails "missing slot X" | External-Job output schema | `add_output(..., slots=[...])` did not include the slot the downstream expects | `controllers/job.py`; native equivalent's `Job.print_output_spec` |
-| `cryosparc-tools` produces schema / type errors after CryoSPARC update | Version drift | `pip install --force cryosparc-tools~=<CryoSPARC X.Y>.0`; retest External-Job drivers | `public cryosparc-tools documentation/API` |
+| `cryosparc-tools` produces schema / type errors after CryoSPARC update | Version drift | `pip install --force cryosparc-tools~=<CryoSPARC X.Y>.0`; retest External-Job drivers | `reference/cryosparc-tools/CHANGELOG.md` |
 | Tool subprocess output missing from event log | External-Job logging | Tool was called via raw `subprocess.run` instead of `job.subprocess(...)` | `examples/cryolo.ipynb` |
 | Wrapper job runs on master but fails on worker | Master/worker path divergence | Conda install path differs between master and worker; or shell init prints text that breaks SSH launch | `15_troubleshooting.md` §2; `17_error_lookup.md` (worker-launch entries) |
 | External Job outputs missing after `cryosparcm compact` | Outputs were written outside `job.dir` (or were intermediate) | Compaction only knows about files in `Jx/` it can prove are intermediate. Files outside the project tree are invisible to it. Re-run with outputs written into `job.dir`. | `24_disk_and_storage.md` |
 | DeepEMhancer / wrapper map shows extra detail that disappears with parameter changes | Tool-output interpretation | DeepEMhancer is visualization-only; do not back FSC / resolution claims with it | `10_postprocessing.md` |
-| crYOLO External Job "Inspect Picks" shows no power histogram or particle overlays | External-Job output schema or path | Particle locations not registered in the slot the GUI expects (`location` slot in `pick` group); or the micrograph paths used at pick time differ from the paths CryoSPARC sees now | Forum thread *crYOLO particle picking problem* (`public cryoSPARC Discuss forum reports` #1) |
+| crYOLO External Job "Inspect Picks" shows no power histogram or particle overlays | External-Job output schema or path | Particle locations not registered in the slot the GUI expects (`location` slot in `pick` group); or the micrograph paths used at pick time differ from the paths CryoSPARC sees now | Forum thread *crYOLO particle picking problem* (`docs/forum_threads/digests/forum_scripting.md` #1) |
 | Job ran outside CryoSPARC, no External Job exists, results need to live in CryoSPARC | Wrong tool for the job | Create an External Job *post hoc* that connects upstream inputs, declares outputs, writes the files into `job.dir`, and records the tool version in `job.log` | `controllers/job.py` `ExternalJobController` |
 
 ---
@@ -424,6 +424,48 @@ Treat the project tree as the primary record; treat MongoDB GridFS assets and th
 
 ---
 
-## Sources consulted
+## Source basis
 
-This reference is original synthesized workflow guidance prepared from public cryoSPARC guide pages, public release notes, public forum reports, public tutorials/webinars, relevant papers, and public `cryosparc-tools` documentation/API material. Raw upstream documents, transcripts, forum posts, screenshots, and datasets are not bundled here. For authoritative and current details, consult the official cryoSPARC documentation, release notes, discussion forum, and upstream project documentation.
+The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
+
+
+- `topic_plan.md`
+- `plan.md`
+- `10_postprocessing.md`
+- `13_cryosparc_tools_api.md`
+- `14_cli_admin.md`
+- `15_troubleshooting.md`
+- `18_decision_trees.md`
+- `21_gpu_lane_queue.md`
+- `24_disk_and_storage.md`
+- `17_error_lookup.md`
+- `reference/cryosparc-tools/CHANGELOG.md`
+- `reference/cryosparc-tools/cryosparc/tools.py`
+- `reference/cryosparc-tools/cryosparc/controllers/job.py`
+- `reference/cryosparc-tools/cryosparc/models/external.py`
+- `reference/cryosparc-tools/cryosparc/api.pyi`
+- `reference/cryosparc-tools/docs/guides/jobs.ipynb`
+- `reference/cryosparc-tools/docs/examples/custom-workflow.ipynb`
+- `reference/cryosparc-tools/docs/examples/cryolo.ipynb`
+- `reference/release_notes/markdown/v4.0.md`
+- `reference/release_notes/markdown/v4.1.md`
+- `reference/release_notes/markdown/v4.2.md`
+- `reference/release_notes/markdown/v4.3.md`
+- `reference/release_notes/markdown/v4.4.md`
+- `reference/release_notes/markdown/v4.5.md`
+- `reference/release_notes/markdown/v4.6.md`
+- `reference/release_notes/markdown/v5.0.md`
+- `docs/per_page/processing-data__cryosparc-tools.md`
+- `docs/per_page/processing-data__automated-workflows.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__post-processing.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__post-processing__job-deepemhancer-wrapper.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__post-processing__job-threedfsc-wrapper-legacy.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__ctf-estimation__job-ctffind4-wrapper.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__ctf-estimation__job-gctf-wrapper-legacy.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__motion-correction__job-motioncor2-wrapper-beta.md`
+- `docs/per_page/application-guide__creating-and-running-jobs.md`
+- `docs/per_page/application-guide__workflows.md`
+- `docs/per_page/application-guide__inspecting-job-data.md`
+- `docs/forum_threads/digests/forum_scripting.md`
+- `docs/forum_threads/digests/forum_troubleshooting.md`
+- `docs/forum_threads/digests/forum_motion-correction.md`

@@ -8,7 +8,7 @@ This is **not** a complete API reference. The exact method signatures and parame
 
 Core rule: **the GUI is the safest source of job-specific names; the tools API is the safest way to automate once those names are known.**
 
-Source note: original synthesis from public cryoSPARC guide/release notes/forum/tutorial materials and public `cryosparc-tools` documentation/API material; consult upstream documentation for authoritative details.
+Primary sources: `13_cryosparc_tools_api.md`, `docs/per_page/application-guide__creating-and-running-jobs.md`, `docs/per_page/application-guide__inspecting-job-data.md`, `docs/per_page/application-guide__low-level-results-interface.md`, `reference/cryosparc-tools/docs/guides/jobs.ipynb`, `reference/cryosparc-tools/cryosparc/api.pyi`, `reference/cryosparc-tools/cryosparc/models/job_spec.py`.
 
 ---
 
@@ -298,6 +298,14 @@ Checklist before running:
 
 ---
 
-## Sources consulted
+## Source inventory
 
-This reference is original synthesized workflow guidance prepared from public cryoSPARC guide pages, public release notes, public forum reports, public tutorials/webinars, relevant papers, and public `cryosparc-tools` documentation/API material. Raw upstream documents, transcripts, forum posts, screenshots, and datasets are not bundled here. For authoritative and current details, consult the official cryoSPARC documentation, release notes, discussion forum, and upstream project documentation.
+- `13_cryosparc_tools_api.md` — automation mental model, lifecycle, safety rules.
+- `14_cli_admin.md` — boundary between `cryosparcm` admin operations and job-level tools automation.
+- `docs/per_page/application-guide__creating-and-running-jobs.md` — Builder, Job Cart, parameters, queue slide-over, chaining jobs.
+- `docs/per_page/application-guide__inspecting-job-data.md` — Inputs/Parameters tab, Outputs tab, Metadata/Log, Comparison view.
+- `docs/per_page/application-guide__low-level-results-interface.md` — output groups/results, slot replacement, passthroughs, result versions.
+- `reference/cryosparc-tools/docs/guides/jobs.ipynb` — concrete tools examples: `create_job`, `set_param`, `connect`, `queue`, `wait_for_done`, `load_output`, downloads.
+- `reference/cryosparc-tools/cryosparc/api.pyi` — API namespaces/method inventory.
+- `reference/cryosparc-tools/cryosparc/models/job_spec.py` — job spec, input/output/result models, categories, builder tags.
+- `reference/cryosparc-tools/cryosparc/models/job.py` — job model and status literals.

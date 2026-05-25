@@ -1,10 +1,8 @@
-# AI Agent Skill for cryoSPARC
+# cryoSPARC Agent Skill
 
 **Consult workflows, inspect results, launch jobs safely.**
 
-This folder contains the StructAgent AI agent skill for cryoSPARC: a self-contained 36-file agent skill folder with `README.md`, `SKILL.md`, `lessons.md`, 32 on-demand Markdown references, and a dry-run-first Python helper for cautious `cryosparc-tools` automation. It is designed for Claude/Codex-style coding agents, but the pattern is runtime-agnostic: any agent can use it if it can load instructions, read reference files on demand, and run approved shell/Python tools.
-
-This is an independent, unofficial project. It is not affiliated with, endorsed by, sponsored by, or approved by Structura Biotechnology Inc. cryoSPARC and CryoSPARC Live are trademarks of Structura Biotechnology Inc. Users are responsible for complying with cryoSPARC licensing, documentation terms, and citation requirements.
+This folder contains the StructAgent cryoSPARC skill: a self-contained 36-file agent skill folder with `README.md`, `SKILL.md`, `lessons.md`, 32 on-demand Markdown references, and a dry-run-first Python helper for cautious `cryosparc-tools` automation. It is designed for Claude/Codex-style coding agents, but the pattern is runtime-agnostic: any agent can use it if it can load instructions, read reference files on demand, and run approved shell/Python tools.
 
 Public example page: https://bhgtiger.github.io/StructAgent/cryosparc_skill_example/
 
@@ -15,12 +13,18 @@ skills/annika/cryosparc/
 ├── README.md
 ├── SKILL.md                         # entrypoint, routing, safety rules
 ├── lessons.md                       # local/site lessons placeholder
-├── references/                      # 32 markdown reference files
+├── references/                      # markdown reference files (incl. 20_masks.md + 20a_mask_generation_chimerax.md)
+├── assets/                          # small static assets (e.g. mask_skill_overview.svg)
 └── scripts/
-    └── cryosparc_harness.py         # dry-run-first helper for cautious automation
+    ├── cryosparc_harness.py         # dry-run-first helper for cautious cryoSPARC automation
+    └── masks/                       # headless ChimeraX mask-base generators (file-local, no cryoSPARC)
+        ├── README.md
+        ├── make_mask_from_model.py      # molmap → binarize/dilate/soft → resample → .mrc + .json
+        ├── make_mask_from_map.py        # no-model fallback: Gaussian blur + threshold + soft
+        └── make_complement_mask.py      # full − region → particle-subtraction mask
 ```
 
-The reference files are synthesized workflow guidance. Raw upstream documentation, forum posts, video transcripts, and release notes are intentionally not bundled. For authoritative and current details, consult the official cryoSPARC guide, release notes, discussion forum, and `cryosparc-tools` documentation.
+The `Source basis` sections inside reference files are provenance notes from skill construction, not runtime dependencies. The raw source corpus is intentionally not bundled.
 
 ## Install
 
@@ -108,3 +112,17 @@ python scripts/cryosparc_harness.py create-job \
 ```
 
 Live use requires a compatible `cryosparc-tools` install and valid local access to a cryoSPARC instance.
+
+### Mask generation helpers (ChimeraX, file-local)
+
+`scripts/masks/` bundles headless ChimeraX (`--nogui --exit --script`) helpers for generating cryoSPARC mask bases off-instance. They read `.mrc`/`.cif`/`.pdb`, write `.mrc` + a `<out>.mrc.json` sidecar (`{"ok": bool, "params": ..., "stats": ...}`), and do **not** touch any cryoSPARC instance. The sidecar is the only reliable success signal — ChimeraX exit codes can be misleading. See `references/20a_mask_generation_chimerax.md` for the full workflow, parameters, and ChimeraX command caveats.
+
+```bash
+# locate ChimeraX (macOS example)
+CHIMERAX=$(ls -1d /Applications/ChimeraX-*.app/Contents/MacOS/ChimeraX 2>/dev/null | sort -V | tail -1)
+
+# model → mask base (primary path)
+"$CHIMERAX" --nogui --exit --script scripts/masks/make_mask_from_model.py -- \
+  --model model.cif --selection "/A:120-340" \
+  --target-map refined_map.mrc --resolution 16 --out mask_base.mrc
+```

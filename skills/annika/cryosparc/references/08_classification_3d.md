@@ -173,6 +173,39 @@ When a user asks "what should I try first?":
 - `orientation_and_preferred_views.md` — diagnosing pose-anisotropy bias upstream of classification.
 - `particle_set_operations.md` — splitting, merging, balancing half-sets across classification loops.
 
-## Sources consulted
+## Source basis
 
-This reference is original synthesized workflow guidance prepared from public cryoSPARC guide pages, public release notes, public forum reports, public tutorials/webinars, relevant papers, and public `cryosparc-tools` documentation/API material. Raw upstream documents, transcripts, forum posts, screenshots, and datasets are not bundled here. For authoritative and current details, consult the official cryoSPARC documentation, release notes, discussion forum, and upstream project documentation.
+The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
+
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__variability__job-3d-classification-beta.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__3d-refinement__job-heterogeneous-refinement.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__3d-refinement__job-heterogeneous-reconstruction-only.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__variability__job-regroup-3d-classes.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__variability__job-reference-based-auto-select-3d-beta.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__utilities__job-symmetry-expansion.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__utilities__job-split-volumes-group.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__utilities__job-select-volume.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__particle-curation__job-subset-particles-by-statistic.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__post-processing__job-validation-fsc.md`
+- `docs/per_page/processing-data__tutorials-and-case-studies__tutorial-3d-classification.md`
+- `docs/per_page/processing-data__tutorials-and-case-studies__case-study-discrete-and-continuous-heterogeneity-in-fanac1-empiar-11631-and-11632.md`
+- `docs/per_page/processing-data__tutorials-and-case-studies__case-study-pseudosymmetry-in-trpv5-and-calmodulin-empiar-10256.md`
+- `docs/per_page/processing-data__tutorials-and-case-studies__case-study-end-to-end-processing-of-encapsulated-ferritin-empiar-10716.md`
+- `docs/per_page/processing-data__tutorials-and-case-studies__tutorial-3d-variability-analysis-part-one.md`
+- `docs/per_page/processing-data__tutorials-and-case-studies__tutorial-3d-variability-analysis-part-two.md`
+- `videos/notes/05_fanac1_and_discrete_heterogeneity.notes.md`
+- `videos/notes/06_fanac1_and_continuous_heterogeneity.notes.md`
+- `videos/notes/03_trpv5_and_symmetry_breaking.notes.md`
+- `videos/notes/04_encapsulated_ferritin_and_non_point_group_symmetry.notes.md`
+- `docs/forum_threads/digests/forum_3d-classification.md`
+- `docs/forum_threads/digests/forum_3d-var.md`
+- `docs/forum_threads/digests/forum_particle-curation.md`
+- `docs/forum_threads/digests/forum_3d-reconstruction.md`
+- `reference/release_notes/markdown/v4.0.md`
+- `reference/release_notes/markdown/v4.1.md`
+- `reference/release_notes/markdown/v4.2.md`
+- `reference/release_notes/markdown/v4.3.md`
+- `reference/release_notes/markdown/v4.4.md`
+- `reference/release_notes/markdown/v4.5.md`
+- `reference/release_notes/markdown/v4.6.md`
+- `reference/release_notes/markdown/v5.0.md`

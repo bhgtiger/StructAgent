@@ -3,19 +3,17 @@ name: cryosparc
 description: Guide and automate cryoSPARC SPA processing: import/preprocessing, picking, extraction/2D, ab initio, homogeneous/heterogeneous/non-uniform refinement, 3D classification, 3DVA/3DFlex, local/focused refinement, masks, symmetry, helical, CryoSPARC Live, cryosparc-tools, cryosparcm admin, GPU lanes/queues, storage, RELION interop, troubleshooting, and error lookup. Covers tomography/cryo-ET only at the SPA boundary (e.g. tilted-SPA vs tilt-series, importing tomo-derived particles); it is not a native tomo/cryo-ET pipeline.
 ---
 
-# AI Agent Skill for cryoSPARC
+# cryoSPARC
 
 Use this skill for cryoSPARC advice, troubleshooting, parameter recommendations, workflow planning, and cautious automation via `cryosparc-tools` / `cryosparcm` when the user explicitly wants commands run.
-
-This is an independent, unofficial AI agent skill. It is not affiliated with, endorsed by, sponsored by, or approved by Structura Biotechnology Inc. cryoSPARC and CryoSPARC Live are trademarks of Structura Biotechnology Inc. Always defer to the official cryoSPARC documentation and license terms for authoritative guidance.
 
 **Scope.** SPA-focused. Tomography/cryo-ET is in-scope only where it touches SPA (tilted-SPA collection, importing tomo-derived particle stacks, boundary disambiguation) — see `12_tomography.md`. Native tilt-series alignment and subtomogram averaging pipelines are out of scope.
 
 ## First response rule
 
-For user questions, do **not** load the whole reference set. Pick the smallest relevant reference file(s) from `references/` and answer with version-aware caveats. The synthesized guidance was prepared against public cryoSPARC material spanning roughly **v4.0 through v5.0**; flag uncertainty when the user is on an earlier or later release than that window. If the user gives an exact error string, start with `17_error_lookup.md` and `15_troubleshooting.md`.
+For user questions, do **not** load the whole corpus. Pick the smallest relevant reference file(s) from `references/` and answer with version-aware caveats. The bundled corpus covers cryoSPARC **v4.0 through v5.0**; flag uncertainty when the user is on an earlier or later release than that window. If the user gives an exact error string, start with `17_error_lookup.md` and `15_troubleshooting.md`.
 
-Reference files contain synthesized guidance, not raw upstream documentation. Do not assume the local source corpus is available; use current official cryoSPARC documentation and release notes for authoritative details.
+The `Source basis` sections inside reference files are provenance notes from skill construction, not runtime dependencies. Do not try to load those raw source paths unless the user explicitly provides the original source corpus; the actionable guidance is contained in the bundled reference file itself.
 
 If acting on a live cryoSPARC instance, first identify:
 - cryoSPARC version;
@@ -50,7 +48,9 @@ Decision and troubleshooting:
 - Version-specific behavior/bugs → `version_caveats.md`
 
 Specialized references:
-- Masks → `20_masks.md`
+- Official tutorials/case-study scenario playbooks → `case_studies_and_tutorials.md`
+- Masks (design & validation) → `20_masks.md`
+- Mask generation in headless ChimeraX (model→mask via `molmap`, map-only fallback, complementary subtraction masks, bundled `scripts/masks/*.py`) → `20a_mask_generation_chimerax.md`
 - Symmetry → `19_symmetry.md`
 - CTF refinement / RBMC → `ctf_refinement_and_rbmc.md`
 - Orientation diagnostics / preferred views → `orientation_and_preferred_views.md`
@@ -102,7 +102,9 @@ Ask before:
 - **Error message:** before prescribing fixes, collect (a) the **exact error text** as it appears in the job log, (b) cryoSPARC **master / worker / cryosparc-tools versions**, and (c) whether the offending **path is visible from the worker** (not just the master/UI host) — many "file not found" / permission errors are worker-side path or mount issues. Then load `17_error_lookup.md` + `15_troubleshooting.md` and give cause/fix/inspection commands.
 - **Bad 2D classes:** load `05_extraction_2d.md` + maybe `04_picking.md`.
 - **Bad/refinement streaky map:** load `07_refinement.md`, `10_postprocessing.md`, and if angular bias suspected `orientation_and_preferred_views.md`.
-- **Mask/local refinement question:** load `20_masks.md` + `09_local_refinement.md`.
+- **Mask/local refinement question (design, FSC tells, Volume Tools params):** load `20_masks.md` + `09_local_refinement.md`.
+- **"Generate/make mask from model/map", "ChimeraX mask", "molmap", "particle subtraction complement mask":** load `20_masks.md` + `20a_mask_generation_chimerax.md` (+ `09_local_refinement.md` for local-refine / subtraction workflow context). The ChimeraX scripts under `scripts/masks/` are **file-local** — they read maps/models and write `.mrc` + `.json` sidecar; they do **not** touch any cryoSPARC instance and need no live credentials. Importing the resulting `.mrc` into cryoSPARC, running Volume Tools, or queueing Local Refinement / Particle Subtraction still follows the usual cryoSPARC safety confirmation rules below.
+- **Official tutorial/case-study by name, EMPIAR ID, or similar dataset phenotype:** load `case_studies_and_tutorials.md` first as a scenario map, choose the dominant matching playbook, then load the smallest listed workflow reference(s). If the user asks generic stage-specific “what next?” without a case-study-like phenotype, use `18_decision_trees.md` first instead.
 - **Continuous heterogeneity (3DVA / 3DFlex):** load `26_continuous_heterogeneity.md` (+ `09_local_refinement.md` if the user is mixing in particle subtraction or masked analysis).
 - **RELION ↔ cryoSPARC interop / STAR import-export:** load `27_relion_interop.md` (+ `02_import.md` for import-side specifics, `particle_set_operations.md` if combining/diffing particle sets across packages).
 - **Particle set operations (union / intersect / difference / dedup across jobs):** load `particle_set_operations.md`.
