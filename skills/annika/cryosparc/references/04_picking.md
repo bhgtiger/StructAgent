@@ -185,6 +185,39 @@ If a user asks "how should I pick particles?":
 - `particle_set_operations.md` — union/dedup semantics for picks across jobs.
 - `version_caveats.md` — version-fixed picking bugs.
 
-## Sources consulted
+## Source basis
 
-This reference is original synthesized workflow guidance prepared from public cryoSPARC guide pages, public release notes, public forum reports, public tutorials/webinars, relevant papers, and public `cryosparc-tools` documentation/API material. Raw upstream documents, transcripts, forum posts, screenshots, and datasets are not bundled here. For authoritative and current details, consult the official cryoSPARC documentation, release notes, discussion forum, and upstream project documentation.
+The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
+
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__particle-picking.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__particle-picking__job-blob-picker.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__particle-picking__job-blob-picker-tuner.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__particle-picking__interactive-job-manual-picker.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__particle-picking__interactive-job-inspect-particle-picks.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__particle-picking__job-create-templates.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__particle-picking__job-template-picker.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__particle-picking__job-filament-tracer-beta.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__deep-picking__topaz.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__deep-picking__topaz__job-topaz-train-beta.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__deep-picking__topaz__job-topaz-extract-beta.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__deep-picking__topaz__job-topaz-denoise-beta.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__deep-picking__deep-network-particle-picker__job-deep-picker-train-beta-and-deep-picker-extract-beta.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__deep-picking__guideline-for-supervised-particle-picking-using-deep-learning-models.md`
+- `docs/per_page/processing-data__tutorials-and-case-studies__tutorial-blob-picker-tuner.md`
+- `docs/per_page/processing-data__tutorials-and-case-studies__tutorial-particle-picking-calibration.md`
+- `docs/forum_threads/digests/forum_particle-picking.md`
+- `docs/forum_threads/digests/forum_particle-curation.md`
+- `docs/forum_threads/digests/forum_2d-classification.md`
+- `docs/forum_threads/digests/forum_cryosparc-live.md`
+- `docs/forum_threads/digests/forum_troubleshooting.md`
+- `17_error_lookup.md`
+- `reference/release_notes/markdown/v4.0.md`
+- `reference/release_notes/markdown/v4.1.md`
+- `reference/release_notes/markdown/v4.2.md`
+- `reference/release_notes/markdown/v4.3.md`
+- `reference/release_notes/markdown/v4.4.md`
+- `reference/release_notes/markdown/v4.5.md`
+- `reference/release_notes/markdown/v4.6.md`
+- `reference/release_notes/markdown/v5.0.md`
+- `videos/notes/02_trpv1_and_a_standard_workflow.notes.md`
+- `videos/notes/07_cryosparc_live_walkthrough.notes.md`

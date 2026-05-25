@@ -342,6 +342,18 @@ If a user asks “how do I debug this?”
 4. try the **smallest corrective action** first
 5. update before deep workaround-hunting if a matching fix already exists upstream
 
-## Sources consulted
+## Source basis
 
-This reference is original synthesized workflow guidance prepared from public cryoSPARC guide pages, public release notes, public forum reports, public tutorials/webinars, relevant papers, and public `cryosparc-tools` documentation/API material. Raw upstream documents, transcripts, forum posts, screenshots, and datasets are not bundled here. For authoritative and current details, consult the official cryoSPARC documentation, release notes, discussion forum, and upstream project documentation.
+The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
+
+- `docs/forum_threads/digests/forum_troubleshooting.md`
+- `docs/forum_threads/digests/forum_import.md`
+- `docs/forum_threads/digests/forum_hardware-and-performance.md`
+- `reference/release_notes/markdown/v4.0.md`
+- `reference/release_notes/markdown/v4.1.md`
+- `reference/release_notes/markdown/v4.2.md`
+- `reference/release_notes/markdown/v4.3.md`
+- `reference/release_notes/markdown/v4.4.md`
+- `reference/release_notes/markdown/v4.5.md`
+- `reference/release_notes/markdown/v4.6.md`
+- `reference/release_notes/markdown/v5.0.md`

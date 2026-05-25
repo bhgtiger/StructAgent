@@ -5,21 +5,21 @@ This page is an **advisor/admin orientation** for a cryoSPARC instance, not a su
 
 What this page does **not** duplicate:
 
-- Full `cryosparcm` / `cryosparcw` flag reference, log layout, restart/maintenance/backup runbook syntax, version-specific CLI differences — `14_cli_admin.md` and the version-matched references under `official cryoSPARC documentation` and `…__management-and-monitoring-4.7/…`.
+- Full `cryosparcm` / `cryosparcw` flag reference, log layout, restart/maintenance/backup runbook syntax, version-specific CLI differences — `14_cli_admin.md` and the version-matched references under `docs/per_page/setup-configuration-and-management__management-and-monitoring-v5.0/…` and `…__management-and-monitoring-4.7/…`.
 - Lane / queue / GPU / SSD-cache *scheduling behavior*, multi-user contention, GPU-not-visible debugging — `21_gpu_lane_queue.md`.
 - Project directory tree, MongoDB sizing, SSD planning, archive/compact/restore, raw-data symlink hygiene — `24_disk_and_storage.md`.
 - Python automation via `cryosparc-tools`, programmatic project/job orchestration — `13_cryosparc_tools_api.md`.
 - Error-string lookup and symptom-pattern triage — `17_error_lookup.md`.
 - General troubleshooting mental model — `15_troubleshooting.md`.
 
-**Standing version disclaimer.** The source window used to synthesize this skill in this skill cover roughly v4.0 through **v5.0 BETA** (released 2026-01-27, see `public cryoSPARC release notes v5.0`). Two version-specific facts dominate everything else on this page:
+**Standing version disclaimer.** The bundled docs in this skill cover roughly v4.0 through **v5.0 BETA** (released 2026-01-27, see `reference/release_notes/markdown/v5.0.md`). Two version-specific facts dominate everything else on this page:
 
-1. v5.0+ and ≤v4.7 have **separate management/monitoring reference pages** in the upstream docs. Before quoting an exact `cryosparcm` flag or environment variable, check `cryosparcm status` for the installed version and consult the version-matched page in the official cryoSPARC documentation.
-2. v4 → v5 is a one-way migration in practice (downgradeable only to v4.4+), and v5 has stricter OS/driver/GPU requirements than v4. See `official cryoSPARC documentation`.
+1. v5.0+ and ≤v4.7 have **separate management/monitoring reference pages** in the upstream docs. Before quoting an exact `cryosparcm` flag or environment variable, check `cryosparcm status` for the installed version and consult the version-matched page in `docs/per_page/`.
+2. v4 → v5 is a one-way migration in practice (downgradeable only to v4.4+), and v5 has stricter OS/driver/GPU requirements than v4. See `docs/per_page/setup-configuration-and-management__software-system-guides__guide-updating-to-cryosparc-v5.md`.
 
 ## Install mental model
 
-cryoSPARC is split into **master** processes and **worker** processes that share project storage. Both halves are part of one logical instance and *must* be the same version (`official cryoSPARC documentation` flags "Version mismatch! Worker and master versions are not the same" as a recurring symptom).
+cryoSPARC is split into **master** processes and **worker** processes that share project storage. Both halves are part of one logical instance and *must* be the same version (`docs/per_page/setup-configuration-and-management__troubleshooting.md` flags "Version mismatch! Worker and master versions are not the same" as a recurring symptom).
 
 | Layer | What runs there | Where it lives |
 |---|---|---|
@@ -28,14 +28,14 @@ cryoSPARC is split into **master** processes and **worker** processes that share
 | Shared project storage | All project directories, raw data, intermediates | Filesystem path(s) reachable from both master and every worker at the **same absolute path** |
 | SSD cache (worker-local) | Particle cache to avoid network reads | A per-worker `cache_path` / SSD path configured at `cryosparcw connect` time |
 
-Master process list shown by `cryosparcm status` (see `official cryoSPARC documentation`):
+Master process list shown by `cryosparcm status` (see `docs/per_page/setup-configuration-and-management__management-and-monitoring-4.7__cryosparcm-4.7.md`):
 
 ```
 app             app_api         command_core    command_rtp
 command_vis     database        app_legacy (optional, off by default in v4+)
 ```
 
-Supported topologies (`official cryoSPARC documentation`):
+Supported topologies (`docs/per_page/setup-configuration-and-management__hardware-and-system-requirements.md`):
 
 | Topology | Use when | Notes |
 |---|---|---|
@@ -44,10 +44,10 @@ Supported topologies (`official cryoSPARC documentation`):
 | **Master + cluster** | Existing HPC scheduler (SLURM, PBS, UGE, LSF…) | `cryosparcm cluster connect`; CryoSPARC submits scripts, the cluster owns GPU/CPU allocation. |
 | **Hybrid** | Mix of standalone workers and cluster lanes | cryoSPARC supports a heterogeneous mix in one instance. |
 
-Hard requirements for any non-trivial setup (`official cryoSPARC documentation`):
+Hard requirements for any non-trivial setup (`docs/per_page/setup-configuration-and-management__hardware-and-system-requirements.md`):
 
 1. **All nodes share a filesystem** at the same path so jobs can read/write intermediate results.
-2. **Master has passwordless SSH** to each worker (for standalone workers); the source window used to synthesize this skill use `ssh-copy-id remote_user@remote_host`.
+2. **Master has passwordless SSH** to each worker (for standalone workers); the bundled docs use `ssh-copy-id remote_user@remote_host`.
 3. **Workers have TCP access** to ten consecutive ports on the master (default 61000–61009).
 
 ## Preflight checklist
@@ -56,22 +56,22 @@ Run through this before recommending or executing *any* install/connect step. Ea
 
 | # | Check | What to verify | Source |
 |---|---|---|---|
-| 1 | **License** | Non-profit academic? Use the cryosparc.com/download form to get a `LICENSE_ID`. Commercial use requires `sales@structura.bio`. | `official cryoSPARC documentation`, `official cryoSPARC documentation` |
-| 2 | **OS** | v5.0+: GLIBC 2.28+ (Rocky/RHEL 8, Ubuntu 20.04+; Ubuntu 22.04+ recommended). v4.x: older Linux is OK. | `official cryoSPARC documentation` |
-| 3 | **NVIDIA driver** | v5.0+: **≥570.26**, Blackwell needs the open driver. v4.4–v4.7: ≥520.61.05. ≤v4.4: also needs a system CUDA toolkit (recommend 11.8). | `official cryoSPARC documentation` |
+| 1 | **License** | Non-profit academic? Use the cryosparc.com/download form to get a `LICENSE_ID`. Commercial use requires `sales@structura.bio`. | `docs/per_page/licensing.md`, `docs/per_page/setup-configuration-and-management__how-to-download-install-and-configure__obtaining-a-license-id.md` |
+| 2 | **OS** | v5.0+: GLIBC 2.28+ (Rocky/RHEL 8, Ubuntu 20.04+; Ubuntu 22.04+ recommended). v4.x: older Linux is OK. | `docs/per_page/setup-configuration-and-management__software-system-guides__guide-updating-to-cryosparc-v5.md` |
+| 3 | **NVIDIA driver** | v5.0+: **≥570.26**, Blackwell needs the open driver. v4.4–v4.7: ≥520.61.05. ≤v4.4: also needs a system CUDA toolkit (recommend 11.8). | `docs/per_page/setup-configuration-and-management__cryosparc-installation-prerequisites.md` |
 | 4 | **GPU compute capability** | v5.0+ supports CC 5.0 (Maxwell) → 12.0 (Blackwell). v5 drops Kepler (CC 3.5). Bundled CUDA: 12.8 (v5.0+), 11.8.0 (v4.4–4.7). | Same as #3 |
-| 5 | **UNIX user** | One non-root account, same numeric UID on master and all workers. **Never use root** to install/update/manage. | `official cryoSPARC documentation` |
-| 6 | **Hostnames** | Master must be reachable by a stable hostname; `hostname -f` should match `$CRYOSPARC_MASTER_HOSTNAME`. | `official cryoSPARC documentation` |
-| 7 | **TCP ports** | Pick 10 consecutive free ports outside the kernel ephemeral range (`cat /proc/sys/net/ipv4/ip_local_port_range`) and outside any other cryoSPARC instance. Default base is 61000. | `official cryoSPARC documentation` |
+| 5 | **UNIX user** | One non-root account, same numeric UID on master and all workers. **Never use root** to install/update/manage. | `docs/per_page/setup-configuration-and-management__cryosparc-installation-prerequisites.md` |
+| 6 | **Hostnames** | Master must be reachable by a stable hostname; `hostname -f` should match `$CRYOSPARC_MASTER_HOSTNAME`. | `docs/per_page/setup-configuration-and-management__management-and-monitoring-v5.0__cryosparcm-reference-v5.0.md` |
+| 7 | **TCP ports** | Pick 10 consecutive free ports outside the kernel ephemeral range (`cat /proc/sys/net/ipv4/ip_local_port_range`) and outside any other cryoSPARC instance. Default base is 61000. | `docs/per_page/setup-configuration-and-management__cryosparc-installation-prerequisites.md` |
 | 8 | **Passwordless SSH** | `ssh-copy-id <user>@<worker_host>` from master for every worker (standalone topology only). | Same |
-| 9 | **Shared filesystem** | Project directory path identical from master *and* every worker shell, owned/writable by the cryoSPARC UNIX account. | `official cryoSPARC documentation` |
+| 9 | **Shared filesystem** | Project directory path identical from master *and* every worker shell, owned/writable by the cryoSPARC UNIX account. | `docs/per_page/setup-configuration-and-management__hardware-and-system-requirements.md` |
 | 10 | **SSD cache** | Per-worker fast-local path with enough room for the biggest particle stacks the user expects to run; needed for almost all 2D/3D jobs. | `24_disk_and_storage.md`; `cryosparcw connect --ssdpath …` |
-| 11 | **Cluster scheduler** | If integrating: SLURM/PBS/UGE/LSF binaries available on the master node; GPU GRES / cgroup configured to actually fence GPUs per job. | `official cryoSPARC documentation` |
-| 12 | **Install path** | Absolute path to `cryosparc_master/` after dereferencing symlinks must be **≤83 characters**. | `official cryoSPARC documentation` |
-| 13 | **Disk headroom** | ≥15 GB to download/install. DB grows ~100 MB–5 GB per project; plan ≥500 GB for ~200 medium projects. | Same; `official cryoSPARC documentation` |
-| 14 | **Shell environment** | Deactivate any active conda environment before install/update; cryoSPARC bundles its own Python and is known to be derailed by an inherited conda env. | `official cryoSPARC documentation`, `public cryoSPARC Discuss forum reports` |
+| 11 | **Cluster scheduler** | If integrating: SLURM/PBS/UGE/LSF binaries available on the master node; GPU GRES / cgroup configured to actually fence GPUs per job. | `docs/per_page/setup-configuration-and-management__how-to-download-install-and-configure__cryosparc-cluster-integration-script-examples.md` |
+| 12 | **Install path** | Absolute path to `cryosparc_master/` after dereferencing symlinks must be **≤83 characters**. | `docs/per_page/setup-configuration-and-management__how-to-download-install-and-configure__downloading-and-installing-cryosparc.md` |
+| 13 | **Disk headroom** | ≥15 GB to download/install. DB grows ~100 MB–5 GB per project; plan ≥500 GB for ~200 medium projects. | Same; `docs/per_page/setup-configuration-and-management__hardware-and-system-requirements.md` |
+| 14 | **Shell environment** | Deactivate any active conda environment before install/update; cryoSPARC bundles its own Python and is known to be derailed by an inherited conda env. | `docs/per_page/setup-configuration-and-management__troubleshooting.md`, `docs/forum_threads/digests/forum_installation.md` |
 
-Default ports (base 61000) and which workers need to reach which (`official cryoSPARC documentation`):
+Default ports (base 61000) and which workers need to reach which (`docs/per_page/setup-configuration-and-management__cryosparc-installation-prerequisites.md`):
 
 | Port | Service | Worker access needed |
 |---|---|---|
@@ -86,15 +86,25 @@ Default ports (base 61000) and which workers need to reach which (`official cryo
 
 ## Download and install flow (master)
 
-High-level only — exact steps live in `official cryoSPARC documentation`.
+High-level only — exact steps live in `docs/per_page/setup-configuration-and-management__how-to-download-install-and-configure__downloading-and-installing-cryosparc.md`.
 
 1. Log in as the dedicated non-root UNIX account on the master host.
 2. `cd` into the chosen install parent directory (path ≤83 chars after symlink resolution).
-3. Download both master and worker packages using the official cryoSPARC download page/URLs and the user's own license ID. Do not redistribute those tarballs. After download, extract `cryosparc_master/` and `cryosparc_worker/` into the chosen install parent. If a legacy-compatibility worker stub appears after extraction, follow the current official install notes for whether it can be ignored or removed.
+3. Download both packages with the user's license ID. The current pattern (per the bundled doc) is:
+
+   ```bash
+   VERSION="latest"   # or e.g. "v4.7.1" for the last v4 line
+   curl -L https://get.cryosparc.com/download/master-$VERSION/$LICENSE_ID -o cryosparc_master.tar.gz
+   curl -L https://get.cryosparc.com/download/worker-$VERSION/$LICENSE_ID -o cryosparc_worker.tar.gz
+   tar -xf cryosparc_master.tar.gz cryosparc_master
+   tar -xf cryosparc_worker.tar.gz cryosparc_worker
+   ```
+
+   The `cryosparc2_worker/` artifact, if present after extract, is a legacy-compatibility stub and can be deleted.
 4. Run `cryosparc_master/install.sh` with the documented flags — license, base port, DB path, hostname, and (for single workstation) the worker install flags. The exact flag set differs between v4.x and v5.x; always read the version-matched install page rather than reciting flags from memory.
 5. Once `cryosparcm start` finishes, create the first administrator user via the install script's prompt (or `cryosparcm createuser` documented in the v5 reference).
 6. Set up a recurring **database backup** (`cryosparcm backup …`) before letting any user touch the instance.
-7. Verify the install end-to-end with `cryosparcm test install` and `cryosparcm test workers` — these are the canonical post-install smoke tests in v4.0+ and the green-tick list in `official cryoSPARC documentation` is the success criterion.
+7. Verify the install end-to-end with `cryosparcm test install` and `cryosparcm test workers` — these are the canonical post-install smoke tests in v4.0+ and the green-tick list in `docs/per_page/setup-configuration-and-management__software-system-guides__guide-installation-testing-with-cryosparcm-test.md` is the success criterion.
 
 ## Worker connection flow
 
@@ -114,7 +124,7 @@ bin/cryosparcw connect \
     --newlane
 ```
 
-(Source: `official cryoSPARC documentation`; v5 equivalent is documented in `cryosparcw-reference-v5.0.md`.)
+(Source: `docs/per_page/setup-configuration-and-management__management-and-monitoring-4.7__cryosparcw-4.7.md`; v5 equivalent is documented in `cryosparcw-reference-v5.0.md`.)
 
 Common flags to be aware of:
 
@@ -127,7 +137,7 @@ Common flags to be aware of:
 - `--update` — re-register an existing worker after CUDA/path/IP changes.
 
 ### Cluster worker (`cryosparcm cluster connect`)
-Run *on the master* with a `cluster_info.json` and a `cluster_script.sh` Jinja template. The bundled SLURM example (`official cryoSPARC documentation`) is a useful starting pattern but **must be adapted to the local cluster** — partition names, GPU GRES type, time limits, memory accounting, container/conda activations, license-server proxying, and `worker_bin_path` are all site-specific:
+Run *on the master* with a `cluster_info.json` and a `cluster_script.sh` Jinja template. The bundled SLURM example (`docs/per_page/setup-configuration-and-management__how-to-download-install-and-configure__cryosparc-cluster-integration-script-examples.md`) is a useful starting pattern but **must be adapted to the local cluster** — partition names, GPU GRES type, time limits, memory accounting, container/conda activations, license-server proxying, and `worker_bin_path` are all site-specific:
 
 ```json
 {
@@ -155,19 +165,21 @@ Run *on the master* with a `cluster_info.json` and a `cluster_script.sh` Jinja t
 PBS and UGE templates are in the same docs page. Critical caveats:
 
 - **CryoSPARC numbers GPUs from 0** inside the job. The scheduler **must** set `CUDA_VISIBLE_DEVICES` (e.g. SLURM cgroups + GRES) so a 2-GPU job really gets 2 fenced GPUs rather than racing with other tenants.
-- `num_cpu` / `num_gpu` / `ram_gb` are CryoSPARC-supplied; you can wrap them with custom variables (`ram_multiplier`, partition selectors, etc.) per `official cryoSPARC documentation`.
+- `num_cpu` / `num_gpu` / `ram_gb` are CryoSPARC-supplied; you can wrap them with custom variables (`ram_multiplier`, partition selectors, etc.) per `docs/per_page/setup-configuration-and-management__software-system-guides__guide-configuring-custom-variables-for-cluster-job-submission-scripts.md`.
 - Clusters **do not auto-update workers** — see the Updates section below.
 
 ## Access, reverse proxy, and security
 
-After startup `cryosparcm start` prints the access URLs (see `official cryoSPARC documentation`):
+After startup `cryosparcm start` prints the access URLs (see `docs/per_page/setup-configuration-and-management__how-to-download-install-and-configure__accessing-cryosparc.md`):
 
 ```
 From this machine:            http://localhost:61000
 From the same network:        http://csserver.lab:61000
 ```
 
-Security posture to preserve: cryoSPARC should be treated as a private-network service, not as a hardened internet-facing application. Do not expose bare master ports to the public internet; use a trusted LAN/VPN/SSH tunnel or a separately controlled reverse-proxy/authentication layer. See the official cryoSPARC hardware/system requirements and access/reverse-proxy documentation for the current wording.
+The defining security warning from `docs/per_page/setup-configuration-and-management__hardware-and-system-requirements.md` is worth repeating verbatim:
+
+> CryoSPARC is designed to be run only within a trusted private network. CryoSPARC instances are not security-hardened against malicious actors on the network and should never be hosted directly on the internet or an untrusted network without a separate controlled authentication layer.
 
 Practical access patterns to recommend, in increasing order of operational weight:
 
@@ -185,7 +197,7 @@ Site-local policy worth recording for any advisor session (so you can re-route o
 
 ## CLI / admin surfaces — what they own, where to go for details
 
-The source window used to synthesize this skill split `cryosparcm` (master) and `cryosparcw` (worker) cleanly. This page summarises **what each surface owns**; for exact flags use `cryosparcm COMMAND --help` on the live host and the version-matched references in `official cryoSPARC documentation` or `…__management-and-monitoring-4.7/` and `14_cli_admin.md`.
+The bundled docs split `cryosparcm` (master) and `cryosparcw` (worker) cleanly. This page summarises **what each surface owns**; for exact flags use `cryosparcm COMMAND --help` on the live host and the version-matched references in `docs/per_page/setup-configuration-and-management__management-and-monitoring-v5.0/` or `…__management-and-monitoring-4.7/` and `14_cli_admin.md`.
 
 | Command family | What it owns | Always run as | Notes |
 |---|---|---|---|
@@ -225,7 +237,7 @@ Key environment variables to know (v5.0 file is `…__management-and-monitoring-
 Three distinct things live under "update": patches (small, in-version), updates (minor/major within the same line), and migrations (v4 → v5).
 
 ### Patches and minor updates
-Per `official cryoSPARC documentation` and the v5/v4 `cryosparcm` references:
+Per `docs/per_page/setup-configuration-and-management__software-updates.md` and the v5/v4 `cryosparcm` references:
 
 1. Announce the update to users (Message of the Day, `cryosparcm cli "set_instance_banner(…)"`; see `…__guide-maintenance-mode-and-configurable-user-facing-messages.md`).
 2. Turn on maintenance mode: `cryosparcm maintenancemode on`. Pause running CryoSPARC Live sessions manually (maintenance mode doesn't pause them).
@@ -239,7 +251,7 @@ Per `official cryoSPARC documentation` and the v5/v4 `cryosparcm` references:
 10. Maintenance mode off; clear the banner.
 
 ### v4 → v5 migration
-Source: `official cryoSPARC documentation`.
+Source: `docs/per_page/setup-configuration-and-management__software-system-guides__guide-updating-to-cryosparc-v5.md`.
 
 - Must already be on v4.0+. v3 must go through v4 first.
 - OS must support GLIBC 2.28+ (Rocky/RHEL 8, Ubuntu 20.04+, recommend 22.04+).
@@ -261,7 +273,7 @@ The forum digests and `17_error_lookup.md` consistently surface the same familie
 
 | Symptom / error | Likely cause | First check / fix |
 |---|---|---|
-| `Couldn't connect to host` / `Could not resolve host` / `tar: This does not look like a tar archive` during install | License server unreachable, wrong `LICENSE_ID`, conda env active | `echo $LICENSE_ID`; `curl https://get.cryosparc.com/checklicenseexists/$LICENSE_ID`; deactivate conda; check firewall whitelist for `get.cryosparc.com`. (`official cryoSPARC documentation`) |
+| `Couldn't connect to host` / `Could not resolve host` / `tar: This does not look like a tar archive` during install | License server unreachable, wrong `LICENSE_ID`, conda env active | `echo $LICENSE_ID`; `curl https://get.cryosparc.com/checklicenseexists/$LICENSE_ID`; deactivate conda; check firewall whitelist for `get.cryosparc.com`. (`docs/per_page/setup-configuration-and-management__troubleshooting.md`) |
 | `Version mismatch! Worker and master versions are not the same` | Patch or update applied to master but not to a (cluster) worker | Re-run worker update with `cryosparcw update` / `cryosparcw patch -f …`. |
 | `nvcc fatal : Value 'sm_75' is not defined` | System CUDA older than the installed GPU | Install a CUDA toolkit that supports the GPU and `cryosparcw newcuda /path/to/cuda` (≤v4.3 only); for v4.4+ update CryoSPARC instead. |
 | `ImportError: libcurand.so.10` / `libcusolver.so.10` / `libcufft.so.10` | Worker's CUDA path changed since `cryosparcw connect` | `cryosparcw env`; re-`connect` or `newcuda` to match. (`17_error_lookup.md`) |
@@ -270,8 +282,8 @@ The forum digests and `17_error_lookup.md` consistently surface the same familie
 | `cryosparcm status` shows DB stopped or supervisord errors | DB volume out of space, host renamed since install, port collision | Check disk free vs `CRYOSPARC_DB_MIN_SPACE_GB`; check `$CRYOSPARC_MASTER_HOSTNAME` vs `hostname -f`; check ports vs ephemeral range. |
 | `did not receive heartbeat` job failures | Slow worker FS or single long step exceeding 180 s | Raise `CRYOSPARC_HEARTBEAT_SECONDS`, restart master. |
 | Path resolves on master but not from the worker shell | Different mount layout, NFS automounter, symlink in master path that doesn't exist on worker | Open a shell as the cryoSPARC UNIX account on each side and stat the path; do not patch by adding new symlinks under `cryosparc_master/`. |
-| `OSError: [Errno 40] Too many levels of symbolic links` | Self-referencing or broken raw-data symlink (frequent with EPU export setups) | Fix the symlink in raw data; do not work around inside cryoSPARC. (`public cryoSPARC Discuss forum reports`) |
-| 500 GB-class `collection-*.wt` file in DB volume | MongoDB has not released deleted space | DB compaction routine in `…/public cryoSPARC Discuss forum reports`; **always back up first**; `24_disk_and_storage.md`. |
+| `OSError: [Errno 40] Too many levels of symbolic links` | Self-referencing or broken raw-data symlink (frequent with EPU export setups) | Fix the symlink in raw data; do not work around inside cryoSPARC. (`docs/forum_threads/digests/forum_cryosparc-live.md`) |
+| 500 GB-class `collection-*.wt` file in DB volume | MongoDB has not released deleted space | DB compaction routine in `…/docs/forum_threads/digests/forum_data-management.md`; **always back up first**; `24_disk_and_storage.md`. |
 | Multi-GPU job sees fewer GPUs than expected | Hyperthreading off; or scheduler not exposing all GPUs to the job | Confirm `nvidia-smi` from inside the job; turn HT on (forum-confirmed fix); on clusters confirm GRES and `CUDA_VISIBLE_DEVICES`. |
 | Reverse proxy returns 502 / loses websocket | Missing `Upgrade: websocket` headers, request buffering on, max body size too small | Compare against the nginx/Apache examples in `…__optional-hosting-cryosparc-through-a-reverse-proxy.md`. |
 | Install/update breakage after `pip install`-ing third-party packages into the cryoSPARC env | Bundled Python now inconsistent | **Do not install third-party packages into the cryoSPARC env.** Use `cryosparc-tools` from a *separate* environment instead (`13_cryosparc_tools_api.md`). |
@@ -300,11 +312,11 @@ Default advisor recommendations when no strong reason exists to deviate:
 
 | Question | Default | Why |
 |---|---|---|
-| New install, single lab, 1–4 GPUs | Single workstation, v4.7.1 if stability matters, v5.0+ if compatible with OS/driver/GPUs | v5 is still labelled BETA in the source window used to synthesize this skill; single-workstation simplifies almost everything. |
+| New install, single lab, 1–4 GPUs | Single workstation, v4.7.1 if stability matters, v5.0+ if compatible with OS/driver/GPUs | v5 is still labelled BETA in the bundled docs; single-workstation simplifies almost everything. |
 | New install, shared GPU server + small group | Master on a separate lightweight host, worker on the GPU host | Avoids GPU OOM hanging the web app/DB. |
 | New install on an HPC | Master on a small login-adjacent VM, cluster lane via `cryosparcm cluster connect` | Lets the scheduler own GPU/CPU; CryoSPARC just submits scripts. |
 | Should I install CUDA system-wide? | v4.4+: no — bundled. ≤v4.3: yes, 11.8 + matching driver. v5.0+: no — bundled 12.8. | `…__cryosparc-installation-prerequisites.md`. |
-| Should I install third-party Python packages into the cryoSPARC env? | No. Use cryosparc-tools from a separate venv/conda env. | Breakage from incompatible deps is one of the top reproducible install failures (`public cryoSPARC Discuss forum reports`). |
+| Should I install third-party Python packages into the cryoSPARC env? | No. Use cryosparc-tools from a separate venv/conda env. | Breakage from incompatible deps is one of the top reproducible install failures (`docs/forum_threads/digests/forum_installation.md`). |
 | Should I expose the GUI to the public internet? | No. LAN, VPN, SSH tunnel, or HTTPS reverse proxy behind SSO only. | The hardware-requirements page is explicit about this. |
 
 ## Runbooks
@@ -357,7 +369,7 @@ If a recent instance config export is not available, the fall-back is a fresh in
 1. Confirm everyone in the user's group can read CryoSPARC project files (`ls -l` on the project dir; check group ownership).
 2. For a shared instance, follow the `g+ws` + `umask 0002` pattern from `…__unix-permissions-and-data-access-control.md` — chown to the cryoSPARC group, set `chmod g+ws`, add researchers to that group.
 3. For multi-team isolation, set up per-team Linux groups and per-team project subtrees; the cryoSPARC owner still has full access (this is required for cryoSPARC to function and cannot be removed).
-4. For DB bloat / huge `collection-*.wt`: back up first, then use the Mongo compaction routine documented in `public cryoSPARC Discuss forum reports`. Do **not** touch Mongo files while cryoSPARC is running. Cross-link `24_disk_and_storage.md`.
+4. For DB bloat / huge `collection-*.wt`: back up first, then use the Mongo compaction routine documented in `docs/forum_threads/digests/forum_data-management.md`. Do **not** touch Mongo files while cryoSPARC is running. Cross-link `24_disk_and_storage.md`.
 5. For SSD cache running out: confirm `--ssdpath` is on a real local SSD, review `CRYOSPARC_CACHE_NUM_THREADS`, and consider raising the per-worker SSD quota.
 
 ## Safety boundaries
@@ -366,10 +378,66 @@ If a recent instance config export is not available, the fall-back is a fresh in
 - **Stop / start / restart / update only with explicit user approval on a live instance.** A user with running jobs may not know what they will lose.
 - **Preserve backups and logs before any risky operation.** `cryosparcm backup` first, then `cryosparcm snaplogs` for diagnostics. Keep both somewhere outside `cryosparc_master/`.
 - **Do not amend config.sh casually.** Especially `CRYOSPARC_MASTER_HOSTNAME`, `CRYOSPARC_DB_PATH`, `CRYOSPARC_BASE_PORT`, `CRYOSPARC_FORCE_HOSTNAME`, `CRYOSPARC_FORCE_USER`, `CRYOSPARC_INSECURE`. Each of these has knock-on effects (worker reconnections, license server reachability, multi-instance port collisions).
-- **Do not bypass version-matched docs.** `cryosparcm cli` syntax, environment variables, and worker connect flags differ between ≤v4.7 and v5.0+. Always start from `cryosparcm status` and the matching `official cryoSPARC documentation` page.
+- **Do not bypass version-matched docs.** `cryosparcm cli` syntax, environment variables, and worker connect flags differ between ≤v4.7 and v5.0+. Always start from `cryosparcm status` and the matching `docs/per_page/setup-configuration-and-management__management-and-monitoring-*` page.
 - **Do not install third-party Python packages into the cryoSPARC env.** Use `cryosparc-tools` from a separate environment for scripting (`13_cryosparc_tools_api.md`).
 - **Confirm before exposing the GUI more widely.** Reverse proxy / VPN / SSH tunnel configurations have security implications that depend on institutional policy; record what the user already has rather than re-deploying it.
 
-## Sources consulted
+## Source basis
 
-This reference is original synthesized workflow guidance prepared from public cryoSPARC guide pages, public release notes, public forum reports, public tutorials/webinars, relevant papers, and public `cryosparc-tools` documentation/API material. Raw upstream documents, transcripts, forum posts, screenshots, and datasets are not bundled here. For authoritative and current details, consult the official cryoSPARC documentation, release notes, discussion forum, and upstream project documentation.
+The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
+
+- `docs/per_page/readme.md`
+- `docs/per_page/licensing.md`
+- `docs/per_page/resources__questions-and-support.md`
+- `docs/per_page/setup-configuration-and-management__cryosparc-installation-prerequisites.md`
+- `docs/per_page/setup-configuration-and-management__hardware-and-system-requirements.md`
+- `docs/per_page/setup-configuration-and-management__how-to-download-install-and-configure.md`
+- `docs/per_page/setup-configuration-and-management__how-to-download-install-and-configure__downloading-and-installing-cryosparc.md`
+- `docs/per_page/setup-configuration-and-management__how-to-download-install-and-configure__obtaining-a-license-id.md`
+- `docs/per_page/setup-configuration-and-management__how-to-download-install-and-configure__accessing-cryosparc.md`
+- `docs/per_page/setup-configuration-and-management__how-to-download-install-and-configure__cryosparc-cluster-integration-script-examples.md`
+- `docs/per_page/setup-configuration-and-management__how-to-download-install-and-configure__optional-hosting-cryosparc-through-a-reverse-proxy.md`
+- `docs/per_page/setup-configuration-and-management__management-and-monitoring-v5.0.md`
+- `docs/per_page/setup-configuration-and-management__management-and-monitoring-v5.0__cryosparcm-reference-v5.0.md`
+- `docs/per_page/setup-configuration-and-management__management-and-monitoring-v5.0__cryosparcm-cli-reference-v5.0.md`
+- `docs/per_page/setup-configuration-and-management__management-and-monitoring-v5.0__cryosparcw-reference-v5.0.md`
+- `docs/per_page/setup-configuration-and-management__management-and-monitoring-v5.0__environment-variables-v5.0.md`
+- `docs/per_page/setup-configuration-and-management__management-and-monitoring-4.7__cryosparcm-4.7.md`
+- `docs/per_page/setup-configuration-and-management__management-and-monitoring-4.7__cryosparcw-4.7.md`
+- `docs/per_page/setup-configuration-and-management__management-and-monitoring-4.7__environment-variables-v4.7.md`
+- `docs/per_page/setup-configuration-and-management__software-updates.md`
+- `docs/per_page/setup-configuration-and-management__troubleshooting.md`
+- `docs/per_page/setup-configuration-and-management__software-system-guides__guide-installation-testing-with-cryosparcm-test.md`
+- `docs/per_page/setup-configuration-and-management__software-system-guides__guide-updating-to-cryosparc-v5.md`
+- `docs/per_page/setup-configuration-and-management__software-system-guides__guide-updating-to-cryosparc-v4.md`
+- `docs/per_page/setup-configuration-and-management__software-system-guides__guide-instance-recovery-v5.0.md`
+- `docs/per_page/setup-configuration-and-management__software-system-guides__unix-permissions-and-data-access-control.md`
+- `docs/per_page/setup-configuration-and-management__software-system-guides__guide-lane-assignments-and-restrictions.md`
+- `docs/per_page/setup-configuration-and-management__software-system-guides__guide-maintenance-mode-and-configurable-user-facing-messages.md`
+- `docs/per_page/setup-configuration-and-management__software-system-guides__guide-configuring-custom-variables-for-cluster-job-submission-scripts.md`
+- `docs/per_page/application-guide__admin-panel.md`
+- `docs/per_page/application-guide__instance-management.md`
+- `docs/per_page/processing-data__cryosparc-tools.md`
+- `docs/forum_threads/digests/forum_installation.md`
+- `docs/forum_threads/digests/forum_hardware-and-performance.md`
+- `docs/forum_threads/digests/forum_troubleshooting.md`
+- `docs/forum_threads/digests/forum_data-management.md`
+- `docs/forum_threads/digests/forum_cryosparc-live.md`
+- `docs/forum_threads/digests/forum_scripting.md`
+- `17_error_lookup.md`
+- `reference/release_notes/markdown/v4.0.md`
+- `reference/release_notes/markdown/v4.1.md`
+- `reference/release_notes/markdown/v4.2.md`
+- `reference/release_notes/markdown/v4.3.md`
+- `reference/release_notes/markdown/v4.4.md`
+- `reference/release_notes/markdown/v4.5.md`
+- `reference/release_notes/markdown/v4.6.md`
+- `reference/release_notes/markdown/v5.0.md`
+- `00_overview.md`
+- `13_cryosparc_tools_api.md`
+- `14_cli_admin.md`
+- `15_troubleshooting.md`
+- `21_gpu_lane_queue.md`
+- `24_disk_and_storage.md`
+- `23_external_jobs.md`
+- `18_decision_trees.md`

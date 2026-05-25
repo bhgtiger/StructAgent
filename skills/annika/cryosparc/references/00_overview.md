@@ -7,7 +7,7 @@ Entry point and router for the cryoSPARC AgentSkill. Read this first when a ques
 cryoSPARC is a GPU-accelerated scientific software platform for cryo-electron microscopy (cryo-EM), maintained by Structura Biotechnology. It covers the full single-particle analysis (SPA) workflow from raw movies through 3D maps, plus extensions for real-time on-the-microscope processing (CryoSPARC Live), helical reconstruction, and (via wrapper / external jobs) interoperation with third-party tools. The instance is web-based; a `cryosparcm` admin CLI and a `cryosparc-tools` Python library expose the same data model programmatically.
 
 Major-version anchors:
-- v5.0 first released 2026-01-27 (current stable line for this skill's source window used to synthesize this skill).
+- v5.0 first released 2026-01-27 (current stable line for this skill's bundled docs).
 - v4.0 first released 2022-10-03; v4.7.1 is the last v4.x line before the v5.0 cut.
 - Helical reconstruction is shipped as a beta job within the main job catalog.
 
@@ -37,7 +37,7 @@ If a user asks for anything in the right column, say so plainly and route them t
 Operational ownership:
 - Lane / queue / GPU / SSD-cache *scheduling behavior* → `21_gpu_lane_queue.md`.
 - `cryosparcm` / `cryosparcw` admin surface, restart/update/log runbooks, version-sensitive CLI syntax → `14_cli_admin.md`.
-- Hardware sizing, install topologies, single-workstation vs cluster setup → `official cryoSPARC documentation` and `official cryoSPARC documentation`.
+- Hardware sizing, install topologies, single-workstation vs cluster setup → `docs/per_page/setup-configuration-and-management__hardware-and-system-requirements.md` and `docs/per_page/setup-configuration-and-management__how-to-download-install-and-configure.md`.
 - Storage lifecycle (project tree growth, SSD cache, archive/compact/restore) → `24_disk_and_storage.md`.
 
 ## Data model — projects, workspaces, jobs, results, datasets
@@ -54,10 +54,10 @@ Layout cues for the advisor:
 - Symlinks under the project tree typically point to raw movie/micrograph storage outside the project — losing those symlink targets makes imports unreplayable.
 
 Detail owners:
-- Project / workspace / session semantics → `official cryoSPARC documentation`.
-- Job building, the cart, quick actions, workflows (saved job graphs) → `official cryoSPARC documentation` and `official cryoSPARC documentation`.
-- Inspecting a job (dashboard, event log, outputs tab, downloads) → `official cryoSPARC documentation` and `official cryoSPARC documentation`.
-- Card / tree / table views of a project → `official cryoSPARC documentation`.
+- Project / workspace / session semantics → `docs/per_page/application-guide__projects-workspaces-and-live-sessions.md`.
+- Job building, the cart, quick actions, workflows (saved job graphs) → `docs/per_page/application-guide__creating-and-running-jobs.md` and `docs/per_page/application-guide__workflows.md`.
+- Inspecting a job (dashboard, event log, outputs tab, downloads) → `docs/per_page/application-guide__inspecting-job-data.md` and `docs/per_page/application-guide__downloading-and-exporting-data.md`.
+- Card / tree / table views of a project → `docs/per_page/application-guide__job-views-cards-tree-and-table.md`.
 
 ## Typical SPA workflow map
 
@@ -72,7 +72,7 @@ Detail owners:
 | 7. Heterogeneity | Discrete: 3D Classification; Continuous: 3DVA / 3DFlex | `08_classification_3d.md`, `26_continuous_heterogeneity.md` |
 | 8. Local / focused | Particle subtraction → Local Refinement around a masked region | `09_local_refinement.md` |
 | 9. Postprocessing | Sharpening, Local Resolution, Orientation Diagnostics, optional DeepEMhancer | `10_postprocessing.md` |
-| 10. Export / handoff | Job/project export, RELION bridge via pyem | `official cryoSPARC documentation`, `27_relion_interop.md` |
+| 10. Export / handoff | Job/project export, RELION bridge via pyem | `docs/per_page/application-guide__downloading-and-exporting-data.md`, `27_relion_interop.md` |
 
 Loops are normal: 2D ↔ picking, ab initio ↔ heterogeneous refinement, refinement ↔ 3D classification, refinement ↔ CTF/RBMC refinement.
 
@@ -83,10 +83,10 @@ Loops are normal: 2D ↔ picking, ab initio ↔ heterogeneous refinement, refine
 | **CryoSPARC Live** | Real-time triage during data collection; streaming preprocess / pick / 2D / ab initio; later handoff | `25_cryosparc_live.md` |
 | **Masks** | Soft, generous, box/pixel/origin-matched masks for refinement, classification, subtraction | `20_masks.md` |
 | **Symmetry strategy** | When to impose / stay C1 / expand / relax; handedness checks | `19_symmetry.md` |
-| **Helical reconstruction (beta)** | Filaments and helical assemblies | Job is in the catalog; see `official cryoSPARC documentation` for the entry point. A dedicated topic page is not in this bundle. |
+| **Helical reconstruction (beta)** | Filaments and helical assemblies | Job is in the catalog; see `docs/per_page/processing-data__all-job-types-in-cryosparc.md` for the entry point. A dedicated topic page is not in this bundle. |
 | **Tomography** | Sub-tomogram averaging / tomo workflows | Not covered by this skill bundle; route to domain-appropriate tooling. |
-| **`cryosparc-tools` Python API** | Programmatic project/job orchestration, dataset I/O, external jobs | `13_cryosparc_tools_api.md`, `official cryoSPARC documentation` |
-| **CLI / admin** | Restart, update, worker registration, logs, diagnostics | `14_cli_admin.md`, `official cryoSPARC documentation` |
+| **`cryosparc-tools` Python API** | Programmatic project/job orchestration, dataset I/O, external jobs | `13_cryosparc_tools_api.md`, `docs/per_page/processing-data__cryosparc-tools.md` |
+| **CLI / admin** | Restart, update, worker registration, logs, diagnostics | `14_cli_admin.md`, `docs/per_page/setup-configuration-and-management__management-and-monitoring-v5.0.md` |
 | **Storage** | SSD cache, project growth, archive/compact/restore, raw-data symlink lifetime | `24_disk_and_storage.md` |
 | **External jobs / wrappers** | CTFFIND4, MotionCor2, DeepEMhancer, ThreeDFSC, crYOLO via `cryosparc-tools` | `23_external_jobs.md` |
 | **RELION interop** | Round-trip via `csparc2star.py` (pyem); optics groups, coordinates, paths | `27_relion_interop.md` |
@@ -132,7 +132,7 @@ CryoSPARC behavior is version-shaped, and the local docs span v4.0 through v5.0.
 
 1. Confirm the installed master version (the master version is the source of truth — workers should match).
 2. Confirm the `cryosparc-tools` version when scripting; it tracks the connected CryoSPARC minor version.
-3. Skim the relevant release-notes page (`public cryoSPARC release notes v4.0` through public cryoSPARC release notes v5.0) for the feature or bug under discussion.
+3. Skim the relevant release-notes page (`reference/release_notes/markdown/v4.0.md` through `v5.0.md`) for the feature or bug under discussion.
 4. Treat forum advice older than two minor versions as suggestive, not prescriptive — many recipes were superseded by jobs added in v4.3 (Data Cleanup Tools), v4.4 (volume viewer types, RBMC fixes), v4.5 (orientation diagnostics, 3D Classification fixes), v4.6 (transparent-hugepages handling, corrupt-particle checks), or v5.0 (job dashboard, instance tab redesign, intermediate-result handling).
 5. `cryosparcm cli` flags can change between versions — verify with `cryosparcm <cmd> --help` on the live instance before scripting destructive operations.
 
@@ -170,6 +170,59 @@ Common first questions the advisor should ask before committing to a recommendat
 
 When the user is about to run something irreversible (delete project, force-restart, push a workflow to a cluster lane, run RBMC on the last copy of raw movies), name the action explicitly and confirm scope before executing.
 
-## Sources consulted
+## Source basis
 
-This reference is original synthesized workflow guidance prepared from public cryoSPARC guide pages, public release notes, public forum reports, public tutorials/webinars, relevant papers, and public `cryosparc-tools` documentation/API material. Raw upstream documents, transcripts, forum posts, screenshots, and datasets are not bundled here. For authoritative and current details, consult the official cryoSPARC documentation, release notes, discussion forum, and upstream project documentation.
+The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
+
+- `topic_plan.md`
+- `02_import.md`
+- `03_preprocessing.md`
+- `04_picking.md`
+- `05_extraction_2d.md`
+- `06_abinitio.md`
+- `07_refinement.md`
+- `08_classification_3d.md`
+- `09_local_refinement.md`
+- `10_postprocessing.md`
+- `13_cryosparc_tools_api.md`
+- `14_cli_admin.md`
+- `15_troubleshooting.md`
+- `16_tuning_recipes.md`
+- `18_decision_trees.md`
+- `19_symmetry.md`
+- `20_masks.md`
+- `21_gpu_lane_queue.md`
+- `23_external_jobs.md`
+- `24_disk_and_storage.md`
+- `25_cryosparc_live.md`
+- `26_continuous_heterogeneity.md`
+- `27_relion_interop.md`
+- `17_error_lookup.md`
+- `docs/per_page/readme.md`
+- `docs/per_page/application-guide__a-tour-of-the-cryosparc-interface.md`
+- `docs/per_page/application-guide__projects-workspaces-and-live-sessions.md`
+- `docs/per_page/application-guide__creating-and-running-jobs.md`
+- `docs/per_page/application-guide__job-views-cards-tree-and-table.md`
+- `docs/per_page/application-guide__inspecting-job-data.md`
+- `docs/per_page/application-guide__workflows.md`
+- `docs/per_page/application-guide__admin-panel.md`
+- `docs/per_page/application-guide__instance-management.md`
+- `docs/per_page/application-guide__downloading-and-exporting-data.md`
+- `docs/per_page/setup-configuration-and-management__hardware-and-system-requirements.md`
+- `docs/per_page/setup-configuration-and-management__how-to-download-install-and-configure.md`
+- `docs/per_page/setup-configuration-and-management__management-and-monitoring-v5.0.md`
+- `docs/per_page/processing-data__cryosparc-tools.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc.md`
+- `docs/per_page/processing-data__get-started-with-cryosparc-introductory-tutorial.md`
+- `reference/release_notes/markdown/v4.0.md`
+- `reference/release_notes/markdown/v4.1.md`
+- `reference/release_notes/markdown/v4.2.md`
+- `reference/release_notes/markdown/v4.3.md`
+- `reference/release_notes/markdown/v4.4.md`
+- `reference/release_notes/markdown/v4.5.md`
+- `reference/release_notes/markdown/v4.6.md`
+- `reference/release_notes/markdown/v5.0.md`
+- `videos/notes/01_introduction_and_cryoem_fundamentals.notes.md`
+- `videos/notes/02_trpv1_and_a_standard_workflow.notes.md`
+- `videos/notes/09_workflows_automated_pipelines.notes.md`
+- `docs/forum_threads/digests/forum_troubleshooting.md`

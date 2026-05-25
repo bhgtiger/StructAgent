@@ -175,6 +175,44 @@ When a symmetric target also has preferred orientation, treat the two problems i
 - `26_continuous_heterogeneity.md` — 3DVA / 3DFlex on symmetry-expanded particles.
 - `orientation_and_preferred_views.md` — anisotropy diagnostics and mitigation.
 
-## Sources consulted
+## Source basis
 
-This reference is original synthesized workflow guidance prepared from public cryoSPARC guide pages, public release notes, public forum reports, public tutorials/webinars, relevant papers, and public `cryosparc-tools` documentation/API material. Raw upstream documents, transcripts, forum posts, screenshots, and datasets are not bundled here. For authoritative and current details, consult the official cryoSPARC documentation, release notes, discussion forum, and upstream project documentation.
+The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
+
+- `06_abinitio.md`
+- `07_refinement.md`
+- `08_classification_3d.md`
+- `09_local_refinement.md`
+- `10_postprocessing.md`
+- `20_masks.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__utilities__job-symmetry-expansion.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__3d-refinement__job-homogeneous-refinement.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__3d-refinement__job-non-uniform-refinement-new.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__3d-refinement__job-heterogeneous-refinement.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__3d-refinement__job-homogeneous-reconstruction-only.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__3d-refinement__job-heterogeneous-reconstruction-only.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__3d-reconstruction__job-ab-initio-reconstruction.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__variability__job-3d-classification-beta.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__local-refinement__job-local-refinement-beta.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__local-refinement__job-new-local-refinement-beta.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__utilities__job-orientation-diagnostics.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__utilities__job-volume-alignment-tools.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__helical-reconstruction-beta.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__helical-reconstruction-beta__helical-symmetry-in-cryosparc.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__helical-reconstruction-beta__job-helical-refinement-beta.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__helical-reconstruction-beta__job-symmetry-search-utility-beta.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__helical-reconstruction-beta__job-average-power-spectra.md`
+- `docs/per_page/processing-data__tutorials-and-case-studies__tutorial-symmetry-relaxation.md`
+- `docs/per_page/processing-data__tutorials-and-case-studies__case-study-pseudosymmetry-in-trpv5-and-calmodulin-empiar-10256.md`
+- `docs/per_page/processing-data__tutorials-and-case-studies__case-study-end-to-end-processing-of-encapsulated-ferritin-empiar-10716.md`
+- `docs/per_page/processing-data__tutorials-and-case-studies__case-study-discrete-and-continuous-heterogeneity-in-fanac1-empiar-11631-and-11632.md`
+- `docs/per_page/processing-data__tutorials-and-case-studies__tutorial-3d-classification.md`
+- `docs/per_page/processing-data__tutorials-and-case-studies__tutorial-orientation-diagnostics.md`
+- `videos/notes/03_trpv5_and_symmetry_breaking.notes.md`
+- `videos/notes/04_encapsulated_ferritin_and_non_point_group_symmetry.notes.md`
+- `videos/notes/05_fanac1_and_discrete_heterogeneity.notes.md`
+- `docs/forum_threads/digests/forum_3d-reconstruction.md`
+- `docs/forum_threads/digests/forum_3d-classification.md`
+- `reference/release_notes/markdown/v4.4.md`
+- `reference/release_notes/markdown/v4.5.md`
+- `reference/release_notes/markdown/v5.0.md`

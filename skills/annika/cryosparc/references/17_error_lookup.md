@@ -259,7 +259,7 @@ Observed exact strings/identifiers:
 **Likely cause:** A movie produced NaN ice thickness (outlier/bad exposure); slider can't render NaN range.
 **Checks:** Browser console for the offending exposure ID; inspect the movie; if needed use browser/UI error logs from https://guide.cryosparc.com/setup-configuration-and-management/troubleshooting#user-interface-error-logging.
 **Fix:** Reject/exclude the bad exposure; reload the page.
-**Observed source:** public cryoSPARC Discuss forum report; screenshot reference omitted from this public skill.
+**Observed source:** `docs/forum_threads/raw/app/10_10647_interactive-exposure-curation-failing.json`, thread https://discuss.cryosparc.com/t/interactive-exposure-curation-failing/10647, screenshot https://discuss.cryosparc.com/uploads/default/original/2X/e/e7b2d7d20ee72db7733dbcacd817f2bc38c3b370.png.
 
 ### Live preprocessing: `IndexError: index 3 is out of bounds for axis 0 with size 0`
 **Likely cause:** A particle-picking threshold set to zero produced zero picks, breaking a downstream array shape.
@@ -411,6 +411,37 @@ Observed exact strings/identifiers:
 
 ---
 
-## Sources consulted
+## 9. Sources
 
-This reference is original synthesized workflow guidance prepared from public cryoSPARC guide pages, public release notes, public forum reports, public tutorials/webinars, relevant papers, and public `cryosparc-tools` documentation/API material. Raw upstream documents, transcripts, forum posts, screenshots, and datasets are not bundled here. For authoritative and current details, consult the official cryoSPARC documentation, release notes, discussion forum, and upstream project documentation.
+- `15_troubleshooting.md`
+- `docs/forum_threads/digests/forum_troubleshooting.md`
+- `docs/forum_threads/digests/forum_import.md`
+- `docs/forum_threads/digests/forum_cryo-em-data-processing.md`
+- `docs/forum_threads/digests/forum_3d-reconstruction.md`
+- https://discuss.cryosparc.com/t/error-while-running-a-job-non-zero-exit-status-255/2030
+- `docs/forum_threads/raw/app/10_10647_interactive-exposure-curation-failing.json`
+- https://discuss.cryosparc.com/t/interactive-exposure-curation-failing/10647
+- https://discuss.cryosparc.com/uploads/default/original/2X/e/e7b2d7d20ee72db7733dbcacd817f2bc38c3b370.png
+- https://guide.cryosparc.com/setup-configuration-and-management/troubleshooting#user-interface-error-logging
+- `docs/forum_threads/digests/forum_hardware-and-performance.md`
+- `docs/forum_threads/digests/forum_data-management.md`
+- `docs/forum_threads/digests/forum_cryosparc-live.md`
+- `docs/forum_threads/digests/forum_scripting.md`
+- `docs/forum_threads/digests/forum_features-and-functionality.md`
+- `docs/forum_threads/digests/forum_ctf-estimation.md`
+- `docs/forum_threads/digests/forum_2d-classification.md`
+- `docs/forum_threads/digests/forum_motion-correction.md`
+- `docs/forum_threads/digests/forum_particle-picking.md`
+- `docs/forum_threads/digests/forum_3d-var.md`
+- `docs/forum_threads/digests/forum_3d-classification.md`
+- `docs/forum_threads/digests/forum_particle-curation.md`
+- `docs/forum_threads/digests/forum_app.md`
+- `reference/cryosparc-tools-meta/issues_digest.md`
+- `reference/release_notes/markdown/v4.0.md`
+- `reference/release_notes/markdown/v4.1.md`
+- `reference/release_notes/markdown/v4.2.md`
+- `reference/release_notes/markdown/v4.3.md`
+- `reference/release_notes/markdown/v4.4.md`
+- `reference/release_notes/markdown/v4.5.md`
+- `reference/release_notes/markdown/v4.6.md`
+- `reference/release_notes/markdown/v5.0.md`

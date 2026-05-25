@@ -157,6 +157,28 @@ When a user asks "should I use Homogeneous Ab-Initio Refinement?":
 - `16_tuning_recipes.md` — parameter cookbooks for small / symmetric / membrane targets.
 - `26_continuous_heterogeneity.md` — when continuous motion is the right interpretation rather than discrete classes.
 
-## Sources consulted
+## Source basis
 
-This reference is original synthesized workflow guidance prepared from public cryoSPARC guide pages, public release notes, public forum reports, public tutorials/webinars, relevant papers, and public `cryosparc-tools` documentation/API material. Raw upstream documents, transcripts, forum posts, screenshots, and datasets are not bundled here. For authoritative and current details, consult the official cryoSPARC documentation, release notes, discussion forum, and upstream project documentation.
+The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
+
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__3d-reconstruction__job-ab-initio-reconstruction.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__3d-reconstruction__job-homogeneous-ab-initio-refinement-beta.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__3d-refinement__job-heterogeneous-refinement.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__3d-refinement__job-heterogeneous-reconstruction-only.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__3d-refinement__job-homogeneous-refinement.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__3d-refinement__job-homogeneous-reconstruction-only.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__utilities__job-select-volume.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__utilities__job-volume-alignment-tools.md`
+- `docs/per_page/processing-data__tutorials-and-case-studies__case-study-dktx-bound-trpv1-empiar-10059.md`
+- `docs/per_page/processing-data__tutorials-and-case-studies__case-study-pseudosymmetry-in-trpv5-and-calmodulin-empiar-10256.md`
+- `docs/per_page/processing-data__tutorials-and-case-studies__case-study-end-to-end-processing-of-encapsulated-ferritin-empiar-10716.md`
+- `docs/per_page/processing-data__tutorials-and-case-studies__case-study-discrete-and-continuous-heterogeneity-in-fanac1-empiar-11631-and-11632.md`
+- `videos/notes/02_trpv1_and_a_standard_workflow.notes.md`
+- `videos/notes/03_trpv5_and_symmetry_breaking.notes.md`
+- `videos/notes/04_encapsulated_ferritin_and_non_point_group_symmetry.notes.md`
+- `videos/notes/05_fanac1_and_discrete_heterogeneity.notes.md`
+- `docs/forum_threads/digests/forum_3d-reconstruction.md`
+- `docs/forum_threads/digests/forum_3d-classification.md`
+- `reference/release_notes/markdown/v4.4.md`
+- `reference/release_notes/markdown/v4.5.md`
+- `reference/release_notes/markdown/v5.0.md`

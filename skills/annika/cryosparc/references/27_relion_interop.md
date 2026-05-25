@@ -140,7 +140,7 @@ Operationally, the bridge does:
 - Pin the pyem version in any pipeline you depend on; do not silently upgrade.
 - Run on a small dataset first and validate (Section 4.4) before running on the production set.
 
-CryoSPARC also exposes a programmatic `cryosparc.star` helper in `cryosparc-tools` (see `public cryosparc-tools documentation/API`) that knows the RELION dtype table and can read/write STAR files. It is not a finished `cs → star` converter on its own — it is the low-level I/O layer — but it is the right building block for in-house bridges and for External Jobs that need to emit STAR files.
+CryoSPARC also exposes a programmatic `cryosparc.star` helper in `cryosparc-tools` (see `reference/cryosparc-tools/cryosparc/star.py`) that knows the RELION dtype table and can read/write STAR files. It is not a finished `cs → star` converter on its own — it is the low-level I/O layer — but it is the right building block for in-house bridges and for External Jobs that need to emit STAR files.
 
 ### 4.2 What to actually export
 
@@ -219,7 +219,7 @@ After **CryoSPARC → RELION** (in addition to the bridge validation checks abov
 | Imported RELION particles "do not align" in CryoSPARC | Linkage or units: wrong `rlnMicrographName` suffix, wrong pixel scaling, Y-flip | Re-tune `Length of Mic. path suffix to cut` and `Length of Part. path suffix to cut`; check coordinate scaling; spot-check Inspect Picks | `02_import.md`, `15_troubleshooting.md` |
 | Inspect Picks shows blank thumbnails after import of RELION coords | Picks: TIFF Y-flip after CryoSPARC re-alignment; or wrong source micrographs connected | Compare a RELION-side micrograph with the cryoSPARC-aligned one; if Y-flipped, fix coordinate convention before extraction | `18_decision_trees.md` (Tree 1 red flags), forum: import digest |
 | Imported particles match micrographs but defocus distribution looks bizarre | CTF: import inherited an old/incompatible higher-order CTF, or pixel size mismatch | Re-run Patch CTF in CryoSPARC against your cryoSPARC-aligned micrographs; use those CTFs, not the imported ones | Import Particle Stack docs (higher-order CTF caveat) |
-| Bridge ran fine but RELION 3D Classification gives a single occupancy class | Per v4.2 fix: 3D Classification in earlier CryoSPARC builds emitted extraneous `alignments3D` that confused csparc2star.py's class assignment | Update CryoSPARC to v4.2+ before exporting; re-run the bridge | `public cryoSPARC release notes v4.2` |
+| Bridge ran fine but RELION 3D Classification gives a single occupancy class | Per v4.2 fix: 3D Classification in earlier CryoSPARC builds emitted extraneous `alignments3D` that confused csparc2star.py's class assignment | Update CryoSPARC to v4.2+ before exporting; re-run the bridge | `reference/release_notes/markdown/v4.2.md` |
 | `csparc2star.py` traceback referencing `set_index(key)` / `None of [None] are in the columns` | Bridge: merge key not present in the secondary file (often `--copy-micrograph-coordinates` against a STAR that does not have the right column) | Drop the merge flag and re-run plain; if you need micrograph coords, pass the correct passthrough `.cs` instead of (or in addition to) the STAR | Forum: "converting to star file" thread |
 | RELION PostProcess result is dramatically different from CryoSPARC's automatic sharpened map | Postprocessing semantics: different masks, different B-factor choice, different FSC correction | Re-make a tight mask in RELION matching CryoSPARC's; quote the corrected FSC, not the tight; expect small differences | `10_postprocessing.md` |
 
@@ -229,7 +229,7 @@ When a row above does not match: capture the exact error text + the pyem version
 
 ## 7. Common mistakes (long-form)
 
-- **Treating old forum advice as current.** The most cited interop forum threads span 2018–2024 and predate multiple breaking changes in both pyem (`--passthrough` removed, multi-file syntax added, optics-table emission added) and CryoSPARC (v3.1's optics-aware STAR import, v3.3's anisotropic-magnification support in Global CTF Refinement, v4.x changes to `.cs` schema, v4.2 fixes to `alignments3D` in 3D Classification). Quote forum advice as a starting point only; check the current `csparc2star.py --help` and current public cryoSPARC release notes.
+- **Treating old forum advice as current.** The most cited interop forum threads span 2018–2024 and predate multiple breaking changes in both pyem (`--passthrough` removed, multi-file syntax added, optics-table emission added) and CryoSPARC (v3.1's optics-aware STAR import, v3.3's anisotropic-magnification support in Global CTF Refinement, v4.x changes to `.cs` schema, v4.2 fixes to `alignments3D` in 3D Classification). Quote forum advice as a starting point only; check the current `csparc2star.py --help` and the relevant `reference/release_notes/markdown/v*.md`.
 - **Mismatched pixel/box silently kills resolution.** Bridges happily emit a STAR with wrong (or absent) pixel size and box size; RELION will load it (sometimes) and refine to noise. Always validate `data_optics` and a quick local-search Refine3D before scaling up.
 - **Missing the source movies/micrographs.** If you do not import movies on the CryoSPARC side, RBMC is unavailable and Bayesian Polishing on the RELION side becomes much harder. If raw movies still exist on the original storage, link them in before importing particles, even if you "just want to look at it."
 - **Broken paths after a project move.** Both Import Movies and Import Particle Stack symlink rather than copy. Moving the raw data or the project breaks the link silently. See `24_disk_and_storage.md` for the storage-side rules; the symptom on this page is "particles import but Patch Motion / Extract fails to open files."
@@ -316,6 +316,54 @@ See Section 3.4 above for the full version. Compressed checklist:
 
 ---
 
-## Sources consulted
+## Source basis
 
-This reference is original synthesized workflow guidance prepared from public cryoSPARC guide pages, public release notes, public forum reports, public tutorials/webinars, relevant papers, and public `cryosparc-tools` documentation/API material. Raw upstream documents, transcripts, forum posts, screenshots, and datasets are not bundled here. For authoritative and current details, consult the official cryoSPARC documentation, release notes, discussion forum, and upstream project documentation.
+The items below were local synthesis inputs used to build this self-contained reference. They are not required at runtime and are intentionally not bundled in this repository; use current public cryoSPARC documentation, release notes, and forum posts for fresh upstream verification.
+
+
+- `topic_plan.md`
+- `plan.md`
+- `02_import.md`
+- `05_extraction_2d.md`
+- `10_postprocessing.md`
+- `13_cryosparc_tools_api.md`
+- `15_troubleshooting.md`
+- `18_decision_trees.md`
+- `23_external_jobs.md`
+- `24_disk_and_storage.md`
+- `17_error_lookup.md`
+- `reference/cryosparc-tools/cryosparc/star.py`
+- `reference/cryosparc-tools/CHANGELOG.md`
+- `reference/cryosparc-tools/docs/guides/jobs.ipynb`
+- `reference/release_notes/markdown/v4.0.md`
+- `reference/release_notes/markdown/v4.1.md`
+- `reference/release_notes/markdown/v4.2.md`
+- `reference/release_notes/markdown/v4.3.md`
+- `reference/release_notes/markdown/v4.4.md`
+- `reference/release_notes/markdown/v4.5.md`
+- `reference/release_notes/markdown/v4.6.md`
+- `reference/release_notes/markdown/v5.0.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__import__job-import-particle-stack.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__import__job-import-movies.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__import__job-import-micrographs.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__utilities__job-particle-sets-tool.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__utilities__job-exposure-sets-tool.md`
+- `docs/per_page/processing-data__all-job-types-in-cryosparc__post-processing__job-sharpening-tools.md`
+- `docs/per_page/processing-data__tutorials-and-case-studies__tutorial-ctf-refinement.md`
+- `docs/per_page/application-guide__downloading-and-exporting-data.md`
+- `docs/per_page/application-guide__inspecting-job-data.md`
+- `docs/forum_threads/digests/forum_import.md`
+- `docs/forum_threads/digests/forum_scripting.md`
+- `docs/forum_threads/digests/forum_cryo-em-data-processing.md`
+- `docs/forum_threads/digests/forum_troubleshooting.md`
+- `docs/forum_threads/raw/import/01_2687_how-to-import-particles-from-relion.json`
+- `docs/forum_threads/raw/import/02_3073_csparc2star-py-final-update.json`
+- `docs/forum_threads/raw/import/03_2026_export-data-to-relion-in-v2.json`
+- `docs/forum_threads/raw/import/04_2928_exporting-map-and-particle-file-to-relion-3-0.json`
+- `docs/forum_threads/raw/import/05_9848_experimental-support-for-relions-bayesian-polishing-in-csparc2star-py.json`
+- `docs/forum_threads/raw/import/06_5528_how-to-import-cryosparc-particle-coordinates-in-relion-3-1.json`
+- `docs/forum_threads/raw/import/07_4978_csparc2star-output-relion-compatibility.json`
+- `docs/forum_threads/raw/import/09_7273_converting-to-star-file.json`
+- `docs/forum_threads/raw/import/10_3750_csparc2star-py-rlnmicrographname-error.json`
+- `docs/forum_threads/raw/3d-reconstruction/09_4224_how-to-go-from-cryosparc-refinement-to-relion-post-processing.json`
+- `docs/forum_threads/raw/cryo-em-data-processing/03_3241_bayesian-polishing-of-cryosparc-processed-particles.json`
