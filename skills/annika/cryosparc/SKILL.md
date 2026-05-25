@@ -45,6 +45,7 @@ Decision and troubleshooting:
 - Error string lookup → `17_error_lookup.md`
 - Parameter cookbook → `16_tuning_recipes.md`
 - “What next?” branch logic → `18_decision_trees.md`
+- Broad workflow/protocol/run-dataset planning + phenotype router → `28_spa_playbook.md`
 - Version-specific behavior/bugs → `version_caveats.md`
 
 Specialized references:
@@ -104,7 +105,8 @@ Ask before:
 - **Bad/refinement streaky map:** load `07_refinement.md`, `10_postprocessing.md`, and if angular bias suspected `orientation_and_preferred_views.md`.
 - **Mask/local refinement question (design, FSC tells, Volume Tools params):** load `20_masks.md` + `09_local_refinement.md`.
 - **"Generate/make mask from model/map", "ChimeraX mask", "molmap", "particle subtraction complement mask":** load `20_masks.md` + `20a_mask_generation_chimerax.md` (+ `09_local_refinement.md` for local-refine / subtraction workflow context). The ChimeraX scripts under `scripts/masks/` are **file-local** — they read maps/models and write `.mrc` + `.json` sidecar; they do **not** touch any cryoSPARC instance and need no live credentials. Importing the resulting `.mrc` into cryoSPARC, running Volume Tools, or queueing Local Refinement / Particle Subtraction still follows the usual cryoSPARC safety confirmation rules below.
-- **Official tutorial/case-study by name, EMPIAR ID, or similar dataset phenotype:** load `case_studies_and_tutorials.md` first as a scenario map, choose the dominant matching playbook, then load the smallest listed workflow reference(s). If the user asks generic stage-specific “what next?” without a case-study-like phenotype, use `18_decision_trees.md` first instead.
+- **Broad "run cryoSPARC" / "process this dataset" / "what protocol or workflow should I use" / unscoped phenotype-matching requests:** load `28_spa_playbook.md` first — it routes by trigger phrase to the right per-stage refs, case-study cards, or decision trees, and bundles a per-job-type checklist. Do **not** load it ahead of more specific routing: preferred-orientation, mask, local-refinement, continuous-heterogeneity, exact-error-string, `cryosparc-tools`/`cryosparcm` automation, RELION interop, particle-set, Live, and helical queries still go straight to their dedicated refs below.
+- **Official tutorial/case-study by name, EMPIAR ID, or similar dataset phenotype:** load `case_studies_and_tutorials.md` first as a scenario map, choose the dominant matching playbook, then load the smallest listed workflow reference(s). If the user asks generic stage-specific “what next?” without a case-study-like phenotype, use `18_decision_trees.md` first instead. If the request is broader than a single phenotype ("plan a whole dataset", "give me a protocol"), start at `28_spa_playbook.md`.
 - **Continuous heterogeneity (3DVA / 3DFlex):** load `26_continuous_heterogeneity.md` (+ `09_local_refinement.md` if the user is mixing in particle subtraction or masked analysis).
 - **RELION ↔ cryoSPARC interop / STAR import-export:** load `27_relion_interop.md` (+ `02_import.md` for import-side specifics, `particle_set_operations.md` if combining/diffing particle sets across packages).
 - **Particle set operations (union / intersect / difference / dedup across jobs):** load `particle_set_operations.md`.
