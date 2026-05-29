@@ -10,6 +10,7 @@ Names of third-party tools, packages, and services are used only to identify int
 - CCP4, Refmac5, AceDRG, Coot, and ISOLDE — their respective project teams and institutions
 - Rosetta and RosettaCommons tools, including EMERALD/GALigandDock workflows — RosettaCommons and the relevant authors/developers
 - RELION and other external cryo-EM tools referenced in workflow notes — their respective authors/developers
+- PDBe, Protein Data Bank in Europe, and related PDBe API/Search services — EMBL-EBI / PDBe and relevant upstream service maintainers
 
 The Apache-2.0 license in this repository applies to original StructAgent code, wrappers, and written material contributed here. It does not grant rights to third-party software, documentation, datasets, trademarks, or services. Users are responsible for obtaining and complying with the licenses, terms of use, and citation requirements for all upstream tools they install or call.
 

@@ -217,4 +217,4 @@ A schematic of the model→mask pipeline is bundled at `assets/mask_skill_overvi
 
 ## Lineage / provenance
 
-This file is synthesised from the standalone `mask_skill` project (`/Users/x_guo/Documents/Annika_projects/mask_skill/`), specifically `SKILL.md`, `references/mask_theory.md`, `references/chimerax_commands.md`, `references/cryosparc_volume_tools.md`, and `references/gui_methods.md`, plus the cryoSPARC-side rules already in `20_masks.md`. The standalone project remains in place as provenance; the runtime copy under this cryoSPARC skill is now the active integrated version.
+This file is synthesised from a standalone mask-generation skill project, specifically `SKILL.md`, `references/mask_theory.md`, `references/chimerax_commands.md`, `references/cryosparc_volume_tools.md`, and `references/gui_methods.md`, plus the cryoSPARC-side rules already in `20_masks.md`. The runtime copy under this cryoSPARC skill is the active integrated version; local build-time source paths are not required.

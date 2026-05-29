@@ -38,13 +38,13 @@ StructAgent is independent and unofficial. It is not affiliated with, endorsed b
 
 ```text
 architecture/                 System architecture and collaboration protocol
-docs/                         Installation, implementation, privacy, versions, release scope
+docs/                         Installation, implementation, privacy, versions, MCP setup, release scope
 scripts/                      Sanitized helper templates for A2A messaging/setup
 skills/annika/                Execution-side structural-biology skills/protocols
   ├── ccp4/                   Refmac5, AceDRG, CCP4 suite orchestration
   ├── chimerax/               UCSF ChimeraX model editing and map fitting
   ├── coot/                   Coot model building and local refinement
-  ├── cryosparc/              AI agent skill for cryoSPARC workflows and cautious automation (NEW)
+  ├── cryosparc/              AI agent skill for cryoSPARC workflows, masks, and cautious automation
   ├── emerald/                Rosetta EMERALD ligand docking into cryo-EM density (NEW)
   ├── isolde/                 ISOLDE interactive refinement in ChimeraX
   ├── phenix/                 Phenix real-space and reciprocal-space refinement
@@ -80,9 +80,13 @@ Create two agents:
 
 Connect them with an A2A JSON-RPC gateway or equivalent message bus. Use the templates in `scripts/` and the protocol in `architecture/collaboration_protocol.md`.
 
-See [`docs/full_system_implementation.md`](docs/full_system_implementation.md).
+See [`docs/full_system_implementation.md`](docs/full_system_implementation.md). Optional public PDB/PDBe lookup tools can be exposed via [`docs/pdbe_mcp_setup.md`](docs/pdbe_mcp_setup.md).
 
 ## Changelog
+
+### v4 (2026-05-29)
+- **Updated** `skills/annika/cryosparc/` to the current v5.0.6-aware skill bundle, including expanded SPA playbooks, case-study/tutorial routing, integrated ChimeraX mask-generation guidance, small mask assets, and file-local mask helper scripts under `scripts/masks/`.
+- **Added** `docs/pdbe_mcp_setup.md` — optional PDBe API/Search MCP configuration for StructAgent-style Maria/Annika deployments using `pdbe-mcp-server --transport stdio`; graph server remains out of scope unless a local PDBe-KB Neo4j deployment is provided.
 
 ### v3 (2026-05-22)
 - **Added** `skills/annika/cryosparc/` — self-contained, unofficial cryoSPARC SPA advisor/automation skill covering import, preprocessing, picking, 2D/3D workflows, refinement, 3DVA/3DFlex, masks, helical processing, CryoSPARC Live, `cryosparc-tools`, `cryosparcm`, GPU lanes/queues, storage, RELION interop, troubleshooting, and error lookup. Includes synthesized workflow references and a dry-run-first `scripts/cryosparc_harness.py` helper for cautious local automation.
