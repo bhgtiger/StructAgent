@@ -24,6 +24,8 @@ Restart or rescan your agent so it indexes the skills.
 
 Worked example: [`docs/cryosparc_skill_example/`](cryosparc_skill_example/) shows a Claude/Codex-style implementation and how to adapt the same unofficial skill package to another agent runtime. Users must follow upstream cryoSPARC licensing and documentation terms.
 
+Optional public PDB/PDBe lookup support for Maria/Annika-style deployments is documented in [`pdbe_mcp_setup.md`](pdbe_mcp_setup.md).
+
 ### Cryo-EM model building / refinement
 
 - `skills/annika/cryosparc` — unofficial SPA processing/reconstruction guidance when cryoSPARC is involved
