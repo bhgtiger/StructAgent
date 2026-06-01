@@ -25,7 +25,7 @@
   .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}.meta span{font-size:13px;color:var(--faint);padding:4px 10px;background:var(--panel);border:1px solid var(--border);border-radius:999px}
   nav{position:sticky;top:24px;align-self:start;max-height:calc(100vh - 48px);overflow:auto;font-size:14px}.toc-label{color:var(--faint);font-size:12px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
   nav ol{list-style:none;margin:0;padding:0;counter-reset:s}nav li{counter-increment:s;margin-bottom:10px}nav a{display:block;color:var(--muted);text-decoration:none;padding-left:8px;border-left:2px solid transparent;line-height:1.35}nav a:before{content:counter(s) ". ";color:var(--faint)}nav a:hover{color:var(--accent);border-left-color:var(--accent)}
-  main{min-width:0;padding-bottom:80px} h2{margin:54px 0 16px;padding-bottom:8px;border-bottom:1px solid var(--border);font-size:26px;letter-spacing:-.01em}h3{margin:30px 0 12px;font-size:18px}h4{margin:0 0 8px;font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}p{margin:0 0 14px}a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+  main{min-width:0;padding-bottom:80px} h2{margin:54px 0 16px;padding-bottom:8px;border-bottom:1px solid var(--border);font-size:26px;letter-spacing:-.01em}main section:first-child h2{margin-top:0}h3{margin:30px 0 12px;font-size:18px}h4{margin:0 0 8px;font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}p{margin:0 0 14px}a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
   code{font:13px/1.45 ui-monospace,"SF Mono",Menlo,Consolas,monospace;background:var(--code);border:1px solid var(--border);border-radius:4px;padding:2px 6px;color:var(--text)}
   pre{background:var(--code);border:1px solid var(--border);border-radius:9px;padding:14px 16px;overflow:auto;font:13px/1.5 ui-monospace,"SF Mono",Menlo,Consolas,monospace;margin:0 0 16px}pre code{background:transparent;border:0;padding:0}
   .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px 22px;margin:0 0 20px}.card.good{border-left:4px solid var(--good)}.card.warn{border-left:4px solid var(--warn)}.card.bad{border-left:4px solid var(--bad)}.card.info{border-left:4px solid var(--accent)}
@@ -43,7 +43,7 @@
 <div class="page">
 
 <header>
-  <div class="eyebrow">StructAgent · unofficial skill example</div>
+  <div class="eyebrow">skill example</div>
   <h1>AI Agent Skill for cryoSPARC</h1>
   <p class="lede">A StructAgent example that gives Claude, Codex, or any tool-using agent three capabilities against a live cryoSPARC instance: <strong>consult</strong> on workflow and parameter questions, <strong>inspect</strong> completed-job results, and <strong>launch</strong> new jobs only with explicit confirmation.</p>
   <div class="meta">
