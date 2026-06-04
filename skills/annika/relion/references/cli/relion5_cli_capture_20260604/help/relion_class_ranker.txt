@@ -1,0 +1,91 @@
+# relion_class_ranker
+path: <RELION_BIN>/relion_class_ranker
+
+## --version
+RELION version: 5.0.0-commit-3d6c20 
+Precision: BASE=double, CUDA-ACC=single 
+
+
+## --help
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== General options ===== 
+                           --opt () : Input optimiser.star file
+                           --o (./) : Directory name for output files
+                     --ext (ranked) : Extension for root filenames of output optimiser.star and model.star
+              --auto_select (false) : Perform auto-selection of particles based on below thresholds for the score
+                  --min_score (0.5) : Minimum selected score to be included in class selection
+                 --max_score (999.) : Maximum selected score to be included in class selection
+     --select_min_nr_particles (-1) : select at least this many particles, regardless of their class score
+       --select_min_nr_classes (-1) : OR: Select at least this many classes, regardless of their score
+      --relative_thresholds (false) : If true, interpret the above min and max_scores as fractions of the maximum score of all predicted classes in the input
+    --fn_sel_parts (particles.star) : Filename for output star file with selected particles
+  --fn_sel_classavgs (class_averages.star) : Filename for output star file with selected class averages
+                   --fn_root (rank) : rootname for output model.star and optimiser.star files
+====== Network training options (only used in development!) ===== 
+                    --train (false) : Only write output files for training purposes (don't rank classes)
+   --select (backup_selection.star) : Input class_averages.star from the Selection job or backup_selection.star
+         --fn_score (job_score.txt) : Input job score file
+                       --cf_file () : Input class feature star file
+               --only_class_nr (-1) : Class number of the class of interest
+      --skip_angular_errors (false) : Skip angular error calculation
+  --do_granularity_features (false) : Calculate granularity features
+               --save_masks (false) : Save the automatically generated 2D solvent masks for all references
+              --save_mask_c (false) : Write out images of protein mask circumferences.
+  --mask_folder_name (protein_solvent_masks) : Folder name for saving all masks.
+====== Extract subimage for deep convolutional neural network analysis ===== 
+        --extract_subimages (false) : Extract subimages for each class
+                --nr_subimages (25) : Number of subimage to extract (randonly)
+            --subimage_boxsize (24) : Boxsize (in pixels) for subimages
+        --only_do_subimages (false) : Dont do anything else than extracting subimages
+====== Expert options ===== 
+              --radius_ratio (0.95) : Ratio of inner radius of the interested ring area in proportion to the current circular mask radius
+                      --radius (-1) : Inner radius of the interested ring area to the current circular mask radius
+                     --lowpass (25) : Image lowpass filter threshold for generating binary masks.
+            --binary_threshold (0.) : Threshold for generating binary masks.
+                        --debug (0) : Debug level
+                         --verb (1) : Verbosity level
+      --fn_features (features.star) : Filename for output features star file
+  --write_normalized_features (false) : Also write out normalized feature vectors
+                          --version : Print RELION version and exit
+
+## -h
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== General options ===== 
+                           --opt () : Input optimiser.star file
+                           --o (./) : Directory name for output files
+                     --ext (ranked) : Extension for root filenames of output optimiser.star and model.star
+              --auto_select (false) : Perform auto-selection of particles based on below thresholds for the score
+                  --min_score (0.5) : Minimum selected score to be included in class selection
+                 --max_score (999.) : Maximum selected score to be included in class selection
+     --select_min_nr_particles (-1) : select at least this many particles, regardless of their class score
+       --select_min_nr_classes (-1) : OR: Select at least this many classes, regardless of their score
+      --relative_thresholds (false) : If true, interpret the above min and max_scores as fractions of the maximum score of all predicted classes in the input
+    --fn_sel_parts (particles.star) : Filename for output star file with selected particles
+  --fn_sel_classavgs (class_averages.star) : Filename for output star file with selected class averages
+                   --fn_root (rank) : rootname for output model.star and optimiser.star files
+====== Network training options (only used in development!) ===== 
+                    --train (false) : Only write output files for training purposes (don't rank classes)
+   --select (backup_selection.star) : Input class_averages.star from the Selection job or backup_selection.star
+         --fn_score (job_score.txt) : Input job score file
+                       --cf_file () : Input class feature star file
+               --only_class_nr (-1) : Class number of the class of interest
+      --skip_angular_errors (false) : Skip angular error calculation
+  --do_granularity_features (false) : Calculate granularity features
+               --save_masks (false) : Save the automatically generated 2D solvent masks for all references
+              --save_mask_c (false) : Write out images of protein mask circumferences.
+  --mask_folder_name (protein_solvent_masks) : Folder name for saving all masks.
+====== Extract subimage for deep convolutional neural network analysis ===== 
+        --extract_subimages (false) : Extract subimages for each class
+                --nr_subimages (25) : Number of subimage to extract (randonly)
+            --subimage_boxsize (24) : Boxsize (in pixels) for subimages
+        --only_do_subimages (false) : Dont do anything else than extracting subimages
+====== Expert options ===== 
+              --radius_ratio (0.95) : Ratio of inner radius of the interested ring area in proportion to the current circular mask radius
+                      --radius (-1) : Inner radius of the interested ring area to the current circular mask radius
+                     --lowpass (25) : Image lowpass filter threshold for generating binary masks.
+            --binary_threshold (0.) : Threshold for generating binary masks.
+                        --debug (0) : Debug level
+                         --verb (1) : Verbosity level
+      --fn_features (features.star) : Filename for output features star file
+  --write_normalized_features (false) : Also write out normalized feature vectors
+                          --version : Print RELION version and exit

@@ -1,0 +1,193 @@
+# relion_helix_toolbox
+path: <RELION_BIN>/relion_helix_toolbox
+
+## --version
+RELION version: 5.0.0-commit-3d6c20 
+Precision: BASE=double, CUDA-ACC=single 
+
+
+## --help
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== Show usage ===== 
+            --function_help (false) : Show usage for the selected function (FEB 19, 2017)
+====== List of functions (alphabetically ordered) ===== 
+                    --check (false) : Check parameters for 3D helical reconstruction in RELION
+                  --cut_out (false) : Cut out a small part of the helix
+                 --cylinder (false) : Create a cylinder as 3D initial reference
+                   --impose (false) : Impose helical symmetry (in real space)
+                  --interpo (false) : Interpolate 3D curve for 3D helical sub-tomogram extraction
+                     --norm (false) : Normalise 2D/3D helical segments in a STAR file
+                --pdb_helix (false) : Simulate a helix from a single PDB file of protein molecule
+           --remove_bad_ctf (false) : Remove micrographs with poor-quality CTF
+          --remove_bad_tilt (false) : Remove helical segments with large tilt angle deviation (away from 90 degrees)
+           --remove_bad_psi (false) : Remove helical segments with large psi angle deviation (away from psi prior)
+                   --search (false) : Local search of helical symmetry
+            --select_3dtomo (false) : Select 3D subtomograms given 2D projections
+           --simulate_helix (false) : Create a helical 3D reference of spheres
+        --simulate_segments (false) : Simulate helical segments using a STAR file
+             --sort_tube_id (false) : Sort segments in _data.star file according to helical tube IDs
+           --spherical_mask (false) : Apply soft spherical mask to 3D helical reference
+            --average_au_2d (false) : Average multiple asymmetrical units in 2D along the helical axis?
+====== List of functions which can be called in Relion GUI ===== 
+             --combine_gctf (false) : Combine Autopicker priors (tilt and psi) with Gctf local search results
+             --central_mask (false) : Crop the central part of a helix
+           --coords_emn2rln (false) : Convert EMAN2 coordinates of helical segments into RELION STAR format
+           --coords_xim2rln (false) : Convert XIMDISP coordinates of helical segments into RELION STAR format
+                   --divide (false) : Divide one huge STAR file into many small ones
+              --extract_emn (false) : Extract EMAN2 coordinates of helical segments from specified straight tubes
+              --extract_rln (false) : Extract RELION coordinates of helical segments from specified straight tubes
+              --extract_xim (false) : Extract XIMDISP coordinates of helical segments from specified straight tubes
+           --impose_fourier (false) : Impose helical symmetry (simulate what is done in 3D reconstruction in Fourier space)
+                --init_tilt (false) : Set tilt angles to 90 degrees for all helical segments
+                    --merge (false) : Merge small STAR files into a huge one
+         --set_xmipp_origin (false) : Set Xmipp origin
+                    --debug (false) : (Debug only)
+====== Parameters (alphabetically ordered) ===== 
+                  --3d_tomo (false) : Simulate 3D subtomograms using a STAR file?
+                        --ang (91.) : Cut out a small part of the helix within this angle (in degrees)
+                     --angpix (-1.) : Pixel size (in Angstroms)
+                  --bimodal (false) : Do bimodal searches of tilt and psi angles in 3D helical reconstruction?
+                          --bin (1) : Binning factor used in manual segment picking
+                      --boxdim (-1) : Box size (in pixels)
+               --center_pdb (false) : Translate all atoms in the original PDB to the center of mass of this molecule?
+               --ctf_fom_min (-999) : Minimum figure-of-merit - threshold used in removing micrographs with bad CTF
+          --cyl_inner_diameter (-1) : Inner diameter of the cylindrical mask (in Angstroms)
+          --cyl_outer_diameter (-1) : Outer diameter of the cylindrical mask (in Angstroms)
+                --df_min (-999999.) : Minimum defocus (in Angstroms)
+                 --df_max (999999.) : Maximum defocus (in Angstroms)
+             --EPA_lowest_res (999) : Lowest EPA resolution (in Angstroms) - threshold used in removing micrographs with bad CTF
+                      --i (file.in) : Input file
+                   --i1 (file01.in) : Input file #1
+                   --i2 (file02.in) : Input file #2
+        --i_root (_rootnameIn.star) : Rootname of input files
+     --i1_root (_rootnameIn01.star) : Rootname #1 of input files
+     --i2_root (_rootnameIn02.star) : Rootname #2 of input files
+  --ignore_helical_symmetry (false) : Ignore helical symmetry in 3D reconstruction?
+                       --nr_asu (1) : Number of helical asymmetrical units
+                 --nr_outfiles (10) : Number of output files
+                 --nr_subunits (-1) : Number of helical subunits
+                    --nr_tubes (-1) : Number of helical tubes
+                     --o (file.out) : Output file
+       --o_root (_rootnameOut.star) : Rootname of output files
+                    --polar (false) : Construct a 3D reference for helical reconstruction with polarity along Z axis?
+                --psi_max_dev (15.) : Maximum deviation of psi angles allowed (away from psi prior)
+                 --random_seed (-1) : Random seed (set to system time if negative)
+                        --rise (-1) : Helical rise (in Angstroms)
+                --rise_inistep (-1) : Initial step of helical rise search (in Angstroms)
+                    --rise_min (-1) : Minimum helical rise (in Angstroms)
+                    --rise_max (-1) : Maximum helical rise (in Angstroms)
+           --seam_nr_filaments (-1) : Number of filaments in a helix with seam (>= 2)
+               --search_sym (false) : Perform local searches of helical symmetry in 3D reconstruction?
+                 --segments (false) : Cut helical tubes into segments?
+                --sigma_offset (5.) : Sigma of translational offsets (in pixels)
+                   --sigma_psi (5.) : Sigma of psi angles (in degrees)
+                  --sigma_tilt (5.) : Sigma of tilt angles (in degrees)
+          --sphere_percentage (0.9) : Diameter of spherical mask divided by the box size (0.10~0.90 or 0.01~0.99)
+            --subunit_diameter (-1) : Diameter of helical subunits (in Angstroms)
+                       --sym_Cn (1) : Rotational symmetry Cn
+               --tilt_max_dev (15.) : Maximum deviation of tilt angles allowed (away from +90 degrees)
+            --topbottom_ratio (0.5) : Top-bottom width ratio for construction of polarised helical reference
+                       --twist (-1) : Helical twist (in degrees, + for right-handedness)
+               --twist_inistep (-1) : Initial step of helical twist search (in degrees)
+                   --twist_min (-1) : Minimum helical twist (in degrees, + for right-handedness)
+                   --twist_max (-1) : Maximum helical twist (in degrees, + for right-handedness)
+                     --verb (false) : Detailed screen output?
+                 --white_noise (1.) : Standard deviation of added white Gaussian noise
+                       --width (5.) : Width of cosine soft edge (in pixels)
+                      --xdim (4096) : Dimension X (in pixels) of the micrographs
+                      --ydim (4096) : Dimension Y (in pixels) of the micrographs
+               --z_percentage (0.3) : Percentage of cropped length (along Z axis, 0.1~0.9)
+                          --version : Print RELION version and exit
+
+## -h
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== Show usage ===== 
+            --function_help (false) : Show usage for the selected function (FEB 19, 2017)
+====== List of functions (alphabetically ordered) ===== 
+                    --check (false) : Check parameters for 3D helical reconstruction in RELION
+                  --cut_out (false) : Cut out a small part of the helix
+                 --cylinder (false) : Create a cylinder as 3D initial reference
+                   --impose (false) : Impose helical symmetry (in real space)
+                  --interpo (false) : Interpolate 3D curve for 3D helical sub-tomogram extraction
+                     --norm (false) : Normalise 2D/3D helical segments in a STAR file
+                --pdb_helix (false) : Simulate a helix from a single PDB file of protein molecule
+           --remove_bad_ctf (false) : Remove micrographs with poor-quality CTF
+          --remove_bad_tilt (false) : Remove helical segments with large tilt angle deviation (away from 90 degrees)
+           --remove_bad_psi (false) : Remove helical segments with large psi angle deviation (away from psi prior)
+                   --search (false) : Local search of helical symmetry
+            --select_3dtomo (false) : Select 3D subtomograms given 2D projections
+           --simulate_helix (false) : Create a helical 3D reference of spheres
+        --simulate_segments (false) : Simulate helical segments using a STAR file
+             --sort_tube_id (false) : Sort segments in _data.star file according to helical tube IDs
+           --spherical_mask (false) : Apply soft spherical mask to 3D helical reference
+            --average_au_2d (false) : Average multiple asymmetrical units in 2D along the helical axis?
+====== List of functions which can be called in Relion GUI ===== 
+             --combine_gctf (false) : Combine Autopicker priors (tilt and psi) with Gctf local search results
+             --central_mask (false) : Crop the central part of a helix
+           --coords_emn2rln (false) : Convert EMAN2 coordinates of helical segments into RELION STAR format
+           --coords_xim2rln (false) : Convert XIMDISP coordinates of helical segments into RELION STAR format
+                   --divide (false) : Divide one huge STAR file into many small ones
+              --extract_emn (false) : Extract EMAN2 coordinates of helical segments from specified straight tubes
+              --extract_rln (false) : Extract RELION coordinates of helical segments from specified straight tubes
+              --extract_xim (false) : Extract XIMDISP coordinates of helical segments from specified straight tubes
+           --impose_fourier (false) : Impose helical symmetry (simulate what is done in 3D reconstruction in Fourier space)
+                --init_tilt (false) : Set tilt angles to 90 degrees for all helical segments
+                    --merge (false) : Merge small STAR files into a huge one
+         --set_xmipp_origin (false) : Set Xmipp origin
+                    --debug (false) : (Debug only)
+====== Parameters (alphabetically ordered) ===== 
+                  --3d_tomo (false) : Simulate 3D subtomograms using a STAR file?
+                        --ang (91.) : Cut out a small part of the helix within this angle (in degrees)
+                     --angpix (-1.) : Pixel size (in Angstroms)
+                  --bimodal (false) : Do bimodal searches of tilt and psi angles in 3D helical reconstruction?
+                          --bin (1) : Binning factor used in manual segment picking
+                      --boxdim (-1) : Box size (in pixels)
+               --center_pdb (false) : Translate all atoms in the original PDB to the center of mass of this molecule?
+               --ctf_fom_min (-999) : Minimum figure-of-merit - threshold used in removing micrographs with bad CTF
+          --cyl_inner_diameter (-1) : Inner diameter of the cylindrical mask (in Angstroms)
+          --cyl_outer_diameter (-1) : Outer diameter of the cylindrical mask (in Angstroms)
+                --df_min (-999999.) : Minimum defocus (in Angstroms)
+                 --df_max (999999.) : Maximum defocus (in Angstroms)
+             --EPA_lowest_res (999) : Lowest EPA resolution (in Angstroms) - threshold used in removing micrographs with bad CTF
+                      --i (file.in) : Input file
+                   --i1 (file01.in) : Input file #1
+                   --i2 (file02.in) : Input file #2
+        --i_root (_rootnameIn.star) : Rootname of input files
+     --i1_root (_rootnameIn01.star) : Rootname #1 of input files
+     --i2_root (_rootnameIn02.star) : Rootname #2 of input files
+  --ignore_helical_symmetry (false) : Ignore helical symmetry in 3D reconstruction?
+                       --nr_asu (1) : Number of helical asymmetrical units
+                 --nr_outfiles (10) : Number of output files
+                 --nr_subunits (-1) : Number of helical subunits
+                    --nr_tubes (-1) : Number of helical tubes
+                     --o (file.out) : Output file
+       --o_root (_rootnameOut.star) : Rootname of output files
+                    --polar (false) : Construct a 3D reference for helical reconstruction with polarity along Z axis?
+                --psi_max_dev (15.) : Maximum deviation of psi angles allowed (away from psi prior)
+                 --random_seed (-1) : Random seed (set to system time if negative)
+                        --rise (-1) : Helical rise (in Angstroms)
+                --rise_inistep (-1) : Initial step of helical rise search (in Angstroms)
+                    --rise_min (-1) : Minimum helical rise (in Angstroms)
+                    --rise_max (-1) : Maximum helical rise (in Angstroms)
+           --seam_nr_filaments (-1) : Number of filaments in a helix with seam (>= 2)
+               --search_sym (false) : Perform local searches of helical symmetry in 3D reconstruction?
+                 --segments (false) : Cut helical tubes into segments?
+                --sigma_offset (5.) : Sigma of translational offsets (in pixels)
+                   --sigma_psi (5.) : Sigma of psi angles (in degrees)
+                  --sigma_tilt (5.) : Sigma of tilt angles (in degrees)
+          --sphere_percentage (0.9) : Diameter of spherical mask divided by the box size (0.10~0.90 or 0.01~0.99)
+            --subunit_diameter (-1) : Diameter of helical subunits (in Angstroms)
+                       --sym_Cn (1) : Rotational symmetry Cn
+               --tilt_max_dev (15.) : Maximum deviation of tilt angles allowed (away from +90 degrees)
+            --topbottom_ratio (0.5) : Top-bottom width ratio for construction of polarised helical reference
+                       --twist (-1) : Helical twist (in degrees, + for right-handedness)
+               --twist_inistep (-1) : Initial step of helical twist search (in degrees)
+                   --twist_min (-1) : Minimum helical twist (in degrees, + for right-handedness)
+                   --twist_max (-1) : Maximum helical twist (in degrees, + for right-handedness)
+                     --verb (false) : Detailed screen output?
+                 --white_noise (1.) : Standard deviation of added white Gaussian noise
+                       --width (5.) : Width of cosine soft edge (in pixels)
+                      --xdim (4096) : Dimension X (in pixels) of the micrographs
+                      --ydim (4096) : Dimension Y (in pixels) of the micrographs
+               --z_percentage (0.3) : Percentage of cropped length (along Z axis, 0.1~0.9)
+                          --version : Print RELION version and exit

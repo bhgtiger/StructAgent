@@ -1,0 +1,55 @@
+# relion_run_motioncorr_mpi
+path: <RELION_BIN>/relion_run_motioncorr_mpi
+
+## --version
+RELION version: 5.0.0-commit-3d6c20 
+Precision: BASE=double, CUDA-ACC=single 
+
+
+## --help
+in: <RELION_SOURCE_ROOT>/src/motioncorr_runner.cpp, line 141
+ERROR: 
+You have to choose either UCSF MotionCor2 or RELION's own implementation.
+=== Backtrace  ===
+relion_run_motioncorr_mpi(_ZN11RelionErrorC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES7_l+0x85) [0x55797bb37cd5]
+relion_run_motioncorr_mpi(+0x56337) [0x55797bab6337]
+relion_run_motioncorr_mpi(_ZN19MotioncorrRunnerMpi4readEiPPc+0x4b) [0x55797bb95f4b]
+relion_run_motioncorr_mpi(main+0x41) [0x55797bb28711]
+/lib/x86_64-linux-gnu/libc.so.6(+0x2a1ca) [0x7ec9df22a1ca]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x8b) [0x7ec9df22a28b]
+relion_run_motioncorr_mpi(_start+0x25) [0x55797bb2c125]
+==================
+ERROR: 
+You have to choose either UCSF MotionCor2 or RELION's own implementation.
+--------------------------------------------------------------------------
+MPI_ABORT was invoked on rank 0 in communicator MPI_COMM_WORLD
+with errorcode 1.
+
+NOTE: invoking MPI_ABORT causes Open MPI to kill all MPI processes.
+You may or may not see output from other processes, depending on
+exactly when Open MPI kills them.
+--------------------------------------------------------------------------
+
+## -h
+in: <RELION_SOURCE_ROOT>/src/motioncorr_runner.cpp, line 141
+ERROR: 
+You have to choose either UCSF MotionCor2 or RELION's own implementation.
+=== Backtrace  ===
+relion_run_motioncorr_mpi(_ZN11RelionErrorC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES7_l+0x85) [0x57e92ffd3cd5]
+relion_run_motioncorr_mpi(+0x56337) [0x57e92ff52337]
+relion_run_motioncorr_mpi(_ZN19MotioncorrRunnerMpi4readEiPPc+0x4b) [0x57e930031f4b]
+relion_run_motioncorr_mpi(main+0x41) [0x57e92ffc4711]
+/lib/x86_64-linux-gnu/libc.so.6(+0x2a1ca) [0x787d0882a1ca]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x8b) [0x787d0882a28b]
+relion_run_motioncorr_mpi(_start+0x25) [0x57e92ffc8125]
+==================
+ERROR: 
+You have to choose either UCSF MotionCor2 or RELION's own implementation.
+--------------------------------------------------------------------------
+MPI_ABORT was invoked on rank 0 in communicator MPI_COMM_WORLD
+with errorcode 1.
+
+NOTE: invoking MPI_ABORT causes Open MPI to kill all MPI processes.
+You may or may not see output from other processes, depending on
+exactly when Open MPI kills them.
+--------------------------------------------------------------------------

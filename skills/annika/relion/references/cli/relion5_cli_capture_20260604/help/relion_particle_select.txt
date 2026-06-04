@@ -1,0 +1,27 @@
+# relion_particle_select
+path: <RELION_BIN>/relion_particle_select
+
+## --version
+RELION version: 5.0.0-commit-3d6c20 
+Precision: BASE=double, CUDA-ACC=single 
+
+
+## --help
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== General options ===== 
+                                --i : Input STAR file containing the source particles
+                            --i_ref : Input STAR file containing reference particles
+                   --angles (false) : Copy particle viewing angles from reference
+                  --offsets (false) : Copy particle offsets from reference
+                --o (selected.star) : Output path
+                          --version : Print RELION version and exit
+
+## -h
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== General options ===== 
+                                --i : Input STAR file containing the source particles
+                            --i_ref : Input STAR file containing reference particles
+                   --angles (false) : Copy particle viewing angles from reference
+                  --offsets (false) : Copy particle offsets from reference
+                --o (selected.star) : Output path
+                          --version : Print RELION version and exit

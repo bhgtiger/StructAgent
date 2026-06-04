@@ -1,0 +1,37 @@
+# relion_run_motioncorr
+path: <RELION_BIN>/relion_run_motioncorr
+
+## --version
+RELION version: 5.0.0-commit-3d6c20 
+Precision: BASE=double, CUDA-ACC=single 
+
+
+## --help
+in: <RELION_SOURCE_ROOT>/src/motioncorr_runner.cpp, line 141
+ERROR: 
+You have to choose either UCSF MotionCor2 or RELION's own implementation.
+=== Backtrace  ===
+relion_run_motioncorr(_ZN11RelionErrorC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES7_l+0x85) [0x567bea80bf95]
+relion_run_motioncorr(+0x552c7) [0x567bea78e2c7]
+relion_run_motioncorr(main+0x43) [0x567bea8003e3]
+/lib/x86_64-linux-gnu/libc.so.6(+0x2a1ca) [0x738fe942a1ca]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x8b) [0x738fe942a28b]
+relion_run_motioncorr(_start+0x25) [0x567bea803d85]
+==================
+ERROR: 
+You have to choose either UCSF MotionCor2 or RELION's own implementation.
+
+## -h
+in: <RELION_SOURCE_ROOT>/src/motioncorr_runner.cpp, line 141
+ERROR: 
+You have to choose either UCSF MotionCor2 or RELION's own implementation.
+=== Backtrace  ===
+relion_run_motioncorr(_ZN11RelionErrorC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES7_l+0x85) [0x6074e3301f95]
+relion_run_motioncorr(+0x552c7) [0x6074e32842c7]
+relion_run_motioncorr(main+0x43) [0x6074e32f63e3]
+/lib/x86_64-linux-gnu/libc.so.6(+0x2a1ca) [0x76fc4082a1ca]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x8b) [0x76fc4082a28b]
+relion_run_motioncorr(_start+0x25) [0x6074e32f9d85]
+==================
+ERROR: 
+You have to choose either UCSF MotionCor2 or RELION's own implementation.

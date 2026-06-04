@@ -1,0 +1,33 @@
+# relion_stack_create
+path: <RELION_BIN>/relion_stack_create
+
+## --version
+RELION version: 5.0.0-commit-3d6c20 
+Precision: BASE=double, CUDA-ACC=single 
+
+
+## --help
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== General options ===== 
+                                --i : Input STAR file with the images (as rlnImageName) to be saved in a stack
+                       --o (output) : Output rootname
+     --split_per_micrograph (false) : Write out separate stacks for each micrograph (needs rlnMicrographName in STAR file)
+     --apply_transformation (false) : Apply the inplane-transformations (needs _rlnOriginX/Y and _rlnAnglePsi in STAR file) by real space interpolation
+  --apply_rounded_offsets_only (false) : Apply the rounded translations only (so-recentering without interpolation; needs _rlnOriginX/Y in STAR file)
+            --ignore_optics (false) : Ignore optics groups. This allows you to read and write RELION 3.0 STAR files but does NOT allow you to convert 3.1 STAR files back to the 3.0 format.
+               --one_by_one (false) : Write particles one by one. This saves memory but can be slower.
+                  --float16 (false) : Write images in 16bit float format (default is 32bit).
+                          --version : Print RELION version and exit
+
+## -h
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== General options ===== 
+                                --i : Input STAR file with the images (as rlnImageName) to be saved in a stack
+                       --o (output) : Output rootname
+     --split_per_micrograph (false) : Write out separate stacks for each micrograph (needs rlnMicrographName in STAR file)
+     --apply_transformation (false) : Apply the inplane-transformations (needs _rlnOriginX/Y and _rlnAnglePsi in STAR file) by real space interpolation
+  --apply_rounded_offsets_only (false) : Apply the rounded translations only (so-recentering without interpolation; needs _rlnOriginX/Y in STAR file)
+            --ignore_optics (false) : Ignore optics groups. This allows you to read and write RELION 3.0 STAR files but does NOT allow you to convert 3.1 STAR files back to the 3.0 format.
+               --one_by_one (false) : Write particles one by one. This saves memory but can be slower.
+                  --float16 (false) : Write images in 16bit float format (default is 32bit).
+                          --version : Print RELION version and exit

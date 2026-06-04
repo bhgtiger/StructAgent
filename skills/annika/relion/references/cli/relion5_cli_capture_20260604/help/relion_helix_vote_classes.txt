@@ -1,0 +1,43 @@
+# relion_helix_vote_classes
+path: <RELION_BIN>/relion_helix_vote_classes
+
+## --version
+RELION version: 5.0.0-commit-3d6c20 
+Precision: BASE=double, CUDA-ACC=single 
+
+
+## --help
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== General options ===== 
+                                --i : The _data.star file with the classes to be analysed
+                       --nr_classes : Number of classes in the input star file
+                  --coord_suffix () : The suffix for the coordinate files, e.g. "_picked.star" or ".box"
+                          --pick () : Alternative to coord_suffix: a 2-column STAR file with micrographs and coordinate files
+         --o (HelixAnalyseClasses/) : Output directory name
+                        --groups () : A string with grouping of comma-separated class numbers (with ':' for separation of groups, e.g. 1,4,5:6,2)
+                   --group_names () : A string with :-separated names for all groups (e.g. phf:sf)
+           --voting_threshold (0.0) : Minimum fraction to assign a helix to a group
+         --consistency_check (0.05) : Check this fraction of particles to be on line of start-end coordinates
+                --min_nr_picks (-1) : Select filaments that have at least this many picks for the group indicated below
+             --min_picks_group (-1) : Number of the group (first one is 1) to select based on minimum number of particles
+                     --norm (false) : Perform normalisation before voting?
+                         --verb (1) : Verbosity
+                          --version : Print RELION version and exit
+
+## -h
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== General options ===== 
+                                --i : The _data.star file with the classes to be analysed
+                       --nr_classes : Number of classes in the input star file
+                  --coord_suffix () : The suffix for the coordinate files, e.g. "_picked.star" or ".box"
+                          --pick () : Alternative to coord_suffix: a 2-column STAR file with micrographs and coordinate files
+         --o (HelixAnalyseClasses/) : Output directory name
+                        --groups () : A string with grouping of comma-separated class numbers (with ':' for separation of groups, e.g. 1,4,5:6,2)
+                   --group_names () : A string with :-separated names for all groups (e.g. phf:sf)
+           --voting_threshold (0.0) : Minimum fraction to assign a helix to a group
+         --consistency_check (0.05) : Check this fraction of particles to be on line of start-end coordinates
+                --min_nr_picks (-1) : Select filaments that have at least this many picks for the group indicated below
+             --min_picks_group (-1) : Number of the group (first one is 1) to select based on minimum number of particles
+                     --norm (false) : Perform normalisation before voting?
+                         --verb (1) : Verbosity
+                          --version : Print RELION version and exit

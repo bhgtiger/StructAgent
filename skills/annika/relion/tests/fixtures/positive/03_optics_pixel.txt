@@ -1,0 +1,2 @@
+What does data_optics mean and why are there two pixel sizes in my particles.star?
+EXPECT: relion skill -> 01_star_and_metadata + 12_conventions_symmetry

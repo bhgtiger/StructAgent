@@ -1,0 +1,2 @@
+Generate the relion_motion_refine Bayesian polishing command for my project.
+EXPECT: relion skill -> 10_ctfrefine_polish (and the single-rank training caveat)

@@ -1,0 +1,2 @@
+Classify these particles.
+EXPECT: NOT relion (no RELION context; bare "classify")

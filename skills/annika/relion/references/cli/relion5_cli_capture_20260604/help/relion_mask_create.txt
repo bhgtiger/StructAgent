@@ -1,0 +1,63 @@
+# relion_mask_create
+path: <RELION_BIN>/relion_mask_create
+
+## --version
+RELION version: 5.0.0-commit-3d6c20 
+Precision: BASE=double, CUDA-ACC=single 
+
+
+## --help
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== Mask creation options ===== 
+                             --i () : Input map to use for thresholding to generate initial binary mask
+                     --o (mask.mrc) : Output mask
+                           --and () : Pixels in the initial mask will be one if the input AND this map are above the --ini_threshold value
+                            --or () : Pixels in the initial mask will be one if the input OR this map are above the --ini_threshold value
+                       --and_not () : Pixels in the initial mask will be one if the input is above the --ini_threshold AND this map is below it
+                        --or_not () : Pixels in the initial mask will be one if the input is above the --ini_threshold OR this map is below it
+             --ini_threshold (0.01) : Initial threshold for binarization
+               --extend_inimask (0) : Extend initial binary mask this number of pixels
+              --width_soft_edge (0) : Width (in pixels) of the additional soft edge on the binary mask
+                   --invert (false) : Invert the final mask
+                    --helix (false) : Generate a mask for 3D helix
+                     --lowpass (-1) : Lowpass filter (in Angstroms) for the input map, prior to binarization (default is none)
+                      --angpix (-1) : Pixel size (in Angstroms) for the lowpass filter
+               --z_percentage (0.3) : This box length along the center of Z axis contains good information of the helix
+                            --j (1) : Number of threads
+====== De novo mask creation ===== 
+                   --denovo (false) : Create a mask de novo
+                    --box_size (-1) : The box size of the mask in pixels
+                 --inner_radius (0) : Inner radius of the masked region in pixels
+             --outer_radius (99999) : Outer radius of the mask region in pixels
+                     --center_x (0) : X coordinate of the center of the mask in pixels
+                     --center_y (0) : Y coordinate of the center of the mask in pixels
+                     --center_z (0) : Z coordinate of the center of the mask in pixels
+                          --version : Print RELION version and exit
+
+## -h
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== Mask creation options ===== 
+                             --i () : Input map to use for thresholding to generate initial binary mask
+                     --o (mask.mrc) : Output mask
+                           --and () : Pixels in the initial mask will be one if the input AND this map are above the --ini_threshold value
+                            --or () : Pixels in the initial mask will be one if the input OR this map are above the --ini_threshold value
+                       --and_not () : Pixels in the initial mask will be one if the input is above the --ini_threshold AND this map is below it
+                        --or_not () : Pixels in the initial mask will be one if the input is above the --ini_threshold OR this map is below it
+             --ini_threshold (0.01) : Initial threshold for binarization
+               --extend_inimask (0) : Extend initial binary mask this number of pixels
+              --width_soft_edge (0) : Width (in pixels) of the additional soft edge on the binary mask
+                   --invert (false) : Invert the final mask
+                    --helix (false) : Generate a mask for 3D helix
+                     --lowpass (-1) : Lowpass filter (in Angstroms) for the input map, prior to binarization (default is none)
+                      --angpix (-1) : Pixel size (in Angstroms) for the lowpass filter
+               --z_percentage (0.3) : This box length along the center of Z axis contains good information of the helix
+                            --j (1) : Number of threads
+====== De novo mask creation ===== 
+                   --denovo (false) : Create a mask de novo
+                    --box_size (-1) : The box size of the mask in pixels
+                 --inner_radius (0) : Inner radius of the masked region in pixels
+             --outer_radius (99999) : Outer radius of the mask region in pixels
+                     --center_x (0) : X coordinate of the center of the mask in pixels
+                     --center_y (0) : Y coordinate of the center of the mask in pixels
+                     --center_z (0) : Z coordinate of the center of the mask in pixels
+                          --version : Print RELION version and exit

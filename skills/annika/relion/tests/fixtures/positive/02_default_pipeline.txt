@@ -1,0 +1,2 @@
+Can you read my default_pipeline.star and tell me what jobs are in this project?
+EXPECT: relion skill -> 02_project_job_tree + inspect_project.py

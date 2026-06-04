@@ -1,0 +1,57 @@
+# relion_import
+path: <RELION_BIN>/relion_import
+
+## --version
+RELION version: 5.0.0-commit-3d6c20 
+Precision: BASE=double, CUDA-ACC=single 
+
+
+## --help
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== General options ===== 
+                                --i : Input (wildcard) filename
+                             --odir : Output directory (e.g. "Import/job001/"
+                            --ofile : Output file name (e.g. "movies.star"
+                --do_movies (false) : Import movies
+           --do_micrographs (false) : Import micrographs
+           --do_coordinates (false) : Import coordinates
+              --do_halfmaps (false) : Import unfiltered half maps
+             --do_particles (false) : Import particle STAR files
+   --particles_optics_group_name () : Rename optics group for all imported particles (e.g. "opticsGroupLMBjan2019"
+                 --do_other (false) : Import anything else
+====== Specific options for movies or micrographs ===== 
+  --optics_group_name (opticsGroup1) : Name for this optics group
+              --optics_group_mtf () : Name for this optics group's MTF
+                     --angpix (1.0) : Pixel size (Angstrom)
+                         --kV (300) : Voltage (kV)
+                         --Cs (2.7) : Spherical aberration (mm)
+                         --Q0 (0.1) : Amplitude contrast
+                 --beamtilt_x (0.0) : Beam tilt (X; mrad)
+                 --beamtilt_y (0.0) : Beam tilt (Y; mrad)
+                 --continue (false) : Continue and old run, add more files to the same import directory
+                          --version : Print RELION version and exit
+
+## -h
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== General options ===== 
+                                --i : Input (wildcard) filename
+                             --odir : Output directory (e.g. "Import/job001/"
+                            --ofile : Output file name (e.g. "movies.star"
+                --do_movies (false) : Import movies
+           --do_micrographs (false) : Import micrographs
+           --do_coordinates (false) : Import coordinates
+              --do_halfmaps (false) : Import unfiltered half maps
+             --do_particles (false) : Import particle STAR files
+   --particles_optics_group_name () : Rename optics group for all imported particles (e.g. "opticsGroupLMBjan2019"
+                 --do_other (false) : Import anything else
+====== Specific options for movies or micrographs ===== 
+  --optics_group_name (opticsGroup1) : Name for this optics group
+              --optics_group_mtf () : Name for this optics group's MTF
+                     --angpix (1.0) : Pixel size (Angstrom)
+                         --kV (300) : Voltage (kV)
+                         --Cs (2.7) : Spherical aberration (mm)
+                         --Q0 (0.1) : Amplitude contrast
+                 --beamtilt_x (0.0) : Beam tilt (X; mrad)
+                 --beamtilt_y (0.0) : Beam tilt (Y; mrad)
+                 --continue (false) : Continue and old run, add more files to the same import directory
+                          --version : Print RELION version and exit

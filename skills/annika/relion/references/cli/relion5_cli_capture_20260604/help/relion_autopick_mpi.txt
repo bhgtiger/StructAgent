@@ -1,0 +1,164 @@
+# relion_autopick_mpi
+path: <RELION_BIN>/relion_autopick_mpi
+
+## --version
+RELION version: 5.0.0-commit-3d6c20 
+Precision: BASE=double, CUDA-ACC=single 
+
+RELION version: 5.0.0-commit-3d6c20 
+Precision: BASE=double, CUDA-ACC=single 
+
+
+## --help
+RELION version: 5.0.0-commit-3d6c20 
+Precision: BASE=double, CUDA-ACC=single 
+
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== General options ===== 
+                                --i : Micrograph STAR file OR filenames from which to autopick particles, e.g. "Micrographs/*.mrc"
+              --pickname (autopick) : Rootname for coordinate STAR files
+                 --odir (AutoPick/) : Output directory for coordinate files (default is to store next to micrographs)
+                       --angpix (1) : Pixel size of the micrographs in Angstroms
+           --particle_diameter (-1) : Diameter of the circular mask that will be applied to the experimental images (in Angstroms, default=automatic)
+         --shrink_particle_mask (2) : Shrink the particle mask by this many pixels (to detect Einstein-from-noise classes)
+      --outlier_removal_zscore (8.) : Remove pixels that are this many sigma away from the mean
+           --write_fom_maps (false) : Write calculated probability-ratio maps to disc (for re-reading in subsequent runs)
+             --no_fom_limit (false) : Ignore default maximum limit of 30 fom maps being written
+            --read_fom_maps (false) : Skip probability calculations, re-read precalculated maps from disc
+      --skip_optimise_scale (false) : Skip the optimisation of the micrograph scale for better prime factors in the FFTs. This runs slower, but at exactly the requested resolution.
+       --only_do_unfinished (false) : Only autopick those micrographs for which the coordinate file does not yet exist
+                      --gpu (false) : Use GPU acceleration when availiable
+====== References options ===== 
+                           --ref () : STAR file with the reference names, or an MRC stack with all references, or "gauss" for blob-picking
+                  --angpix_ref (-1) : Pixel size of the references in Angstroms (default is same as micrographs)
+                   --invert (false) : Density in micrograph is inverted w.r.t. density in template
+                         --ang (10) : Angular sampling (in degrees); use 360 for no rotations
+                     --lowpass (-1) : Lowpass filter in Angstroms for the references (prevent Einstein-from-noise!)
+                    --highpass (-1) : Highpass filter in Angstroms for the micrographs
+                      --ctf (false) : Perform CTF correction on the references?
+    --ctf_intact_first_peak (false) : Ignore CTFs until their first peak?
+                  --gauss_max (0.1) : Value of the peak in the Gaussian blob reference
+                --healpix_order (1) : Healpix order for projecting a 3D reference (hp0=60deg; hp1=30deg; hp2=15deg)
+                         --sym (C1) : Symmetry point group for a 3D reference
+====== Laplacian-of-Gaussian options ===== 
+                      --LoG (false) : Use Laplacian-of-Gaussian filter-based picking, instead of template matching
+                --LoG_diam_min (-1) : Smallest particle diameter (in Angstroms) for blob-detection by Laplacian-of-Gaussian filter
+                --LoG_diam_max (-1) : Largest particle diameter (in Angstroms) for blob-detection by Laplacian-of-Gaussian filter
+              --LoG_neighbour (100) : Avoid neighbouring particles within (the detected diameter + the minimum diameter) times this percent
+               --Log_invert (false) : Use this option if the particles are white instead of black
+        --LoG_adjust_threshold (0.) : Use this option to adjust the picking threshold: positive for less particles, negative for more
+      --LoG_upper_threshold (99999) : Use this option to set the upper limit of the picking threshold
+              --LoG_use_ctf (false) : Use CTF until the first peak in Laplacian-of-Gaussian picker
+====== Topaz wrapper options ===== 
+              --topaz_train (false) : Use wrapper to the topaz train command
+            --topaz_extract (false) : Use wrapper to the topaz extract command (i.e. predict particle positions)
+         --topaz_nr_particles (200) : Expected number of particles per micrograph for topaz
+             --topaz_threshold (-6) : Minimum threshold for topaz picking
+             --topaz_train_picks () : Name of picking coordinates for topaz training
+             --topaz_train_parts () : OR: name of particle star file for topaz training
+           --topaz_test_ratio (0.2) : Ratio of picks in the test set for cross-validation in topaz training
+             --topaz_downscale (-1) : Downscale factor for topaz
+                   --topaz_model () : Saved model model from topaz train for topaz extract. Leave this empty to use the default (general) model.
+                --topaz_radius (-1) : Particle radius (in pix) for topaz extract (default is from particle diameter)
+                    --topaz_args () : Additional arguments to be passed to topaz
+                --topaz_workers (1) : Number of topaz workers for parallelized training
+               --topaz_plot (false) : Plot intermediate information for helical picking in topaz (developmental)
+  --fn_topaz_exe (relion_python_topaz) : Topaz executable (default is using relion_python_topaz from conda install)
+====== Helix options ===== 
+                    --helix (false) : Are the references 2D helical segments? If so, in-plane rotation angles (psi) are estimated for the references.
+    --helical_tube_kappa_max (0.25) : Factor of maximum curvature relative to that of a circle
+  --helical_tube_outer_diameter (-1) : Tube diameter in Angstroms
+     --helical_tube_length_min (-1) : Minimum tube length in Angstroms
+                  --amyloid (false) : Activate specific algorithm for amyloid picking?
+          --max_diam_local_avg (-1) : Maximum diameter to calculate local average density in Angstroms
+====== Peak-search options ===== 
+                 --threshold (0.25) : Fraction of expected probability ratio in order to consider peaks?
+                --min_distance (-1) : Minimum distance (in A) between any two particles (default is half the box size)
+            --max_stddev_noise (-1) : Maximum standard deviation in the noise area to use for picking peaks (default is no maximum)
+            --min_avg_noise (-999.) : Minimum average in the noise area to use for picking peaks (default is no minimum)
+                    --skip_side (0) : Keep this many extra pixels (apart from particle_size/2) away from the edge of the micrograph 
+====== Expert options ===== 
+                         --verb (1) : Verbosity
+                          --pad (2) : Padding factor for Fourier transforms
+                  --random_seed (1) : Number for the random seed generator
+                     --shrink (1.0) : Reduce micrograph to this fraction size, during correlation calc (saves memory and time)
+              --Log_max_search (5.) : Maximum diameter in LoG-picking multi-scale approach is this many times the min/max diameter
+                    --extra_pad (0) : Number of pixels for additional padding of the original micrograph
+                          --version : Print RELION version and exit
+
+## -h
+RELION version: 5.0.0-commit-3d6c20 
+Precision: BASE=double, CUDA-ACC=single 
+
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== General options ===== 
+                                --i : Micrograph STAR file OR filenames from which to autopick particles, e.g. "Micrographs/*.mrc"
+              --pickname (autopick) : Rootname for coordinate STAR files
+                 --odir (AutoPick/) : Output directory for coordinate files (default is to store next to micrographs)
+                       --angpix (1) : Pixel size of the micrographs in Angstroms
+           --particle_diameter (-1) : Diameter of the circular mask that will be applied to the experimental images (in Angstroms, default=automatic)
+         --shrink_particle_mask (2) : Shrink the particle mask by this many pixels (to detect Einstein-from-noise classes)
+      --outlier_removal_zscore (8.) : Remove pixels that are this many sigma away from the mean
+           --write_fom_maps (false) : Write calculated probability-ratio maps to disc (for re-reading in subsequent runs)
+             --no_fom_limit (false) : Ignore default maximum limit of 30 fom maps being written
+            --read_fom_maps (false) : Skip probability calculations, re-read precalculated maps from disc
+      --skip_optimise_scale (false) : Skip the optimisation of the micrograph scale for better prime factors in the FFTs. This runs slower, but at exactly the requested resolution.
+       --only_do_unfinished (false) : Only autopick those micrographs for which the coordinate file does not yet exist
+                      --gpu (false) : Use GPU acceleration when availiable
+====== References options ===== 
+                           --ref () : STAR file with the reference names, or an MRC stack with all references, or "gauss" for blob-picking
+                  --angpix_ref (-1) : Pixel size of the references in Angstroms (default is same as micrographs)
+                   --invert (false) : Density in micrograph is inverted w.r.t. density in template
+                         --ang (10) : Angular sampling (in degrees); use 360 for no rotations
+                     --lowpass (-1) : Lowpass filter in Angstroms for the references (prevent Einstein-from-noise!)
+                    --highpass (-1) : Highpass filter in Angstroms for the micrographs
+                      --ctf (false) : Perform CTF correction on the references?
+    --ctf_intact_first_peak (false) : Ignore CTFs until their first peak?
+                  --gauss_max (0.1) : Value of the peak in the Gaussian blob reference
+                --healpix_order (1) : Healpix order for projecting a 3D reference (hp0=60deg; hp1=30deg; hp2=15deg)
+                         --sym (C1) : Symmetry point group for a 3D reference
+====== Laplacian-of-Gaussian options ===== 
+                      --LoG (false) : Use Laplacian-of-Gaussian filter-based picking, instead of template matching
+                --LoG_diam_min (-1) : Smallest particle diameter (in Angstroms) for blob-detection by Laplacian-of-Gaussian filter
+                --LoG_diam_max (-1) : Largest particle diameter (in Angstroms) for blob-detection by Laplacian-of-Gaussian filter
+              --LoG_neighbour (100) : Avoid neighbouring particles within (the detected diameter + the minimum diameter) times this percent
+               --Log_invert (false) : Use this option if the particles are white instead of black
+        --LoG_adjust_threshold (0.) : Use this option to adjust the picking threshold: positive for less particles, negative for more
+      --LoG_upper_threshold (99999) : Use this option to set the upper limit of the picking threshold
+              --LoG_use_ctf (false) : Use CTF until the first peak in Laplacian-of-Gaussian picker
+====== Topaz wrapper options ===== 
+              --topaz_train (false) : Use wrapper to the topaz train command
+            --topaz_extract (false) : Use wrapper to the topaz extract command (i.e. predict particle positions)
+         --topaz_nr_particles (200) : Expected number of particles per micrograph for topaz
+             --topaz_threshold (-6) : Minimum threshold for topaz picking
+             --topaz_train_picks () : Name of picking coordinates for topaz training
+             --topaz_train_parts () : OR: name of particle star file for topaz training
+           --topaz_test_ratio (0.2) : Ratio of picks in the test set for cross-validation in topaz training
+             --topaz_downscale (-1) : Downscale factor for topaz
+                   --topaz_model () : Saved model model from topaz train for topaz extract. Leave this empty to use the default (general) model.
+                --topaz_radius (-1) : Particle radius (in pix) for topaz extract (default is from particle diameter)
+                    --topaz_args () : Additional arguments to be passed to topaz
+                --topaz_workers (1) : Number of topaz workers for parallelized training
+               --topaz_plot (false) : Plot intermediate information for helical picking in topaz (developmental)
+  --fn_topaz_exe (relion_python_topaz) : Topaz executable (default is using relion_python_topaz from conda install)
+====== Helix options ===== 
+                    --helix (false) : Are the references 2D helical segments? If so, in-plane rotation angles (psi) are estimated for the references.
+    --helical_tube_kappa_max (0.25) : Factor of maximum curvature relative to that of a circle
+  --helical_tube_outer_diameter (-1) : Tube diameter in Angstroms
+     --helical_tube_length_min (-1) : Minimum tube length in Angstroms
+                  --amyloid (false) : Activate specific algorithm for amyloid picking?
+          --max_diam_local_avg (-1) : Maximum diameter to calculate local average density in Angstroms
+====== Peak-search options ===== 
+                 --threshold (0.25) : Fraction of expected probability ratio in order to consider peaks?
+                --min_distance (-1) : Minimum distance (in A) between any two particles (default is half the box size)
+            --max_stddev_noise (-1) : Maximum standard deviation in the noise area to use for picking peaks (default is no maximum)
+            --min_avg_noise (-999.) : Minimum average in the noise area to use for picking peaks (default is no minimum)
+                    --skip_side (0) : Keep this many extra pixels (apart from particle_size/2) away from the edge of the micrograph 
+====== Expert options ===== 
+                         --verb (1) : Verbosity
+                          --pad (2) : Padding factor for Fourier transforms
+                  --random_seed (1) : Number for the random seed generator
+                     --shrink (1.0) : Reduce micrograph to this fraction size, during correlation calc (saves memory and time)
+              --Log_max_search (5.) : Maximum diameter in LoG-picking multi-scale approach is this many times the min/max diameter
+                    --extra_pad (0) : Number of pixels for additional padding of the original micrograph
+                          --version : Print RELION version and exit

@@ -1,0 +1,177 @@
+# relion_image_handler
+path: <RELION_BIN>/relion_image_handler
+
+## --version
+RELION version: 5.0.0-commit-3d6c20 
+Precision: BASE=double, CUDA-ACC=single 
+
+
+## --help
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== General options ===== 
+                                --i : Input STAR file, image (.mrc) or movie/stack (.mrcs)
+                             --o () : Output name (for STAR-input: insert this string before each image's extension)
+                  --float16 (false) : Write in half-precision 16 bit floating point numbers (MRC mode 12), instead of 32 bit (MRC mode 0).
+====== image-by-constant operations ===== 
+            --multiply_constant (1) : Multiply the image(s) pixel values by this constant
+              --divide_constant (1) : Divide the image(s) pixel values by this constant
+                --add_constant (0.) : Add this constant to the image(s) pixel values
+           --subtract_constant (0.) : Subtract this constant from the image(s) pixel values
+           --threshold_above (999.) : Set all values higher than this value to this value
+          --threshold_below (-999.) : Set all values lower than this value to this value
+====== image-by-image operations ===== 
+                      --multiply () : Multiply input image(s) by the pixel values in this image
+                        --divide () : Divide input image(s) by the pixel values in this image
+                           --add () : Add the pixel values in this image to the input image(s) 
+                      --subtract () : Subtract the pixel values in this image to the input image(s) 
+                           --fsc () : Calculate FSC curve of the input image with this image
+                    --power (false) : Calculate power spectrum (|F|^2) of the input image
+                  --guinier (false) : Calculate Guinier plot and determine B-factor of the input image
+             --guinier_minres (10.) : Lowest resolution (in A) to include in fitting of the B-factor
+            --guinier_maxres (0.01) : Highest resolution (in A) to include in fitting of the B-factor
+                  --adjust_power () : Adjust the power spectrum of the input image to be the same as this image 
+                --fourier_filter () : Multiply the Fourier transform of the input image(s) with this one image 
+====== additional subtract options ===== 
+  --optimise_scale_subtract (false) : Optimise scale between maps before subtraction?
+   --optimise_bfactor_subtract (0.) : Search range for relative B-factor for subtraction (in A^2)
+        --mask_optimise_subtract () : Use only voxels in this mask to optimise scale for subtraction
+====== per-image operations ===== 
+                    --stats (false) : Calculate per-image statistics?
+                      --com (false) : Calculate center of mass?
+                     --bfactor (0.) : Apply a B-factor (in A^2)
+                    --lowpass (-1.) : Low-pass filter frequency (in A)
+                   --highpass (-1.) : High-pass filter frequency (in A)
+                   --directional () : Directionality of low-pass filter frequency ('X', 'Y' or 'Z', default non-directional)
+                        --LoG (-1.) : Diameter for optimal response of Laplacian of Gaussian filter (in A)
+                      --angpix (-1) : Pixel size (in A)
+             --rescale_angpix (-1.) : Scale input image(s) to this new pixel size (in A)
+        --force_header_angpix (-1.) : Change the pixel size in the header (in A). Without --rescale_angpix, the image is not scaled.
+                     --new_box (-1) : Resize the image(s) to this new box size (in pixel) 
+            --filter_edge_width (2) : Width of the raised cosine on the low/high-pass filter edge (in resolution shells)
+                    --flipX (false) : Flip (mirror) a 2D image or 3D map in the X-direction?
+                    --flipY (false) : Flip (mirror) a 2D image or 3D map in the Y-direction?
+                    --flipZ (false) : Flip (mirror) a 3D map in the Z-direction?
+              --invert_hand (false) : Invert hand by flipping X? Similar to flipX, but preserves the symmetry origin. Edge pixels are wrapped around.
+                --shift_com (false) : Shift image(s) to their center-of-mass (only on positive pixel values)
+                     --shift_x (0.) : Shift images this many pixels in the X-direction
+                     --shift_y (0.) : Shift images this many pixels in the Y-direction
+                     --shift_z (0.) : Shift images this many pixels in the Z-direction
+                 --avg_ampl (false) : Calculate average amplitude spectrum for all images?
+                --avg_ampl2 (false) : Calculate average amplitude spectrum for all images?
+            --avg_ampl2_ali (false) : Calculate average amplitude spectrum for all aligned images?
+                  --average (false) : Calculate average of all images (without alignment)
+              --correct_avg_ampl () : Correct all images with this average amplitude spectrum
+               --minr_ampl_corr (0) : Minimum radius (in Fourier pixels) to apply average amplitudes
+               --remove_nan (false) : Replace non-numerical values (NaN, inf, etc) in the image(s)
+                  --replace_nan (0) : Replace non-numerical values (NaN, inf, etc) with this value
+             --phase_randomise (-1) : Randomise phases beyond this resolution (in Angstroms)
+====== 3D operations ===== 
+                           --sym () : Symmetrise 3D map with this point group (e.g. D6)
+====== 2D-micrograph (or movie) operations ===== 
+                   --flipXY (false) : Flip the image(s) in the XY direction?
+                  --flipmXY (false) : Flip the image(s) in the -XY direction?
+                 --add_edge (false) : Add a barcode-like edge to the micrograph/movie frames?
+                      --edge_x0 (0) : Pixel column to be used for the left edge
+                      --edge_y0 (0) : Pixel row to be used for the top edge
+                   --edge_xF (4095) : Pixel column to be used for the right edge
+                   --edge_yF (4095) : Pixel row to be used for the bottom edge
+====== Movie-frame averaging options ===== 
+                     --avg_bin (-1) : Width (in frames) for binning average, i.e. of every so-many frames
+                   --avg_first (-1) : First frame to include in averaging
+                    --avg_last (-1) : Last frame to include in averaging
+  --average_all_movie_frames (false) : Average all movie frames of all movies in the input STAR file.
+====== PNG options ===== 
+                        --black (0) : Pixel value for black (default is auto-contrast)
+                        --white (0) : Pixel value for white (default is auto-contrast)
+               --sigma_contrast (0) : Set white and black pixel values this many times the image stddev from the mean
+              --colour_fire (false) : Show images in black-grey-white-red colour scheme (highlight high signal)?
+               --colour_ice (false) : Show images in blue-black-grey-white colour scheme (highlight low signal)?
+        --colour_fire-n-ice (false) : Show images in blue-grey-red colour scheme (highlight high&low signal)?
+           --colour_rainbow (false) : Show images in cyan-blue-black-red-yellow colour scheme?
+        --colour_difference (false) : Show images in cyan-blue-black-red-yellow colour scheme (for difference images)?
+                          --version : Print RELION version and exit
+
+## -h
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== General options ===== 
+                                --i : Input STAR file, image (.mrc) or movie/stack (.mrcs)
+                             --o () : Output name (for STAR-input: insert this string before each image's extension)
+                  --float16 (false) : Write in half-precision 16 bit floating point numbers (MRC mode 12), instead of 32 bit (MRC mode 0).
+====== image-by-constant operations ===== 
+            --multiply_constant (1) : Multiply the image(s) pixel values by this constant
+              --divide_constant (1) : Divide the image(s) pixel values by this constant
+                --add_constant (0.) : Add this constant to the image(s) pixel values
+           --subtract_constant (0.) : Subtract this constant from the image(s) pixel values
+           --threshold_above (999.) : Set all values higher than this value to this value
+          --threshold_below (-999.) : Set all values lower than this value to this value
+====== image-by-image operations ===== 
+                      --multiply () : Multiply input image(s) by the pixel values in this image
+                        --divide () : Divide input image(s) by the pixel values in this image
+                           --add () : Add the pixel values in this image to the input image(s) 
+                      --subtract () : Subtract the pixel values in this image to the input image(s) 
+                           --fsc () : Calculate FSC curve of the input image with this image
+                    --power (false) : Calculate power spectrum (|F|^2) of the input image
+                  --guinier (false) : Calculate Guinier plot and determine B-factor of the input image
+             --guinier_minres (10.) : Lowest resolution (in A) to include in fitting of the B-factor
+            --guinier_maxres (0.01) : Highest resolution (in A) to include in fitting of the B-factor
+                  --adjust_power () : Adjust the power spectrum of the input image to be the same as this image 
+                --fourier_filter () : Multiply the Fourier transform of the input image(s) with this one image 
+====== additional subtract options ===== 
+  --optimise_scale_subtract (false) : Optimise scale between maps before subtraction?
+   --optimise_bfactor_subtract (0.) : Search range for relative B-factor for subtraction (in A^2)
+        --mask_optimise_subtract () : Use only voxels in this mask to optimise scale for subtraction
+====== per-image operations ===== 
+                    --stats (false) : Calculate per-image statistics?
+                      --com (false) : Calculate center of mass?
+                     --bfactor (0.) : Apply a B-factor (in A^2)
+                    --lowpass (-1.) : Low-pass filter frequency (in A)
+                   --highpass (-1.) : High-pass filter frequency (in A)
+                   --directional () : Directionality of low-pass filter frequency ('X', 'Y' or 'Z', default non-directional)
+                        --LoG (-1.) : Diameter for optimal response of Laplacian of Gaussian filter (in A)
+                      --angpix (-1) : Pixel size (in A)
+             --rescale_angpix (-1.) : Scale input image(s) to this new pixel size (in A)
+        --force_header_angpix (-1.) : Change the pixel size in the header (in A). Without --rescale_angpix, the image is not scaled.
+                     --new_box (-1) : Resize the image(s) to this new box size (in pixel) 
+            --filter_edge_width (2) : Width of the raised cosine on the low/high-pass filter edge (in resolution shells)
+                    --flipX (false) : Flip (mirror) a 2D image or 3D map in the X-direction?
+                    --flipY (false) : Flip (mirror) a 2D image or 3D map in the Y-direction?
+                    --flipZ (false) : Flip (mirror) a 3D map in the Z-direction?
+              --invert_hand (false) : Invert hand by flipping X? Similar to flipX, but preserves the symmetry origin. Edge pixels are wrapped around.
+                --shift_com (false) : Shift image(s) to their center-of-mass (only on positive pixel values)
+                     --shift_x (0.) : Shift images this many pixels in the X-direction
+                     --shift_y (0.) : Shift images this many pixels in the Y-direction
+                     --shift_z (0.) : Shift images this many pixels in the Z-direction
+                 --avg_ampl (false) : Calculate average amplitude spectrum for all images?
+                --avg_ampl2 (false) : Calculate average amplitude spectrum for all images?
+            --avg_ampl2_ali (false) : Calculate average amplitude spectrum for all aligned images?
+                  --average (false) : Calculate average of all images (without alignment)
+              --correct_avg_ampl () : Correct all images with this average amplitude spectrum
+               --minr_ampl_corr (0) : Minimum radius (in Fourier pixels) to apply average amplitudes
+               --remove_nan (false) : Replace non-numerical values (NaN, inf, etc) in the image(s)
+                  --replace_nan (0) : Replace non-numerical values (NaN, inf, etc) with this value
+             --phase_randomise (-1) : Randomise phases beyond this resolution (in Angstroms)
+====== 3D operations ===== 
+                           --sym () : Symmetrise 3D map with this point group (e.g. D6)
+====== 2D-micrograph (or movie) operations ===== 
+                   --flipXY (false) : Flip the image(s) in the XY direction?
+                  --flipmXY (false) : Flip the image(s) in the -XY direction?
+                 --add_edge (false) : Add a barcode-like edge to the micrograph/movie frames?
+                      --edge_x0 (0) : Pixel column to be used for the left edge
+                      --edge_y0 (0) : Pixel row to be used for the top edge
+                   --edge_xF (4095) : Pixel column to be used for the right edge
+                   --edge_yF (4095) : Pixel row to be used for the bottom edge
+====== Movie-frame averaging options ===== 
+                     --avg_bin (-1) : Width (in frames) for binning average, i.e. of every so-many frames
+                   --avg_first (-1) : First frame to include in averaging
+                    --avg_last (-1) : Last frame to include in averaging
+  --average_all_movie_frames (false) : Average all movie frames of all movies in the input STAR file.
+====== PNG options ===== 
+                        --black (0) : Pixel value for black (default is auto-contrast)
+                        --white (0) : Pixel value for white (default is auto-contrast)
+               --sigma_contrast (0) : Set white and black pixel values this many times the image stddev from the mean
+              --colour_fire (false) : Show images in black-grey-white-red colour scheme (highlight high signal)?
+               --colour_ice (false) : Show images in blue-black-grey-white colour scheme (highlight low signal)?
+        --colour_fire-n-ice (false) : Show images in blue-grey-red colour scheme (highlight high&low signal)?
+           --colour_rainbow (false) : Show images in cyan-blue-black-red-yellow colour scheme?
+        --colour_difference (false) : Show images in cyan-blue-black-red-yellow colour scheme (for difference images)?
+                          --version : Print RELION version and exit

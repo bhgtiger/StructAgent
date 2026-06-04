@@ -1,0 +1,2 @@
+Train crYOLO to pick my micrographs.
+EXPECT: NOT relion (crYOLO picking -> cryolo skill; relion only at the coordinate-interop boundary)
