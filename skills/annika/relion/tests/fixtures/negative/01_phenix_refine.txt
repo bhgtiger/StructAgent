@@ -1,0 +1,2 @@
+Refine my model into the map.
+EXPECT: NOT relion (ambiguous "refine" -> phenix/coot/structural-strategy, no RELION context)

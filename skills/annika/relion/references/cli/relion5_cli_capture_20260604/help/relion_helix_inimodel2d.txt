@@ -1,0 +1,55 @@
+# relion_helix_inimodel2d
+path: <RELION_BIN>/relion_helix_inimodel2d
+
+## --version
+RELION version: 5.0.0-commit-3d6c20 
+Precision: BASE=double, CUDA-ACC=single 
+
+
+## --help
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== General options ===== 
+                             --o () : Output rootname
+                             --i () :  STAR file with the input images and orientation parameters
+====== Parameters ===== 
+            --crossover_distance () : Distance in Angstroms between 2 cross-overs
+                        --iter (10) : Maximum number of iterations to perform
+                            --K (1) : Number of classes
+                      --angpix (-1) : Pixel size in Angstroms (default take from STAR file)
+                      --maxres (-1) : Limit calculations to approximately this resolution in Angstroms
+                 --search_shift (0) : How many Angstroms to search translations perpendicular to helical axis?
+                 --search_angle (0) : How many degrees to search in-plane rotations?
+                   --step_angle (1) : The step size (in degrees) of the rotational searches
+                        --iniref () : An initial model to starting optimisation path
+                          --sym (1) : Order of symmetry in the 2D xy-slice?
+                        --smear (0) : Smear out each image along X to ensure continuity
+                 --random_seed (-1) : Random seed (default is with clock)
+                  --search_size (5) : Search this many pixels up/down of the target downscaled size to fit best crossover distance
+               --mask_diameter (-1) : The diameter (A) of a mask to be aplpied to the 2D reconstruction
+                            --j (1) : Number of (openMP) threads
+             --only_make_3d (false) : Take the iniref image, and create a 3D model from that without any alignment of the input images
+                          --version : Print RELION version and exit
+
+## -h
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== General options ===== 
+                             --o () : Output rootname
+                             --i () :  STAR file with the input images and orientation parameters
+====== Parameters ===== 
+            --crossover_distance () : Distance in Angstroms between 2 cross-overs
+                        --iter (10) : Maximum number of iterations to perform
+                            --K (1) : Number of classes
+                      --angpix (-1) : Pixel size in Angstroms (default take from STAR file)
+                      --maxres (-1) : Limit calculations to approximately this resolution in Angstroms
+                 --search_shift (0) : How many Angstroms to search translations perpendicular to helical axis?
+                 --search_angle (0) : How many degrees to search in-plane rotations?
+                   --step_angle (1) : The step size (in degrees) of the rotational searches
+                        --iniref () : An initial model to starting optimisation path
+                          --sym (1) : Order of symmetry in the 2D xy-slice?
+                        --smear (0) : Smear out each image along X to ensure continuity
+                 --random_seed (-1) : Random seed (default is with clock)
+                  --search_size (5) : Search this many pixels up/down of the target downscaled size to fit best crossover distance
+               --mask_diameter (-1) : The diameter (A) of a mask to be aplpied to the 2D reconstruction
+                            --j (1) : Number of (openMP) threads
+             --only_make_3d (false) : Take the iniref image, and create a 3D model from that without any alignment of the input images
+                          --version : Print RELION version and exit

@@ -1,0 +1,2 @@
+Set up an ab initio job in cryoSPARC.
+EXPECT: NOT relion (native cryoSPARC -> cryosparc skill)

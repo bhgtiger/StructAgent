@@ -1,0 +1,41 @@
+# relion_particle_symmetry_expand
+path: <RELION_BIN>/relion_particle_symmetry_expand
+
+## --version
+RELION version: 5.0.0-commit-3d6c20 
+Precision: BASE=double, CUDA-ACC=single 
+
+
+## --help
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== Options ===== 
+                                --i : Input particle STAR file
+                --o (expanded.star) : Output expanded particle STAR file
+                         --sym (C1) : Symmetry point group
+====== Helix ===== 
+                    --helix (false) : Do helical symmetry expansion
+                       --twist (0.) : Helical twist (deg)
+                        --rise (0.) : Helical rise (A)
+                      --angpix (1.) : Pixel size (A)
+                          --asu (1) : Number of asymmetrical units to expand
+                --frac_sampling (1) : Number of samplings in between a single asymmetrical unit
+                 --frac_range (0.5) : Range of the rise [-0.5, 0.5> to be sampled
+            --ignore_optics (false) : Provide this option for relion-3.0 functionality, without optics groups
+                          --version : Print RELION version and exit
+
+## -h
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== Options ===== 
+                                --i : Input particle STAR file
+                --o (expanded.star) : Output expanded particle STAR file
+                         --sym (C1) : Symmetry point group
+====== Helix ===== 
+                    --helix (false) : Do helical symmetry expansion
+                       --twist (0.) : Helical twist (deg)
+                        --rise (0.) : Helical rise (A)
+                      --angpix (1.) : Pixel size (A)
+                          --asu (1) : Number of asymmetrical units to expand
+                --frac_sampling (1) : Number of samplings in between a single asymmetrical unit
+                 --frac_range (0.5) : Range of the rise [-0.5, 0.5> to be sampled
+            --ignore_optics (false) : Provide this option for relion-3.0 functionality, without optics groups
+                          --version : Print RELION version and exit

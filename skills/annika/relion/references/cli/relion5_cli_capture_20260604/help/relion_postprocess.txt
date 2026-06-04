@@ -1,0 +1,95 @@
+# relion_postprocess
+path: <RELION_BIN>/relion_postprocess
+
+## --version
+RELION version: 5.0.0-commit-3d6c20 
+Precision: BASE=double, CUDA-ACC=single 
+
+
+## --help
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== General options ===== 
+                             --i () : Input name of half1, e.g. run_half1_class001_unfil.mrc
+                            --i2 () : Input name of half2, (default replaces half1 from --i with half2)
+                           --ios () : Input tomo optimiser set file. It is used to set --i if not provided. Updated output optimiser set is created.
+                  --o (postprocess) : Output rootname
+                      --angpix (-1) : Pixel size in Angstroms
+                --half_maps (false) : Write post-processed half maps for validation
+                 --mtf_angpix (-1.) : Pixel size in the original micrographs/movies (in Angstroms)
+                   --molweight (-1) : Molecular weight (in kDa) of ordered protein mass
+====== Masking options ===== 
+                --auto_mask (false) : Perform automated masking, based on a density threshold
+         --inimask_threshold (0.02) : Density at which to threshold the map for the initial seed mask
+              --extend_inimask (3.) : Number of pixels to extend the initial seed mask
+             --width_mask_edge (6.) : Width for the raised cosine soft mask edge (in pixels)
+                          --mask () : Filename of a user-provided mask (1=protein, 0=solvent, all values in range [0,1])
+               --force_mask (false) : Use the mask even when the masked resolution is worse than the unmasked resolution
+====== Sharpening options ===== 
+                           --mtf () : User-provided STAR-file with the MTF-curve of the detector
+                --auto_bfac (false) : Perform automated B-factor determination (Rosenthal and Henderson, 2003)
+               --autob_lowres (10.) : Lowest resolution (in A) to include in fitting of the B-factor
+               --autob_highres (0.) : Highest resolution (in A) to include in fitting of the B-factor
+                  --adhoc_bfac (0.) : User-provided B-factor (in A^2) for map sharpening, e.g. -400
+====== Filtering options ===== 
+       --skip_fsc_weighting (false) : Do not use FSC-weighting (Rosenthal and Henderson, 2003) in the sharpening process
+                     --low_pass (0) : Resolution (in Angstroms) at which to low-pass filter the final map (0: disable, negative: resolution at FSC=0.143)
+====== Local-resolution options ===== 
+                   --locres (false) : Perform local resolution estimation
+            --locres_sampling (25.) : Sampling rate (in Angstroms) with which to sample the local-resolution map
+              --locres_maskrad (-1) : Radius (in A) of spherical mask for local-resolution map (default = 0.5*sampling)
+             --locres_edgwidth (-1) : Width of soft edge (in A) on masks for local-resolution map (default = sampling)
+        --locres_randomize_at (25.) : Randomize phases from this resolution (in A)
+              --locres_minres (50.) : Lowest local resolution allowed (in A)
+====== Expert options ===== 
+                --ampl_corr (false) : Perform amplitude correlation and DPR, also re-normalize amplitudes for non-uniform angular distributions
+           --randomize_at_fsc (0.8) : Randomize phases from the resolution where FSC drops below this value
+              --randomize_at_A (-1) : Randomize phases from this resolution (in A) onwards (if positive)
+            --filter_edge_width (2) : Width of the raised cosine on the low-pass filter edge (in resolution shells)
+              --interpolate (false) : Interpolate the FSC to obtain an additional, more precise resolution estimate
+                         --verb (1) : Verbosity
+                  --random_seed (0) : Seed for random number generator (negative value for truly random)
+                          --version : Print RELION version and exit
+
+## -h
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== General options ===== 
+                             --i () : Input name of half1, e.g. run_half1_class001_unfil.mrc
+                            --i2 () : Input name of half2, (default replaces half1 from --i with half2)
+                           --ios () : Input tomo optimiser set file. It is used to set --i if not provided. Updated output optimiser set is created.
+                  --o (postprocess) : Output rootname
+                      --angpix (-1) : Pixel size in Angstroms
+                --half_maps (false) : Write post-processed half maps for validation
+                 --mtf_angpix (-1.) : Pixel size in the original micrographs/movies (in Angstroms)
+                   --molweight (-1) : Molecular weight (in kDa) of ordered protein mass
+====== Masking options ===== 
+                --auto_mask (false) : Perform automated masking, based on a density threshold
+         --inimask_threshold (0.02) : Density at which to threshold the map for the initial seed mask
+              --extend_inimask (3.) : Number of pixels to extend the initial seed mask
+             --width_mask_edge (6.) : Width for the raised cosine soft mask edge (in pixels)
+                          --mask () : Filename of a user-provided mask (1=protein, 0=solvent, all values in range [0,1])
+               --force_mask (false) : Use the mask even when the masked resolution is worse than the unmasked resolution
+====== Sharpening options ===== 
+                           --mtf () : User-provided STAR-file with the MTF-curve of the detector
+                --auto_bfac (false) : Perform automated B-factor determination (Rosenthal and Henderson, 2003)
+               --autob_lowres (10.) : Lowest resolution (in A) to include in fitting of the B-factor
+               --autob_highres (0.) : Highest resolution (in A) to include in fitting of the B-factor
+                  --adhoc_bfac (0.) : User-provided B-factor (in A^2) for map sharpening, e.g. -400
+====== Filtering options ===== 
+       --skip_fsc_weighting (false) : Do not use FSC-weighting (Rosenthal and Henderson, 2003) in the sharpening process
+                     --low_pass (0) : Resolution (in Angstroms) at which to low-pass filter the final map (0: disable, negative: resolution at FSC=0.143)
+====== Local-resolution options ===== 
+                   --locres (false) : Perform local resolution estimation
+            --locres_sampling (25.) : Sampling rate (in Angstroms) with which to sample the local-resolution map
+              --locres_maskrad (-1) : Radius (in A) of spherical mask for local-resolution map (default = 0.5*sampling)
+             --locres_edgwidth (-1) : Width of soft edge (in A) on masks for local-resolution map (default = sampling)
+        --locres_randomize_at (25.) : Randomize phases from this resolution (in A)
+              --locres_minres (50.) : Lowest local resolution allowed (in A)
+====== Expert options ===== 
+                --ampl_corr (false) : Perform amplitude correlation and DPR, also re-normalize amplitudes for non-uniform angular distributions
+           --randomize_at_fsc (0.8) : Randomize phases from the resolution where FSC drops below this value
+              --randomize_at_A (-1) : Randomize phases from this resolution (in A) onwards (if positive)
+            --filter_edge_width (2) : Width of the raised cosine on the low-pass filter edge (in resolution shells)
+              --interpolate (false) : Interpolate the FSC to obtain an additional, more precise resolution estimate
+                         --verb (1) : Verbosity
+                  --random_seed (0) : Seed for random number generator (negative value for truly random)
+                          --version : Print RELION version and exit

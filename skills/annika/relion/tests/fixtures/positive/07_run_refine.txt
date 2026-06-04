@@ -1,0 +1,2 @@
+Run relion_refine 3D auto-refine on Select/job045 particles.
+EXPECT: relion skill -> 08_refine3d + run_relion.sh dry-run + site_config

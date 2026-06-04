@@ -1,0 +1,2 @@
+Convert this cryoSPARC refinement to a RELION star file with csparc2star.
+EXPECT: relion skill -> 16_interop_cryosparc

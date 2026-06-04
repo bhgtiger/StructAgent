@@ -1,0 +1,77 @@
+# relion_project
+path: <RELION_BIN>/relion_project
+
+## --version
+RELION version: 5.0.0-commit-3d6c20 
+Precision: BASE=double, CUDA-ACC=single 
+
+
+## --help
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== Options ===== 
+                                --i : Input map to be projected
+                         --o (proj) : Rootname for output projections
+                  --float16 (false) : Write in half-precision 16 bit floating point numbers (MRC mode 12), instead of 32 bit (MRC mode 0).
+                      --ctf (false) : Apply CTF to reference projections
+           --ctf_phase_flip (false) : Flip phases of the CTF in the output projections
+    --ctf_intact_first_peak (false) : Ignore CTFs until their first peak?
+                      --angpix (-1) : Pixel size (in Angstroms)
+                          --mask () : Mask that will be applied to the input map prior to making projections
+                       --ang (None) : Particle STAR file with orientations and CTF for multiple projections (if None, assume single projection)
+                  --nr_uniform (-1) :  OR get this many random samples from a uniform angular distribution
+                 --sigma_offset (0) : Apply Gaussian errors (A) with this stddev to the XY-offsets
+                          --rot (0) : First Euler angle (for a single projection)
+                         --tilt (0) : Second Euler angle (for a single projection)
+                          --psi (0) : Third Euler angle (for a single projection)
+                         --xoff (0) : Origin X-offsets (in pixels) (for a single projection)
+                         --yoff (0) : Origin Y-offsets (in pixels) (for a single projection)
+                         --zoff (0) : Origin Z-offsets (in pixels) (for a single 3D rotation)
+                --add_noise (false) : Add noise to the output projections (only with --ang)
+                  --white_noise (0) : Standard deviation of added white Gaussian noise
+                   --model_noise () : Model STAR file with power spectra for coloured Gaussian noise
+             --subtract_exp (false) : Subtract projections from experimental images (in --ang)
+     --ignore_particle_name (false) : Ignore the rlnParticleName column (in --ang)
+                   --3d_rot (false) : Perform 3D rotations instead of projection into 2D images
+                 --simulate (false) : Simulate data with known ground-truth by subtracting signal and adding projection in random orientation.
+       --adjust_simulation_SNR (1.) : Relative SNR compared to input images for realistic simulation of data
+                  --ang_simulate () : STAR file with orientations for projections of realistic simulations (random from --ang STAR file by default)
+                      --maxres (-1) : Maximum resolution (in Angstrom) to consider in Fourier space (default Nyquist)
+                          --pad (2) : Padding factor
+                     --ctf2 (false) : Apply CTF*CTF to reference projections
+                       --NN (false) : Use nearest-neighbour instead of linear interpolation
+                          --version : Print RELION version and exit
+
+## -h
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== Options ===== 
+                                --i : Input map to be projected
+                         --o (proj) : Rootname for output projections
+                  --float16 (false) : Write in half-precision 16 bit floating point numbers (MRC mode 12), instead of 32 bit (MRC mode 0).
+                      --ctf (false) : Apply CTF to reference projections
+           --ctf_phase_flip (false) : Flip phases of the CTF in the output projections
+    --ctf_intact_first_peak (false) : Ignore CTFs until their first peak?
+                      --angpix (-1) : Pixel size (in Angstroms)
+                          --mask () : Mask that will be applied to the input map prior to making projections
+                       --ang (None) : Particle STAR file with orientations and CTF for multiple projections (if None, assume single projection)
+                  --nr_uniform (-1) :  OR get this many random samples from a uniform angular distribution
+                 --sigma_offset (0) : Apply Gaussian errors (A) with this stddev to the XY-offsets
+                          --rot (0) : First Euler angle (for a single projection)
+                         --tilt (0) : Second Euler angle (for a single projection)
+                          --psi (0) : Third Euler angle (for a single projection)
+                         --xoff (0) : Origin X-offsets (in pixels) (for a single projection)
+                         --yoff (0) : Origin Y-offsets (in pixels) (for a single projection)
+                         --zoff (0) : Origin Z-offsets (in pixels) (for a single 3D rotation)
+                --add_noise (false) : Add noise to the output projections (only with --ang)
+                  --white_noise (0) : Standard deviation of added white Gaussian noise
+                   --model_noise () : Model STAR file with power spectra for coloured Gaussian noise
+             --subtract_exp (false) : Subtract projections from experimental images (in --ang)
+     --ignore_particle_name (false) : Ignore the rlnParticleName column (in --ang)
+                   --3d_rot (false) : Perform 3D rotations instead of projection into 2D images
+                 --simulate (false) : Simulate data with known ground-truth by subtracting signal and adding projection in random orientation.
+       --adjust_simulation_SNR (1.) : Relative SNR compared to input images for realistic simulation of data
+                  --ang_simulate () : STAR file with orientations for projections of realistic simulations (random from --ang STAR file by default)
+                      --maxres (-1) : Maximum resolution (in Angstrom) to consider in Fourier space (default Nyquist)
+                          --pad (2) : Padding factor
+                     --ctf2 (false) : Apply CTF*CTF to reference projections
+                       --NN (false) : Use nearest-neighbour instead of linear interpolation
+                          --version : Print RELION version and exit

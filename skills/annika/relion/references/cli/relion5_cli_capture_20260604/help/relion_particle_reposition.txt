@@ -1,0 +1,37 @@
+# relion_particle_reposition
+path: <RELION_BIN>/relion_particle_reposition
+
+## --version
+RELION version: 5.0.0-commit-3d6c20 
+Precision: BASE=double, CUDA-ACC=single 
+
+
+## --help
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== Options ===== 
+                                --i : Input STAR file with rlnMicrographName's 
+                              --opt : Optimiser STAR file with the 2D classes or 3D maps to be repositioned
+                             --o () : Output rootname, to be added to input micrograph names
+                          --odir () : Output directory (default is same as input micrographs directory
+                          --data () : Data STAR file with selected particles (default is to use all particles)
+                 --background (0.1) : The fraction of micrograph background noise in the output micrograph
+                   --invert (false) : Invert the contrast in the references?
+                      --ctf (false) : Apply CTF for each particle to the references?
+                 --norm_radius (-1) : Radius of the circle used for background normalisation (in pixels)
+                 --subtract (false) : Subtract repositioned micrographs from the input ones?
+                          --version : Print RELION version and exit
+
+## -h
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== Options ===== 
+                                --i : Input STAR file with rlnMicrographName's 
+                              --opt : Optimiser STAR file with the 2D classes or 3D maps to be repositioned
+                             --o () : Output rootname, to be added to input micrograph names
+                          --odir () : Output directory (default is same as input micrographs directory
+                          --data () : Data STAR file with selected particles (default is to use all particles)
+                 --background (0.1) : The fraction of micrograph background noise in the output micrograph
+                   --invert (false) : Invert the contrast in the references?
+                      --ctf (false) : Apply CTF for each particle to the references?
+                 --norm_radius (-1) : Radius of the circle used for background normalisation (in pixels)
+                 --subtract (false) : Subtract repositioned micrographs from the input ones?
+                          --version : Print RELION version and exit

@@ -1,0 +1,61 @@
+# relion_pipeliner
+path: <RELION_BIN>/relion_pipeliner
+
+## --version
+RELION version: 5.0.0-commit-3d6c20 
+Precision: BASE=double, CUDA-ACC=single 
+
+
+## --help
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== Check job completion options ===== 
+     --check_job_completion (false) : Use this flag to only check whether running jobs have completed
+====== Add scheduled jobs options ===== 
+                --addJobFromStar () : Add a job with the type and options as in this job.star to the pipeline
+                        --addJob () : Add a job of this type to the pipeline
+                 --addJobOptions () : Options for this job (either through --addJobFromStar or --addJob)
+                   --setJobAlias () : Set an alias to this job
+====== Run scheduled jobs options ===== 
+                       --RunJobs () : Run these jobs
+                      --schedule () : Name of the scheduler for running the scheduled jobs
+                       --repeat (1) : Run the scheduled jobs this many times
+                     --min_wait (0) : Wait at least this many minutes between each repeat
+              --min_wait_before (0) : Wait this many minutes before starting the running the first job
+              --sec_wait_after (10) : Wait this many seconds after a process finishes (workaround for slow IO)
+====== Edit jobs ===== 
+                       --editJob () : Star file of a job to be edited
+                    --editJobOut () : Output star file of the edited job (default is to overwrite input)
+                    --editOption () : The name of the joboption to be edited. This needs to be present in the input star file.
+                     --editValue () : The value of the joboption to be set.
+====== Expert options ===== 
+               --pipeline (default) : Name of the pipeline
+                --gentle_clean (-1) : Gentle clean this job
+                 --harsh_clean (-1) : Harsh clean this job
+                          --version : Print RELION version and exit
+
+## -h
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== Check job completion options ===== 
+     --check_job_completion (false) : Use this flag to only check whether running jobs have completed
+====== Add scheduled jobs options ===== 
+                --addJobFromStar () : Add a job with the type and options as in this job.star to the pipeline
+                        --addJob () : Add a job of this type to the pipeline
+                 --addJobOptions () : Options for this job (either through --addJobFromStar or --addJob)
+                   --setJobAlias () : Set an alias to this job
+====== Run scheduled jobs options ===== 
+                       --RunJobs () : Run these jobs
+                      --schedule () : Name of the scheduler for running the scheduled jobs
+                       --repeat (1) : Run the scheduled jobs this many times
+                     --min_wait (0) : Wait at least this many minutes between each repeat
+              --min_wait_before (0) : Wait this many minutes before starting the running the first job
+              --sec_wait_after (10) : Wait this many seconds after a process finishes (workaround for slow IO)
+====== Edit jobs ===== 
+                       --editJob () : Star file of a job to be edited
+                    --editJobOut () : Output star file of the edited job (default is to overwrite input)
+                    --editOption () : The name of the joboption to be edited. This needs to be present in the input star file.
+                     --editValue () : The value of the joboption to be set.
+====== Expert options ===== 
+               --pipeline (default) : Name of the pipeline
+                --gentle_clean (-1) : Gentle clean this job
+                 --harsh_clean (-1) : Harsh clean this job
+                          --version : Print RELION version and exit

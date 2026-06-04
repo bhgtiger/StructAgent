@@ -1,0 +1,67 @@
+# relion_schemer
+path: <RELION_BIN>/relion_schemer
+
+## --version
+RELION version: 5.0.0-commit-3d6c20 
+Precision: BASE=double, CUDA-ACC=single 
+
+
+## --help
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== General options ===== 
+                           --scheme : Directory name of the scheme
+                          --copy () : Make a copy of the scheme into this directory
+====== Add elements to the scheme ===== 
+                           --add () : Specify category of element to add to the scheme (variable, operator, job, edge or fork)
+                          --type () : Specify type of that element to add to the scheme
+                             --i () : Specify input to the element 
+                            --i2 () : Specify 2nd input to the element 
+                          --bool () : Name of boolean variable (for forks)
+                             --o () : Specify output of the element 
+                            --o2 () : Specify 2nd output of the element 
+                          --name () : Name of the variable, operator or job to be added
+                         --value () : Value of the variable to be added
+                --original_value () : Original value of the variable to be added
+                          --mode () : Mode (for jobs): new or continue
+====== Set values of variables in the scheme ===== 
+                    --reset (false) : Reset all variables to their original values
+                    --abort (false) : Abort a scheme that is running
+                       --set_var () : Name of a variable to set (using also the --value argument)
+                  --set_job_mode () : Name of a job whose mode to set (using also the --value argument)
+               --set_has_started () : Name of a job whose has_started variable to set (using also the --value argument)
+              --set_current_node () : Name of a node to which to set current_node
+====== Run the schemer within a pipeline ===== 
+                      --run (false) : Run the schemer
+                         --verb (1) : Running verbosity: 0, 1, 2 or 3)
+           --run_pipeline (default) : Name of the pipeline in which to run this scheme
+                          --version : Print RELION version and exit
+
+## -h
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== General options ===== 
+                           --scheme : Directory name of the scheme
+                          --copy () : Make a copy of the scheme into this directory
+====== Add elements to the scheme ===== 
+                           --add () : Specify category of element to add to the scheme (variable, operator, job, edge or fork)
+                          --type () : Specify type of that element to add to the scheme
+                             --i () : Specify input to the element 
+                            --i2 () : Specify 2nd input to the element 
+                          --bool () : Name of boolean variable (for forks)
+                             --o () : Specify output of the element 
+                            --o2 () : Specify 2nd output of the element 
+                          --name () : Name of the variable, operator or job to be added
+                         --value () : Value of the variable to be added
+                --original_value () : Original value of the variable to be added
+                          --mode () : Mode (for jobs): new or continue
+====== Set values of variables in the scheme ===== 
+                    --reset (false) : Reset all variables to their original values
+                    --abort (false) : Abort a scheme that is running
+                       --set_var () : Name of a variable to set (using also the --value argument)
+                  --set_job_mode () : Name of a job whose mode to set (using also the --value argument)
+               --set_has_started () : Name of a job whose has_started variable to set (using also the --value argument)
+              --set_current_node () : Name of a node to which to set current_node
+====== Run the schemer within a pipeline ===== 
+                      --run (false) : Run the schemer
+                         --verb (1) : Running verbosity: 0, 1, 2 or 3)
+           --run_pipeline (default) : Name of the pipeline in which to run this scheme
+                          --version : Print RELION version and exit

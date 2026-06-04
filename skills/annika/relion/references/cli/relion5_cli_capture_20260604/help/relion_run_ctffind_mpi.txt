@@ -1,0 +1,91 @@
+# relion_run_ctffind_mpi
+path: <RELION_BIN>/relion_run_ctffind_mpi
+
+## --version
+RELION version: 5.0.0-commit-3d6c20 
+Precision: BASE=double, CUDA-ACC=single 
+
+
+## --help
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== General options ===== 
+====== CTF estimation ===== 
+                                --i : STAR file with all input micrographs, or a unix wildcard to all micrograph files, e.g. "mics/*.mrc"
+                 --use_noDW (false) : Estimate CTFs from rlnMicrographNameNoDW instead of rlnMicrographName (only after MotionCor2)
+                 --o (CtfEstimate/) : Directory, where all output files will be stored
+           --only_make_star (false) : Don't estimate any CTFs, only join all logfile results in a STAR file
+       --only_do_unfinished (false) : Only estimate CTFs for those micrographs for which there is not yet a logfile with Final values.
+                  --do_at_most (-1) : Only process up to this number of (unprocessed) micrographs.
+                      --ctfWin (-1) : Size (in pixels) of a centered, squared window to use for CTF-estimation
+====== Tomography-specific parameters ===== 
+  --localsearch_nominal_defocus (10000.) : If positive, search defoci (+/-) around rlnTomoNominalDefocus (in A)
+           --exp_factor_dose (100.) : If positive, use exponential factor by which to limit maxres per unit dose (maxres*=exp(dose/factor))
+====== Microscopy parameters ===== 
+                          --CS (-1) : Spherical Aberration (mm) 
+                          --HT (-1) : Voltage (kV)
+                     --AmpCnst (-1) : Amplitude constrast
+                      --angpix (-1) : Pixel size in the input micrographs (A)
+====== CTFFIND parameters ===== 
+                   --ctffind_exe () : Location of ctffind executable (or through RELION_CTFFIND_EXECUTABLE environment variable)
+                        --Box (512) : Size of the boxes to calculate FFTs
+                     --ResMin (100) : Minimum resolution (in A) to include in calculations
+                       --ResMax (7) : Maximum resolution (in A) to include in calculations
+                    --dFMin (10000) : Minimum defocus value (in A) to search
+                    --dFMax (50000) : Maximum defocus value (in A) to search
+                      --FStep (250) : defocus step size (in A) for search
+                         --dAst (0) : amount of astigmatism (in A)
+====== CTFFIND4 parameters ===== 
+              --is_ctffind4 (false) : The provided CTFFIND executable is CTFFIND4 (version 4.1+)
+             --use_given_ps (false) : Use pre-calculated power spectra?
+      --do_movie_thon_rings (false) : Calculate Thon rings from movie frames?
+             --avg_movie_frames (1) : Average over how many movie frames (try to get 4 e-/A2)
+     --movie_rootname (_movie.mrcs) : Rootname plus extension for movies
+            --do_phaseshift (false) : Estimate the phase shift in the images (e.g. from a phase-plate)
+                   --phase_min (0.) : Minimum phase shift (in degrees)
+                 --phase_max (180.) : Maximum phase shift (in degrees)
+                 --phase_step (10.) : Step in phase shift (in degrees)
+                            --j (1) : Number of threads (for CTFIND4 only)
+              --fast_search (false) : Disable "Slower, more exhaustive search" in CTFFIND4.1 (faster but less accurate)
+                          --version : Print RELION version and exit
+
+## -h
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== General options ===== 
+====== CTF estimation ===== 
+                                --i : STAR file with all input micrographs, or a unix wildcard to all micrograph files, e.g. "mics/*.mrc"
+                 --use_noDW (false) : Estimate CTFs from rlnMicrographNameNoDW instead of rlnMicrographName (only after MotionCor2)
+                 --o (CtfEstimate/) : Directory, where all output files will be stored
+           --only_make_star (false) : Don't estimate any CTFs, only join all logfile results in a STAR file
+       --only_do_unfinished (false) : Only estimate CTFs for those micrographs for which there is not yet a logfile with Final values.
+                  --do_at_most (-1) : Only process up to this number of (unprocessed) micrographs.
+                      --ctfWin (-1) : Size (in pixels) of a centered, squared window to use for CTF-estimation
+====== Tomography-specific parameters ===== 
+  --localsearch_nominal_defocus (10000.) : If positive, search defoci (+/-) around rlnTomoNominalDefocus (in A)
+           --exp_factor_dose (100.) : If positive, use exponential factor by which to limit maxres per unit dose (maxres*=exp(dose/factor))
+====== Microscopy parameters ===== 
+                          --CS (-1) : Spherical Aberration (mm) 
+                          --HT (-1) : Voltage (kV)
+                     --AmpCnst (-1) : Amplitude constrast
+                      --angpix (-1) : Pixel size in the input micrographs (A)
+====== CTFFIND parameters ===== 
+                   --ctffind_exe () : Location of ctffind executable (or through RELION_CTFFIND_EXECUTABLE environment variable)
+                        --Box (512) : Size of the boxes to calculate FFTs
+                     --ResMin (100) : Minimum resolution (in A) to include in calculations
+                       --ResMax (7) : Maximum resolution (in A) to include in calculations
+                    --dFMin (10000) : Minimum defocus value (in A) to search
+                    --dFMax (50000) : Maximum defocus value (in A) to search
+                      --FStep (250) : defocus step size (in A) for search
+                         --dAst (0) : amount of astigmatism (in A)
+====== CTFFIND4 parameters ===== 
+              --is_ctffind4 (false) : The provided CTFFIND executable is CTFFIND4 (version 4.1+)
+             --use_given_ps (false) : Use pre-calculated power spectra?
+      --do_movie_thon_rings (false) : Calculate Thon rings from movie frames?
+             --avg_movie_frames (1) : Average over how many movie frames (try to get 4 e-/A2)
+     --movie_rootname (_movie.mrcs) : Rootname plus extension for movies
+            --do_phaseshift (false) : Estimate the phase shift in the images (e.g. from a phase-plate)
+                   --phase_min (0.) : Minimum phase shift (in degrees)
+                 --phase_max (180.) : Maximum phase shift (in degrees)
+                 --phase_step (10.) : Step in phase shift (in degrees)
+                            --j (1) : Number of threads (for CTFIND4 only)
+              --fast_search (false) : Disable "Slower, more exhaustive search" in CTFFIND4.1 (faster but less accurate)
+                          --version : Print RELION version and exit

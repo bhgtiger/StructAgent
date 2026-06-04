@@ -1,0 +1,131 @@
+# relion_ctf_refine_mpi
+path: <RELION_BIN>/relion_ctf_refine_mpi
+
+## --version
+RELION version: 5.0.0-commit-3d6c20 
+Precision: BASE=double, CUDA-ACC=single 
+
+
+## --help
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== General options ===== 
+                                --i : Input STAR file containing the particles
+                                --f : Input STAR file with the FSC of the reference (usually from PostProcess)
+                                --o : Output directory, e.g. CtfRefine/job041/
+                            --m1 () : Reference map, half 1
+                            --m2 () : Reference map, half 2
+                            --a1 () : Amplitude reference map, half 1
+                            --a2 () : Amplitude reference map, half 2
+                  --angpix_ref (-1) : Pixel size of the reference map
+                          --mask () : Reference mask
+                          --pad (2) : Padding factor
+       --only_do_unfinished (false) : Skip those steps for which output files already exist.
+                  --ctf_pad (false) : Use larger box to calculate CTF and then downscale to mimic boxing operation in real space
+                     --diag (false) : Write out diagnostic data (slower)
+====== Defocus fit options ===== 
+              --fit_defocus (false) : Perform refinement of per-particle defocus values?
+                 --fit_mode (fpmfm) : String of 5 characters describing whether to fit the phase shift (1), 
+                                      defocus (2), astigmatism (3), spherical aberration (4) and B-factors (5) 
+                                      per particle ('p'), per micrograph ('m') or to keep them fixed ('f')
+                                      during the per-micrograph CTF refinement.
+          --max_defocus_iters (100) : Maximum number of iterations for CTF refinement.
+                      --bf0 (false) : Perform brute-force per-particle defocus search (as in RELION 3.0) prior 
+                                      to the per-micrograph CTF refinement.
+                      --bf1 (false) : Perform brute-force defocus search after CTF refinement.
+                  --bf_only (false) : Skip CTF refinement and only perform a brute-force defocus search.
+                 --bf_range (2000.) : Defocus scan range (in A) for brute-force search.
+             --legacy_astig (false) : Estimate independent per-particle astigmatism (from RELION 3.0)
+              --kmin_defocus (30.0) : Inner freq. threshold for defocus estimation [Angst]
+====== B-factor options ===== 
+                --fit_bfacs (false) : Estimate CTF B-factors
+              --bfac_per_mg (false) : Estimate B-factors per micrograph, instead of per particle
+                 --bfac_min_B (-30) : Minimal allowed B-factor
+                 --bfac_max_B (300) : Maximal allowed B-factor
+             --bfac_min_scale (0.2) : Minimal allowed scale-factor (essential for outlier rejection)
+                 --kmin_bfac (30.0) : Inner freq. threshold for B-factor estimation [Angst]
+====== Beam-tilt options ===== 
+             --fit_beamtilt (false) : Perform refinement of beamtilt
+                 --kmin_tilt (20.0) : Inner freq. threshold for beamtilt estimation [Å]
+              --odd_aberr_max_n (0) : Maximum degree of Zernike polynomials used to fit odd (i.e. antisymmetrical) aberrations
+                       --xr0_t (-1) : Exclusion ring start [Å] - use to exclude dominant frequency (e.g. for helices)
+                       --xr1_t (-1) : Exclusion ring end [Å]
+====== Symmetric aberrations options ===== 
+                --fit_aberr (false) : Estimate symmetric aberrations
+                --kmin_aberr (20.0) : Inner freq. threshold for symmetrical aberration estimation [Å]
+             --even_aberr_max_n (4) : Maximum degree of Zernike polynomials used to fit even (i.e. symmetrical) aberrations
+                       --xr0_a (-1) : Exclusion ring start [Å]
+                       --xr1_a (-1) : Exclusion ring end [Å]
+====== Anisotropic magnification options ===== 
+                --fit_aniso (false) : Estimate anisotropic magnification
+                  --kmin_mag (20.0) : Inner freq. threshold for anisotropic magnification estimation [Angst]
+               --keep_astig (false) : Do not translate astigmatism into new coordinates
+               --part_astig (false) : Allow astigmatism to vary among the particles of a micrograph
+====== Computational options ===== 
+                            --j (1) : Number of (OMP) threads
+                       --min_MG (0) : First micrograph index
+                      --max_MG (-1) : Last micrograph index (default is to process all)
+                    --debug (false) : Write debugging data
+                         --verb (1) : Verbosity
+                          --version : Print RELION version and exit
+
+## -h
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== General options ===== 
+                                --i : Input STAR file containing the particles
+                                --f : Input STAR file with the FSC of the reference (usually from PostProcess)
+                                --o : Output directory, e.g. CtfRefine/job041/
+                            --m1 () : Reference map, half 1
+                            --m2 () : Reference map, half 2
+                            --a1 () : Amplitude reference map, half 1
+                            --a2 () : Amplitude reference map, half 2
+                  --angpix_ref (-1) : Pixel size of the reference map
+                          --mask () : Reference mask
+                          --pad (2) : Padding factor
+       --only_do_unfinished (false) : Skip those steps for which output files already exist.
+                  --ctf_pad (false) : Use larger box to calculate CTF and then downscale to mimic boxing operation in real space
+                     --diag (false) : Write out diagnostic data (slower)
+====== Defocus fit options ===== 
+              --fit_defocus (false) : Perform refinement of per-particle defocus values?
+                 --fit_mode (fpmfm) : String of 5 characters describing whether to fit the phase shift (1), 
+                                      defocus (2), astigmatism (3), spherical aberration (4) and B-factors (5) 
+                                      per particle ('p'), per micrograph ('m') or to keep them fixed ('f')
+                                      during the per-micrograph CTF refinement.
+          --max_defocus_iters (100) : Maximum number of iterations for CTF refinement.
+                      --bf0 (false) : Perform brute-force per-particle defocus search (as in RELION 3.0) prior 
+                                      to the per-micrograph CTF refinement.
+                      --bf1 (false) : Perform brute-force defocus search after CTF refinement.
+                  --bf_only (false) : Skip CTF refinement and only perform a brute-force defocus search.
+                 --bf_range (2000.) : Defocus scan range (in A) for brute-force search.
+             --legacy_astig (false) : Estimate independent per-particle astigmatism (from RELION 3.0)
+              --kmin_defocus (30.0) : Inner freq. threshold for defocus estimation [Angst]
+====== B-factor options ===== 
+                --fit_bfacs (false) : Estimate CTF B-factors
+              --bfac_per_mg (false) : Estimate B-factors per micrograph, instead of per particle
+                 --bfac_min_B (-30) : Minimal allowed B-factor
+                 --bfac_max_B (300) : Maximal allowed B-factor
+             --bfac_min_scale (0.2) : Minimal allowed scale-factor (essential for outlier rejection)
+                 --kmin_bfac (30.0) : Inner freq. threshold for B-factor estimation [Angst]
+====== Beam-tilt options ===== 
+             --fit_beamtilt (false) : Perform refinement of beamtilt
+                 --kmin_tilt (20.0) : Inner freq. threshold for beamtilt estimation [Å]
+              --odd_aberr_max_n (0) : Maximum degree of Zernike polynomials used to fit odd (i.e. antisymmetrical) aberrations
+                       --xr0_t (-1) : Exclusion ring start [Å] - use to exclude dominant frequency (e.g. for helices)
+                       --xr1_t (-1) : Exclusion ring end [Å]
+====== Symmetric aberrations options ===== 
+                --fit_aberr (false) : Estimate symmetric aberrations
+                --kmin_aberr (20.0) : Inner freq. threshold for symmetrical aberration estimation [Å]
+             --even_aberr_max_n (4) : Maximum degree of Zernike polynomials used to fit even (i.e. symmetrical) aberrations
+                       --xr0_a (-1) : Exclusion ring start [Å]
+                       --xr1_a (-1) : Exclusion ring end [Å]
+====== Anisotropic magnification options ===== 
+                --fit_aniso (false) : Estimate anisotropic magnification
+                  --kmin_mag (20.0) : Inner freq. threshold for anisotropic magnification estimation [Angst]
+               --keep_astig (false) : Do not translate astigmatism into new coordinates
+               --part_astig (false) : Allow astigmatism to vary among the particles of a micrograph
+====== Computational options ===== 
+                            --j (1) : Number of (OMP) threads
+                       --min_MG (0) : First micrograph index
+                      --max_MG (-1) : Last micrograph index (default is to process all)
+                    --debug (false) : Write debugging data
+                         --verb (1) : Verbosity
+                          --version : Print RELION version and exit

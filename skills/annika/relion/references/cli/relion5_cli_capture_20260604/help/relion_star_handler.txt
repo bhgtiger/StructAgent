@@ -1,0 +1,133 @@
+# relion_star_handler
+path: <RELION_BIN>/relion_star_handler
+
+## --version
+RELION version: 5.0.0-commit-3d6c20 
+Precision: BASE=double, CUDA-ACC=single 
+
+
+## --help
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== General options ===== 
+                                --i : Input STAR file(s)
+                     --o (out.star) : Output STAR file
+            --ignore_optics (false) : Provide this option for relion-3.0 functionality, without optics groups
+                      --angpix (1.) : Pixel size in Angstrom, for when ignoring the optics groups in the input star file
+                   --i_tablename () : If ignoring optics, then read table with this name
+====== Compare options ===== 
+                       --compare () : STAR file name to compare the input STAR file with
+                        --label1 () : 1st metadata label for the comparison (may be string, int or RFLOAT)
+                        --label2 () : 2nd metadata label for the comparison (RFLOAT only) for 2D/3D-distance)
+                        --label3 () : 3rd metadata label for the comparison (RFLOAT only) for 3D-distance)
+                    --max_dist (0.) : Maximum distance to consider a match (for int and RFLOAT only)
+====== Select options ===== 
+                        --select () : Metadata label (number) to base output selection on (e.g. rlnCtfFigureOfMerit)
+              --minval (-99999999.) : Minimum acceptable value for this label (inclusive)
+               --maxval (99999999.) : Maximum acceptable value for this label (inclusive)
+                 --select_by_str () : Metadata label (string) to base output selection on (e.g. rlnMicrographname)
+                --select_include () : select rows that contains this string in --select_by_str 
+                --select_exclude () : exclude rows that contains this string in --select_by_str 
+====== Discard based on image statistics options ===== 
+         --discard_on_stats (false) : Discard images if their average/stddev deviates too many sigma from the ensemble average
+     --discard_label (rlnImageName) : MetaDataLabel that points to the images to be used for discarding based on statistics
+               --discard_sigma (4.) : Discard images with average or stddev values that lie this many sigma away from the ensemble average
+====== Combine options ===== 
+                  --combine (false) : Combine input STAR files (multiple individual filenames, all within double-quotes after --i)
+            --combine_picks (false) : Combine input manual/autopick STAR files (multiple individual filenames, all within double-quotes after --i)
+              --check_duplicates () : MetaDataLabel (for a string only!) to check for duplicates, e.g. rlnImageName
+====== Split options ===== 
+                    --split (false) : Split the input STAR file into one or more smaller output STAR files
+             --random_order (false) : Perform splits on randomised order of the input STAR file
+                 --random_seed (-1) : Random seed for randomisation.
+                    --nr_split (-1) : Split into this many equal-sized STAR files
+                  --size_split (-1) : AND/OR split into subsets of this many lines
+====== Operate options ===== 
+                       --operate () : Operate on this metadata label
+                      --operate2 () : Operate also on this metadata label
+                      --operate3 () : Operate also on this metadata label
+                        --set_to () : Set all the values for the --operate label(s) to this value
+                 --multiply_by (1.) : Multiply all the values for the --operate label(s) by this value
+                      --add_to (0.) : Add this value to all the values for the --operate label(s)
+====== Center options ===== 
+                   --center (false) : Perform centering of particles according to a position in the reference.
+                    --center_X (0.) : X-coordinate in the reference to center particles on (in pix)
+                    --center_Y (0.) : Y-coordinate in the reference to center particles on (in pix)
+                    --center_Z (0.) : Z-coordinate in the reference to center particles on (in pix)
+====== Column options ===== 
+                 --remove_column () : Remove the column with this metadata label from the input STAR file.
+                    --add_column () : Add a column with this metadata label from the input STAR file.
+              --add_column_value () : Set this value in all rows for the added column
+              --copy_column_from () : Copy values in this column to the added column
+                   --hist_column () : Calculate histogram of values in the column with this metadata label
+               --in_percent (false) : Show a histogram in percent (need --hist_column)
+          --show_cumulative (false) : Show a histogram of cumulative distribution (need --hist_column)
+                   --hist_bins (-1) : Number of bins for the histogram. By default, determined automatically by Freedman–Diaconis rule.
+                  --hist_min (-inf) : Minimum value for the histogram (needs --hist_bins)
+                   --hist_max (inf) : Maximum value for the histogram (needs --hist_bins)
+====== Duplicate removal ===== 
+           --remove_duplicates (-1) : Remove duplicated particles within this distance [Angstrom]. Negative values disable this.
+                --image_angpix (-1) : For down-sampled particles, specify the pixel size [A/pix] of the original images used in the Extract job
+                          --version : Print RELION version and exit
+
+## -h
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== General options ===== 
+                                --i : Input STAR file(s)
+                     --o (out.star) : Output STAR file
+            --ignore_optics (false) : Provide this option for relion-3.0 functionality, without optics groups
+                      --angpix (1.) : Pixel size in Angstrom, for when ignoring the optics groups in the input star file
+                   --i_tablename () : If ignoring optics, then read table with this name
+====== Compare options ===== 
+                       --compare () : STAR file name to compare the input STAR file with
+                        --label1 () : 1st metadata label for the comparison (may be string, int or RFLOAT)
+                        --label2 () : 2nd metadata label for the comparison (RFLOAT only) for 2D/3D-distance)
+                        --label3 () : 3rd metadata label for the comparison (RFLOAT only) for 3D-distance)
+                    --max_dist (0.) : Maximum distance to consider a match (for int and RFLOAT only)
+====== Select options ===== 
+                        --select () : Metadata label (number) to base output selection on (e.g. rlnCtfFigureOfMerit)
+              --minval (-99999999.) : Minimum acceptable value for this label (inclusive)
+               --maxval (99999999.) : Maximum acceptable value for this label (inclusive)
+                 --select_by_str () : Metadata label (string) to base output selection on (e.g. rlnMicrographname)
+                --select_include () : select rows that contains this string in --select_by_str 
+                --select_exclude () : exclude rows that contains this string in --select_by_str 
+====== Discard based on image statistics options ===== 
+         --discard_on_stats (false) : Discard images if their average/stddev deviates too many sigma from the ensemble average
+     --discard_label (rlnImageName) : MetaDataLabel that points to the images to be used for discarding based on statistics
+               --discard_sigma (4.) : Discard images with average or stddev values that lie this many sigma away from the ensemble average
+====== Combine options ===== 
+                  --combine (false) : Combine input STAR files (multiple individual filenames, all within double-quotes after --i)
+            --combine_picks (false) : Combine input manual/autopick STAR files (multiple individual filenames, all within double-quotes after --i)
+              --check_duplicates () : MetaDataLabel (for a string only!) to check for duplicates, e.g. rlnImageName
+====== Split options ===== 
+                    --split (false) : Split the input STAR file into one or more smaller output STAR files
+             --random_order (false) : Perform splits on randomised order of the input STAR file
+                 --random_seed (-1) : Random seed for randomisation.
+                    --nr_split (-1) : Split into this many equal-sized STAR files
+                  --size_split (-1) : AND/OR split into subsets of this many lines
+====== Operate options ===== 
+                       --operate () : Operate on this metadata label
+                      --operate2 () : Operate also on this metadata label
+                      --operate3 () : Operate also on this metadata label
+                        --set_to () : Set all the values for the --operate label(s) to this value
+                 --multiply_by (1.) : Multiply all the values for the --operate label(s) by this value
+                      --add_to (0.) : Add this value to all the values for the --operate label(s)
+====== Center options ===== 
+                   --center (false) : Perform centering of particles according to a position in the reference.
+                    --center_X (0.) : X-coordinate in the reference to center particles on (in pix)
+                    --center_Y (0.) : Y-coordinate in the reference to center particles on (in pix)
+                    --center_Z (0.) : Z-coordinate in the reference to center particles on (in pix)
+====== Column options ===== 
+                 --remove_column () : Remove the column with this metadata label from the input STAR file.
+                    --add_column () : Add a column with this metadata label from the input STAR file.
+              --add_column_value () : Set this value in all rows for the added column
+              --copy_column_from () : Copy values in this column to the added column
+                   --hist_column () : Calculate histogram of values in the column with this metadata label
+               --in_percent (false) : Show a histogram in percent (need --hist_column)
+          --show_cumulative (false) : Show a histogram of cumulative distribution (need --hist_column)
+                   --hist_bins (-1) : Number of bins for the histogram. By default, determined automatically by Freedman–Diaconis rule.
+                  --hist_min (-inf) : Minimum value for the histogram (needs --hist_bins)
+                   --hist_max (inf) : Maximum value for the histogram (needs --hist_bins)
+====== Duplicate removal ===== 
+           --remove_duplicates (-1) : Remove duplicated particles within this distance [Angstrom]. Negative values disable this.
+                --image_angpix (-1) : For down-sampled particles, specify the pixel size [A/pix] of the original images used in the Extract job
+                          --version : Print RELION version and exit

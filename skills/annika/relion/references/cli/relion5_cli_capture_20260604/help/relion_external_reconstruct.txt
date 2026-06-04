@@ -1,0 +1,47 @@
+# relion_external_reconstruct
+path: <RELION_BIN>/relion_external_reconstruct
+
+## --version
+in: <RELION_SOURCE_ROOT>/src/apps/external_reconstruct.cpp, line 55
+ERROR: 
+ ERROR: input argument does not have a .star extension.
+=== Backtrace  ===
+relion_external_reconstruct(_ZN11RelionErrorC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES7_l+0x85) [0x595eca5698e5]
+relion_external_reconstruct(_ZN21ext_recons_parameters4readEiPPc+0xc95) [0x595eca539c25]
+relion_external_reconstruct(main+0x45) [0x595eca52b015]
+/lib/x86_64-linux-gnu/libc.so.6(+0x2a1ca) [0x79b62f22a1ca]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x8b) [0x79b62f22a28b]
+relion_external_reconstruct(_start+0x25) [0x595eca52e8f5]
+==================
+ERROR: 
+ ERROR: input argument does not have a .star extension.
+
+## --help
+in: <RELION_SOURCE_ROOT>/src/apps/external_reconstruct.cpp, line 55
+ERROR: 
+ ERROR: input argument does not have a .star extension.
+=== Backtrace  ===
+relion_external_reconstruct(_ZN11RelionErrorC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES7_l+0x85) [0x5dbb0f4f18e5]
+relion_external_reconstruct(_ZN21ext_recons_parameters4readEiPPc+0xc95) [0x5dbb0f4c1c25]
+relion_external_reconstruct(main+0x45) [0x5dbb0f4b3015]
+/lib/x86_64-linux-gnu/libc.so.6(+0x2a1ca) [0x7b17e8e2a1ca]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x8b) [0x7b17e8e2a28b]
+relion_external_reconstruct(_start+0x25) [0x5dbb0f4b68f5]
+==================
+ERROR: 
+ ERROR: input argument does not have a .star extension.
+
+## -h
+in: <RELION_SOURCE_ROOT>/src/apps/external_reconstruct.cpp, line 55
+ERROR: 
+ ERROR: input argument does not have a .star extension.
+=== Backtrace  ===
+relion_external_reconstruct(_ZN11RelionErrorC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES7_l+0x85) [0x6324cf8d48e5]
+relion_external_reconstruct(_ZN21ext_recons_parameters4readEiPPc+0xc95) [0x6324cf8a4c25]
+relion_external_reconstruct(main+0x45) [0x6324cf896015]
+/lib/x86_64-linux-gnu/libc.so.6(+0x2a1ca) [0x7289f462a1ca]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x8b) [0x7289f462a28b]
+relion_external_reconstruct(_start+0x25) [0x6324cf8998f5]
+==================
+ERROR: 
+ ERROR: input argument does not have a .star extension.

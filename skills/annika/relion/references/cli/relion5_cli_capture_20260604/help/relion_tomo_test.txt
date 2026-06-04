@@ -1,0 +1,23 @@
+# relion_tomo_test
+path: <RELION_BIN>/relion_tomo_test
+
+## --version
+reading: frames/bin4_0.mrc
+in: <RELION_SOURCE_ROOT>/src/image.h, line 276
+ERROR: 
+Cannot read file frames/bin4_0.mrc It does not exist
+terminate called after throwing an instance of 'RelionError'
+
+## --help
+reading: frames/bin4_0.mrc
+in: <RELION_SOURCE_ROOT>/src/image.h, line 276
+ERROR: 
+Cannot read file frames/bin4_0.mrc It does not exist
+terminate called after throwing an instance of 'RelionError'
+
+## -h
+reading: frames/bin4_0.mrc
+in: <RELION_SOURCE_ROOT>/src/image.h, line 276
+ERROR: 
+Cannot read file frames/bin4_0.mrc It does not exist
+terminate called after throwing an instance of 'RelionError'

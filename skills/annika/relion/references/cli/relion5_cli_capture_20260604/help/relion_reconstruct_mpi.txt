@@ -1,0 +1,127 @@
+# relion_reconstruct_mpi
+path: <RELION_BIN>/relion_reconstruct_mpi
+
+## --version
+RELION version: 5.0.0-commit-3d6c20 
+Precision: BASE=double, CUDA-ACC=single 
+
+
+## --help
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== General options ===== 
+                             --i () : Input STAR file with the projection images and their orientations
+                   --o (relion.mrc) : Name for output reconstruction
+                         --sym (c1) : Symmetry group
+                      --maxres (-1) : Maximum resolution (in Angstrom) to consider in Fourier space (default Nyquist)
+                          --pad (2) : Padding factor
+                           --img () : Optional: image path prefix
+                      --subset (-1) : Subset of images to consider (1: only reconstruct half1; 2: only half2; other: reconstruct all)
+                       --class (-1) : Consider only this class (-1: use all classes)
+                      --angpix (-1) : Pixel size in the reconstruction (take from first optics group by default)
+====== CTF options ===== 
+                      --ctf (false) : Apply CTF correction
+    --ctf_intact_first_peak (false) : Leave CTFs intact until first peak
+        --ctf_phase_flipped (false) : Images have been phase flipped
+         --only_flip_phases (false) : Do not correct CTF-amplitudes, only flip phases
+====== Ewald-sphere correction options ===== 
+                    --ewald (false) : Correct for Ewald-sphere curvature (developmental)
+              --mask_diameter (-1.) : Diameter (in A) of mask for Ewald-sphere curvature correction
+              --width_mask_edge (3) : Width (in pixels) of the soft edge on the mask
+        --reverse_curvature (false) : Try curvature the other way around
+                      --newbox (-1) : Box size of reconstruction after Ewald sphere correction
+                      --sectors (2) : Number of sectors for Ewald sphere correction
+                --skip_mask (false) : Do not apply real space mask during Ewald sphere correction
+           --skip_weighting (false) : Do not apply weighting during Ewald sphere correction
+====== Helical options ===== 
+               --nr_helical_asu (1) : Number of helical asymmetrical units
+                --helical_rise (0.) : Helical rise (in Angstroms)
+               --helical_twist (0.) : Helical twist (in degrees, + for right-handedness)
+====== Subtomogram averaging ===== 
+       --normalised_subtomo (false) : Have subtomograms been multiplicity normalised? (Default=False)
+       --skip_subtomo_multi (false) : Skip subtomo multiplicity correction? (For nomalised subtomos only)
+        --ctf3d_not_squared (false) : CTF3D files contain sqrt(CTF^2) patterns
+====== Expert options ===== 
+                      --subtract () : Subtract projections of this map from the images used for reconstruction
+                       --NN (false) : Use nearest-neighbour instead of linear interpolation before gridding correction
+                     --blob_r (1.9) : Radius of blob for gridding interpolation
+                       --blob_m (0) : Order of blob for gridding interpolation
+                      --blob_a (15) : Alpha-value of blob for gridding interpolation
+                        --iter (10) : Number of gridding-correction iterations
+                       --refdim (3) : Dimension of the reconstruction (2D or 3D)
+               --angular_error (0.) : Apply random deviations with this standard deviation (in degrees) to each of the 3 Euler angles
+                 --shift_error (0.) : Apply random deviations with this standard deviation (in Angstrom) to each of the 2 translations
+            --fom_weighting (false) : Weight particles according to their figure-of-merit (_rlnParticleFigureOfMerit)
+                           --fsc () : FSC-curve for regularized reconstruction
+                   --3d_rot (false) : Perform 3D rotations instead of backprojections from 2D images
+             --reconstruct_ctf (-1) : Perform a 3D reconstruction from 2D CTF-images, with the given size in pixels
+                     --ctf2 (false) : Reconstruct CTF^2 and then take the sqrt of that
+       --dont_skip_gridding (false) : Perform gridding in the reconstruction (obsolete?)
+                         --debug () : Rootname for debug reconstruction files
+               --debug_ori_size (1) : Rootname for debug reconstruction files
+                   --debug_size (1) : Rootname for debug reconstruction files
+             --reconstruct_noise () : Reconstruct noise using sigma2 values in this model STAR file
+             --read_weights (false) : Developmental: read freq. weight files
+       --write_debug_output (false) : Write out arrays with data and weight terms prior to reconstruct
+     --external_reconstruct (false) : Write out BP denominator and numerator for external_reconstruct program
+                         --verb (1) : Verbosity
+                          --version : Print RELION version and exit
+
+## -h
++++ RELION: command line arguments (with defaults for optional ones between parantheses) +++
+====== General options ===== 
+                             --i () : Input STAR file with the projection images and their orientations
+                   --o (relion.mrc) : Name for output reconstruction
+                         --sym (c1) : Symmetry group
+                      --maxres (-1) : Maximum resolution (in Angstrom) to consider in Fourier space (default Nyquist)
+                          --pad (2) : Padding factor
+                           --img () : Optional: image path prefix
+                      --subset (-1) : Subset of images to consider (1: only reconstruct half1; 2: only half2; other: reconstruct all)
+                       --class (-1) : Consider only this class (-1: use all classes)
+                      --angpix (-1) : Pixel size in the reconstruction (take from first optics group by default)
+====== CTF options ===== 
+                      --ctf (false) : Apply CTF correction
+    --ctf_intact_first_peak (false) : Leave CTFs intact until first peak
+        --ctf_phase_flipped (false) : Images have been phase flipped
+         --only_flip_phases (false) : Do not correct CTF-amplitudes, only flip phases
+====== Ewald-sphere correction options ===== 
+                    --ewald (false) : Correct for Ewald-sphere curvature (developmental)
+              --mask_diameter (-1.) : Diameter (in A) of mask for Ewald-sphere curvature correction
+              --width_mask_edge (3) : Width (in pixels) of the soft edge on the mask
+        --reverse_curvature (false) : Try curvature the other way around
+                      --newbox (-1) : Box size of reconstruction after Ewald sphere correction
+                      --sectors (2) : Number of sectors for Ewald sphere correction
+                --skip_mask (false) : Do not apply real space mask during Ewald sphere correction
+           --skip_weighting (false) : Do not apply weighting during Ewald sphere correction
+====== Helical options ===== 
+               --nr_helical_asu (1) : Number of helical asymmetrical units
+                --helical_rise (0.) : Helical rise (in Angstroms)
+               --helical_twist (0.) : Helical twist (in degrees, + for right-handedness)
+====== Subtomogram averaging ===== 
+       --normalised_subtomo (false) : Have subtomograms been multiplicity normalised? (Default=False)
+       --skip_subtomo_multi (false) : Skip subtomo multiplicity correction? (For nomalised subtomos only)
+        --ctf3d_not_squared (false) : CTF3D files contain sqrt(CTF^2) patterns
+====== Expert options ===== 
+                      --subtract () : Subtract projections of this map from the images used for reconstruction
+                       --NN (false) : Use nearest-neighbour instead of linear interpolation before gridding correction
+                     --blob_r (1.9) : Radius of blob for gridding interpolation
+                       --blob_m (0) : Order of blob for gridding interpolation
+                      --blob_a (15) : Alpha-value of blob for gridding interpolation
+                        --iter (10) : Number of gridding-correction iterations
+                       --refdim (3) : Dimension of the reconstruction (2D or 3D)
+               --angular_error (0.) : Apply random deviations with this standard deviation (in degrees) to each of the 3 Euler angles
+                 --shift_error (0.) : Apply random deviations with this standard deviation (in Angstrom) to each of the 2 translations
+            --fom_weighting (false) : Weight particles according to their figure-of-merit (_rlnParticleFigureOfMerit)
+                           --fsc () : FSC-curve for regularized reconstruction
+                   --3d_rot (false) : Perform 3D rotations instead of backprojections from 2D images
+             --reconstruct_ctf (-1) : Perform a 3D reconstruction from 2D CTF-images, with the given size in pixels
+                     --ctf2 (false) : Reconstruct CTF^2 and then take the sqrt of that
+       --dont_skip_gridding (false) : Perform gridding in the reconstruction (obsolete?)
+                         --debug () : Rootname for debug reconstruction files
+               --debug_ori_size (1) : Rootname for debug reconstruction files
+                   --debug_size (1) : Rootname for debug reconstruction files
+             --reconstruct_noise () : Reconstruct noise using sigma2 values in this model STAR file
+             --read_weights (false) : Developmental: read freq. weight files
+       --write_debug_output (false) : Write out arrays with data and weight terms prior to reconstruct
+     --external_reconstruct (false) : Write out BP denominator and numerator for external_reconstruct program
+                         --verb (1) : Verbosity
+                          --version : Print RELION version and exit

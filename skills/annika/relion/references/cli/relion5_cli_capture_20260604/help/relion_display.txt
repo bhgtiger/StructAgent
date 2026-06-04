@@ -1,0 +1,11 @@
+# relion_display
+path: <RELION_BIN>/relion_display
+
+## --version
+relion_display: error while loading shared libraries: libfltk.so.1.3: cannot open shared object file: No such file or directory
+
+## --help
+relion_display: error while loading shared libraries: libfltk.so.1.3: cannot open shared object file: No such file or directory
+
+## -h
+relion_display: error while loading shared libraries: libfltk.so.1.3: cannot open shared object file: No such file or directory
