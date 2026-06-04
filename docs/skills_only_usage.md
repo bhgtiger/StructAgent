@@ -11,6 +11,7 @@ Copy one or more skill folders into your agent's skill directory.
 cp -R skills/annika/chimerax ~/.openclaw/workspace/skills/
 cp -R skills/annika/phenix ~/.openclaw/workspace/skills/
 cp -R skills/annika/cryosparc ~/.openclaw/workspace/skills/
+cp -R skills/annika/mask ~/.openclaw/workspace/skills/
 cp -R skills/maria/paper-reader ~/.openclaw/workspace/skills/
 ```
 
@@ -29,6 +30,7 @@ Optional public PDB/PDBe lookup support for Maria/Annika-style deployments is do
 ### Cryo-EM model building / refinement
 
 - `skills/annika/cryosparc` — unofficial SPA processing/reconstruction guidance when cryoSPARC is involved
+- `skills/annika/mask` — headless ChimeraX mask bases for local refinement, particle subtraction, and domain/chain masks
 - `skills/annika/chimerax`
 - `skills/annika/isolde`
 - `skills/annika/phenix`
@@ -36,6 +38,12 @@ Optional public PDB/PDBe lookup support for Maria/Annika-style deployments is do
 - `skills/annika/ccp4`
 - `skills/annika/structural_build`
 - `skills/annika/structural-strategy`
+
+### Focused refinement / particle subtraction masks
+
+- `skills/annika/mask` — standalone model/map-derived mask generation
+- `skills/annika/cryosparc` — Volume Tools and downstream CryoSPARC workflow guidance
+- `skills/annika/chimerax` — broader ChimeraX command and visualization support
 
 ### Ligand fitting and geometry review
 

@@ -45,7 +45,8 @@ skills/annika/                Execution-side structural-biology skills/protocols
   ├── chimerax/               UCSF ChimeraX model editing and map fitting
   ├── coot/                   Coot model building and local refinement
   ├── cryosparc/              AI agent skill for cryoSPARC workflows, masks, and cautious automation
-  ├── emerald/                Rosetta EMERALD ligand docking into cryo-EM density (NEW)
+  ├── mask/                   Headless ChimeraX model/map-derived cryo-EM mask generation (NEW)
+  ├── emerald/                Rosetta EMERALD ligand docking into cryo-EM density
   ├── isolde/                 ISOLDE interactive refinement in ChimeraX
   ├── phenix/                 Phenix real-space and reciprocal-space refinement
   ├── annika-log/             Auditable project/job logging for reproducibility (NEW)
@@ -83,6 +84,9 @@ Connect them with an A2A JSON-RPC gateway or equivalent message bus. Use the tem
 See [`docs/full_system_implementation.md`](docs/full_system_implementation.md). Optional public PDB/PDBe lookup tools can be exposed via [`docs/pdbe_mcp_setup.md`](docs/pdbe_mcp_setup.md).
 
 ## Changelog
+
+### v5 (2026-06-04)
+- **Added** `skills/annika/mask/` — standalone headless ChimeraX mask-generation skill for model-reference (`molmap`) and map-threshold mask bases, including CryoSPARC handoff guidance, helper scripts, and compact original references. The raw upstream tutorial transcript from the local source folder is intentionally not bundled.
 
 ### v4 (2026-05-29)
 - **Updated** `skills/annika/cryosparc/` to the current v5.0.6-aware skill bundle, including expanded SPA playbooks, case-study/tutorial routing, integrated ChimeraX mask-generation guidance, small mask assets, and file-local mask helper scripts under `scripts/masks/`.
