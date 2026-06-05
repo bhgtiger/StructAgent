@@ -45,11 +45,13 @@ skills/annika/                Execution-side structural-biology skills/protocols
   ├── chimerax/               UCSF ChimeraX model editing and map fitting
   ├── coot/                   Coot model building and local refinement
   ├── cryosparc/              AI agent skill for cryoSPARC workflows, masks, and cautious automation
-  ├── mask/                   Headless ChimeraX model/map-derived cryo-EM mask generation (NEW)
+  ├── mask/                   Headless ChimeraX model/map-derived cryo-EM mask generation
+  ├── relion/                 RELION 5 SPA/tomo workflow guidance and CLI-grounded automation templates
+  ├── topaz-skill/            Topaz particle-picking/denoising guidance with config-first safety gates (NEW)
   ├── emerald/                Rosetta EMERALD ligand docking into cryo-EM density
   ├── isolde/                 ISOLDE interactive refinement in ChimeraX
   ├── phenix/                 Phenix real-space and reciprocal-space refinement
-  ├── annika-log/             Auditable project/job logging for reproducibility (NEW)
+  ├── annika-log/             Auditable project/job logging for reproducibility
   ├── structural-strategy/    Decision-making for fitting, refinement, validation
   └── structural_build/       End-to-end model building orchestration
 skills/maria/                 Reading/reasoning/database/review skills
@@ -84,6 +86,12 @@ Connect them with an A2A JSON-RPC gateway or equivalent message bus. Use the tem
 See [`docs/full_system_implementation.md`](docs/full_system_implementation.md). Optional public PDB/PDBe lookup tools can be exposed via [`docs/pdbe_mcp_setup.md`](docs/pdbe_mcp_setup.md).
 
 ## Changelog
+
+### v7 (2026-06-05)
+- **Added** `skills/annika/topaz-skill/` — config-first, source-grounded Topaz skill for particle picking, denoising, coordinate conversion, install/device guidance, and safe placeholder workflow templates. Local probe outputs (`configs/site_config.local.*`) are intentionally not bundled.
+
+### v6 (2026-06-04)
+- **Added** `skills/annika/relion/` — RELION 5 workflow skill covering STAR metadata, project/job trees, preprocessing, picking/extraction, 2D/3D classification/refinement, masks/postprocessing/local resolution, polishing, tomography, schemes, interop, and troubleshooting.
 
 ### v5 (2026-06-04)
 - **Added** `skills/annika/mask/` — standalone headless ChimeraX mask-generation skill for model-reference (`molmap`) and map-threshold mask bases, including CryoSPARC handoff guidance, helper scripts, and compact original references. The raw upstream tutorial transcript from the local source folder is intentionally not bundled.
