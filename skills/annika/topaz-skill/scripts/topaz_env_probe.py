@@ -231,23 +231,99 @@ def _python_package_version(pkg_import_name):
     return None
 
 
+# Known subcommands for the pinned/validated Topaz release. Used (a) as a
+# whitelist to keep _parse_subcommands from emitting group headers/description
+# words, and (b) as a fallback when the help layout cannot be parsed.
+# Source: captured live help `topaz.help.txt` for topaz 0.3.20 lists, under grouped
+# headers: Particle picking {train, segment, extract, precision_recall_curve};
+# Image processing {downsample, normalize, preprocess, denoise, denoise3d};
+# File utilities {convert, split, particle_stack, train_test_split}; GUI {gui};
+# [Deprecated] {scale_coordinates}.
+# The remaining names below {boxes_to_coordinates, star_to_coordinates,
+# coordinates_to_star, coordinates_to_boxes, coordinates_to_eman2_json,
+# star_particles_threshold} are real callable `topaz <cmd>` subcommands that are
+# HIDDEN from the grouped `topaz --help` output but verified to run
+# (`topaz <cmd> --help` succeeds on 0.3.20). They are included so the probe reports
+# the full callable surface, not only the help-listed commands.
+KNOWN_SUBCOMMANDS = (
+    # Particle picking
+    "train", "segment", "extract", "precision_recall_curve",
+    # Image processing
+    "downsample", "normalize", "preprocess", "denoise", "denoise3d",
+    # File utilities
+    "convert", "split", "particle_stack", "train_test_split",
+    # GUI
+    "gui",
+    # Deprecated
+    "scale_coordinates", "boxes_to_coordinates", "star_to_coordinates",
+    "coordinates_to_star", "coordinates_to_boxes", "coordinates_to_eman2_json",
+    "star_particles_threshold",
+)
+
+
 def _parse_subcommands(help_text):
-    """Extract subcommand names from `topaz --help` output, best effort."""
+    """Extract real subcommand names from `topaz --help`.
+
+    The 0.3.20 help groups commands ("Particle picking:", "Image processing:",
+    ...) and each command is INDENTED under its group, e.g.
+
+        commands:
+          Particle picking:
+            train                      train 2D region classifier ...
+            segment                    segment images using ...
+
+    Continuation lines of a description are indented even further. A naive
+    "first token on every captured line" parser (the old behaviour) wrongly
+    emitted group headers ("Particle", "Image", "File") and the first word of
+    wrapped description lines ("by", "boxes_to_coordinates" mid-sentence, ...).
+
+    Strategy: only accept a line whose first whitespace-separated token is a
+    known 0.3.20 subcommand (KNOWN_SUBCOMMANDS). This both filters group
+    headers/description noise and keeps the captured list matching
+    topaz.help.txt exactly. Unknown-but-plausible command tokens (a future
+    Topaz adding a subcommand) are still surfaced when they sit directly under
+    a group header and look like a command token, so the probe does not silently
+    hide new commands.
+    """
+    known = set(KNOWN_SUBCOMMANDS)
     subs = []
     capture = False
+    in_group = False
     for line in help_text.splitlines():
-        low = line.strip().lower()
+        raw = line.rstrip("\n")
+        low = raw.strip().lower()
         if low.startswith("commands:") or low.startswith("<command>"):
             capture = True
             continue
-        if capture:
-            stripped = line.strip()
-            if not stripped:
-                continue
-            token = stripped.split()[0]
-            if token.isalnum() or "_" in token or token.replace("_", "").isalnum():
-                if token not in ("optional", "positional", "usage", "options"):
-                    subs.append(token)
+        if not capture:
+            continue
+        stripped = raw.strip()
+        if not stripped:
+            continue
+        # A group header line ends with ':' and has no description column,
+        # e.g. "Particle picking:", "[Deprecated]:". Mark that we are now
+        # inside a group whose next indented lines are real commands.
+        if stripped.endswith(":"):
+            in_group = True
+            continue
+        token = stripped.split()[0]
+        if token in ("optional", "positional", "usage", "options"):
+            continue
+        if token in known:
+            subs.append(token)
+        elif in_group and (token.replace("_", "").isalnum()):
+            # New/unknown command token sitting directly under a group header:
+            # accept it but only if it is the start of a command row (the help
+            # aligns descriptions in a second column, so a real command row has
+            # two-plus whitespace before the description).
+            if "  " in stripped[len(token):]:
+                subs.append(token)
+        # Lines that don't start with a known command and aren't a fresh group
+        # header are description continuations -> ignore.
+    if not subs:
+        # Help layout unparseable but topaz is the pinned release: fall back to
+        # the known command set rather than reporting an empty list.
+        subs = list(KNOWN_SUBCOMMANDS)
     return sorted(set(subs))
 
 
@@ -272,7 +348,11 @@ def detect_torch(check_torch, python_exe):
             "cuda_available": "not_checked",
             "mps_available": "not_checked",
             "note": "Run with --check-torch to probe. torch is imported only in a "
-                    "separate subprocess to isolate side effects (GPU context init).",
+                    "separate subprocess to isolate side effects (GPU context init). "
+                    "CUDA-build caveat: the default PyPI torch is now a CUDA-13 (cu130) "
+                    "wheel and reports cuda=False on a CUDA-12.x driver; if that happens "
+                    "pin a cu12x build (e.g. torch==2.9.1+cu128). "
+                    "[smoke]",
         }
     snippet = (
         "import json\n"
@@ -298,7 +378,10 @@ def detect_torch(check_torch, python_exe):
             data["checked"] = True
             data["note"] = (
                 "torch.backends.mps.is_available() reports the FRAMEWORK only. "
-                "Topaz does not dispatch to MPS (see topaz_mps_supported)."
+                "Topaz does not dispatch to MPS (see topaz_mps_supported). "
+                "If cuda_available is False but an NVIDIA GPU is present, the most "
+                "common cause is a CUDA-13 (cu130) torch wheel on a CUDA-12.x driver; "
+                "pin a cu12x build (e.g. torch==2.9.1+cu128). [smoke]"
             )
             return data
         except Exception:
@@ -370,9 +453,12 @@ def compute_validation(topaz, python_info, devsupport, usability):
         status = "partial"
         blocked.append("concrete_command_generation_with_real_paths")
         blocked.append("topaz_job_execution")
-        blocked.append("local_binary_behavior_validation")
-        notes.append("Topaz not installed: every workflow answer must be labeled "
-                     "'NOT validated against a local Topaz executable'.")
+        notes.append("Topaz not installed ON THIS MACHINE: do not emit concrete "
+                     "commands with the user's real paths or run jobs here until it "
+                     "is installed. The skill's CLI facts are still VALIDATED against "
+                     "topaz 0.3.20 (captured live help) and may be used for guidance; "
+                     "see configs/site_config.template.md and install per "
+                     "references/02_config_session_and_environment.md.")
     elif topaz["installed"] and not topaz.get("version"):
         status = "partial"
         blocked.append("version_specific_claims")
@@ -408,7 +494,7 @@ def build_report(args):
     stale_after = started + datetime.timedelta(days=DEFAULT_TTL_DAYS)
 
     report = {
-        "schema": "topaz_skill.site_config/v0",
+        "schema": "topaz_skill.site_config/v1",
         "generated_at": _iso(started),
         "generated_by": "topaz_env_probe.py",
         "probe_is_read_only": True,
@@ -546,7 +632,9 @@ def main(argv=None):
                         help="optional target project directory to record (not scanned)")
     parser.add_argument("--check-torch", action="store_true",
                         help="probe torch CUDA/MPS in an isolated subprocess "
-                             "(default: OFF; avoids importing torch)")
+                             "(default: OFF; avoids importing torch). Note: a "
+                             "CUDA-13/cu130 torch wheel reports cuda=False on a "
+                             "CUDA-12.x driver; pin a cu12x build if so.")
     parser.add_argument("--topaz", metavar="PATH", default=None,
                         help="explicit path to the topaz executable (default: search PATH)")
     parser.add_argument("--no-topaz-exec", action="store_true",

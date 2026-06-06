@@ -70,7 +70,14 @@ notes:                   # [..]
 ```
 
 ## Interpretation rules
-- `topaz.installed=false` OR `validation_status∈{partial,blocked,stale}` → **templates
-  only**, label "NOT validated against a local Topaz executable", surface `blocked_capabilities`.
-- `topaz_mps_supported` is **false** by source; never override from a torch MPS flag.
+- `topaz.installed=false` OR `validation_status∈{partial,blocked,stale}` → gather/refresh the
+  environment and offer to install Topaz if it is uninstalled-on-this-host; on
+  `validation_status=valid`, concrete commands with the user's real paths AND (confirmed)
+  execution are allowed. Surface `blocked_capabilities` when present.
+- `topaz_mps_supported` is **false** by source (no MPS code path in topaz/ at
+  `58fe5237` — [sourced 0.3.20 @ 58fe5237: topaz/]); never override from a torch MPS flag.
+  If the probe reports Apple Silicon / no NVIDIA GPU, Topaz runs CPU-only; pass `-d -1`.
+- Run the probe with `--check-torch` to confirm the torch CUDA build: default PyPI torch is now
+  CUDA-13 (cu130) and reports `cuda_available=false` on a CUDA-12 driver — pin a cu12x build
+  (e.g. `torch==2.9.1+cu128`) [smoke].
 - Refresh when stale (see staleness policy in the probe output / ref 02).

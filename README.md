@@ -45,9 +45,11 @@ skills/annika/                Execution-side structural-biology skills/protocols
   ├── chimerax/               UCSF ChimeraX model editing and map fitting
   ├── coot/                   Coot model building and local refinement
   ├── cryosparc/              AI agent skill for cryoSPARC workflows, masks, and cautious automation
+  ├── cryolo-skill/            crYOLO particle-picking skill, config-first and validated against crYOLO 1.9.9 (NEW)
+  ├── cryodrgn-skill/          cryoDRGN heterogeneity reconstruction skill, config-first and validated against cryoDRGN 4.2.1 (NEW)
   ├── mask/                   Headless ChimeraX model/map-derived cryo-EM mask generation
   ├── relion/                 RELION 5 SPA/tomo workflow guidance and CLI-grounded automation templates
-  ├── topaz-skill/            Topaz particle-picking/denoising guidance with config-first safety gates (NEW)
+  ├── topaz-skill/            Topaz particle-picking/denoising guidance, validated against Topaz 0.3.20 (UPDATED)
   ├── emerald/                Rosetta EMERALD ligand docking into cryo-EM density
   ├── isolde/                 ISOLDE interactive refinement in ChimeraX
   ├── phenix/                 Phenix real-space and reciprocal-space refinement
@@ -86,6 +88,11 @@ Connect them with an A2A JSON-RPC gateway or equivalent message bus. Use the tem
 See [`docs/full_system_implementation.md`](docs/full_system_implementation.md). Optional public PDB/PDBe lookup tools can be exposed via [`docs/pdbe_mcp_setup.md`](docs/pdbe_mcp_setup.md).
 
 ## Changelog
+
+### v8 (2026-06-06)
+- **Added** `skills/annika/cryolo-skill/` — config-first crYOLO particle-picking skill validated against crYOLO 1.9.9 on a Linux + NVIDIA host; local/private probe outputs are intentionally not bundled.
+- **Added** `skills/annika/cryodrgn-skill/` — config-first cryoDRGN heterogeneity reconstruction skill validated against cryoDRGN 4.2.1 on a Linux + NVIDIA host; local/private probe outputs are intentionally not bundled.
+- **Updated** `skills/annika/topaz-skill/` — rewritten/validated against Topaz 0.3.20 with live help + GPU smoke evidence; local/private probe outputs remain excluded.
 
 ### v7 (2026-06-05)
 - **Added** `skills/annika/topaz-skill/` — config-first, source-grounded Topaz skill for particle picking, denoising, coordinate conversion, install/device guidance, and safe placeholder workflow templates. Local probe outputs (`configs/site_config.local.*`) are intentionally not bundled.

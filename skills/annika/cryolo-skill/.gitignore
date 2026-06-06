@@ -1,5 +1,5 @@
 # Local/private generated config reports — contain hostname/paths/env details.
-# Never commit, package, or upload (see references/00_scope_and_trust.md / safety).
+# Never commit, package, or upload (see references/07_safety_license_privacy.md).
 configs/site_config.local.md
 references/environment/local_env_probe_*.md
 
