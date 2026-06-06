@@ -3,6 +3,8 @@
 # An external agent has an approved plan and wants claude to carry it out.
 # Claude CLI runs with bypassPermissions so it never stalls on permission UI;
 # safety/approval is handled by the calling agent, cwd/worktree, and budget/timeout.
+# In -p/non-TTY mode Claude skips workspace-trust prompts. Run this only from
+# an intended trusted cwd/worktree/sandbox selected by the parent agent.
 #
 # Inputs:
 #   $1 — path to file containing the approved plan
@@ -60,7 +62,7 @@ ENVELOPE=$(
         --effort max \
         --model sonnet \
         --fallback-model haiku \
-        --max-budget-usd 1.00 \
+        --max-budget-usd 20 \
         --output-format json \
         --json-schema "$SCHEMA" \
         "Execute the plan provided on stdin."

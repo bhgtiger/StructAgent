@@ -12,6 +12,10 @@ AutoGen, custom). Demonstrates the patterns covered in SKILL.md:
   - hard subprocess timeouts and budget caps
   - robust envelope parsing (always check is_error)
 
+Note: `claude -p` / non-TTY mode skips workspace-trust prompts, and invalid
+settings files can be silently ignored. The parent orchestrator must choose a
+trusted cwd/sandbox and keep critical guardrails on the command line.
+
 Requires: `claude` CLI on $PATH and Python 3.10+. If you enable `--bare`,
 provide `ANTHROPIC_API_KEY` or an apiKeyHelper; desktop Claude Max / claude.ai
 login works only for non-bare calls. See references/safety.md.
@@ -179,7 +183,7 @@ def execute(
     role: str = "You are an executor agent invoked by an external planner. The plan is on stdin.",
     model: str = "sonnet",
     effort: str = "max",
-    budget_usd: float = 1.0,
+    budget_usd: float = 20.0,
     timeout_s: int = 600,
     cwd: str | None = None,
     feedback_schema: dict[str, Any] | None = EXECUTE_FEEDBACK_SCHEMA,

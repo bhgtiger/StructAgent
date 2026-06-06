@@ -1,6 +1,6 @@
 # Flag cheatsheet (alphabetical)
 
-Every flag the skill discusses, with one-line semantics. Verified against `claude --help` for version 2.1.x.
+Every flag the skill discusses, with one-line semantics. Verified against `claude --help` for version 2.1.167.
 
 | Flag | One-line meaning |
 |---|---|
@@ -10,7 +10,7 @@ Every flag the skill discusses, with one-line semantics. Verified against `claud
 | `--allow-dangerously-skip-permissions` | Enable `--dangerously-skip-permissions` as an option (not on by default). |
 | `--allowedTools / --allowed-tools <tools...>` | Permission allowlist for non-bypass modes. Do not treat as safety boundary when `bypassPermissions` is used. |
 | `--append-system-prompt <prompt>` | Append text after the default system prompt. **Preferred for role-setting in agents.** |
-| `--bare` | Strip hooks, LSP, plugin sync, auto-memory, keychain, CLAUDE.md discovery. Sets `CLAUDE_CODE_SIMPLE=1`. |
+| `--bare` | Strip hooks, LSP, plugin sync, attribution, auto-memory, keychain, CLAUDE.md discovery. Sets `CLAUDE_CODE_SIMPLE=1`; requires explicit API key/helper auth or 3P provider credentials. |
 | `--betas <names...>` | API beta headers (API-key users only). |
 | `--brief` | Enable SendUserMessage tool for agent-to-user communication. |
 | `--chrome` | Enable Claude in Chrome integration. |
@@ -22,7 +22,7 @@ Every flag the skill discusses, with one-line semantics. Verified against `claud
 | `--disallowedTools / --disallowed-tools <tools...>` | Denylist of tools. Fails open on new tools. |
 | `--effort <level>` | Reasoning effort: low / medium / high / xhigh / max; local operator rollout defaults to `--effort max`. |
 | `--exclude-dynamic-system-prompt-sections` | Move cwd/env/memory/git-status to first user message for better cache reuse. |
-| `--fallback-model <model>` | Auto-fallback if primary overloaded. **`-p` only.** |
+| `--fallback-model <model[,model...]>` | Auto-fallback if primary overloaded. **`-p` only.** Comma-separated list is tried in order; primary is retried at each turn. |
 | `--file <specs...>` | Download resources at startup. Format: `file_id:relative_path`. |
 | `--fork-session` | When resuming, branch off with a new session ID. |
 | `--from-pr [value]` | Resume session linked to a PR. |
@@ -42,6 +42,7 @@ Every flag the skill discusses, with one-line semantics. Verified against `claud
 | `--output-format <fmt>` | `text` (default), `json`, or `stream-json`. `-p` only. |
 | `-p, --print` | Non-interactive mode: print response and exit. **Required for subprocess use.** |
 | `--permission-mode <mode>` | `default`, `plan`, `acceptEdits`, `dontAsk`, `bypassPermissions`, `auto`; local operator rollout uses `bypassPermissions` for all headless calls. |
+| `--prompt-suggestions [value]` | Emit predicted next-user-prompt messages in print/SDK mode. Leave off for orchestration. |
 | `--plugin-dir <path>` | Load plugin from directory or .zip. Repeatable. |
 | `--plugin-url <url>` | Fetch plugin .zip from URL. Repeatable. |
 | `--remote-control [name]` | Start an interactive session with Remote Control enabled. |
@@ -54,7 +55,7 @@ Every flag the skill discusses, with one-line semantics. Verified against `claud
 | `--strict-mcp-config` | Ignore MCP configs outside `--mcp-config`. |
 | `--system-prompt <prompt>` | **Replaces** default system prompt. Use sparingly. |
 | `--tmux` | Create a tmux session for a `--worktree` session. |
-| `--tools <tools...>` | Specify available tools. `""` disables all; with bypass use explicit tool names for execution. |
+| `--tools <tools...>` | Specify available tools. `""` disables all; `"default"` exposes the default set; with bypass use explicit tool names for execution. |
 | `--verbose` | Verbose output. |
 | `-v, --version` | Print version. |
 | `-w, --worktree [name]` | Create git worktree for the session. |

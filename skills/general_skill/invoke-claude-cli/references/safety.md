@@ -15,6 +15,8 @@ Read this whenever you are about to grant Claude any tool capability beyond pure
 
 In local operator's rollout, `--permission-mode bypassPermissions` is deliberately used for all headless subprocess calls so Claude CLI never stalls on internal permission UI. That moves the safety boundary to the **parent agent**: approved plan, explicit cwd/worktree/sandbox, budget, timeout, `--effort max`, logs, and user feedback handling.
 
+Current Claude Code `-p` / non-TTY mode skips the workspace-trust dialog. Headless runs must therefore start in a cwd the parent already trusts; the interactive trust prompt is not a safety backstop.
+
 ## The dangerous flags
 
 ### `--dangerously-skip-permissions`
@@ -70,6 +72,12 @@ A Claude that's stuck in a tool loop (e.g. repeatedly retrying a failing Bash co
 ### Missing subprocess timeout
 
 Independent of `--max-budget-usd`. Always pass `timeout=` to `subprocess.run` (or equivalent). Suggest 600s for execution tasks, 120s for plan critique.
+
+### Trust, settings, and MCP/doctor side effects
+
+In `-p` mode, settings files that fail validation are silently ignored with no error dialog. Do not rely on `--settings` or `--setting-sources` as the only enforcement point for budgets, permissions, tool policy, or auth; pass critical controls directly on the command line and verify the response envelope.
+
+`claude doctor` is not a harmless read-only check in untrusted repositories. It skips the workspace-trust dialog and can spawn stdio servers declared in `.mcp.json` during health checks. Treat `claude doctor` and MCP health checks as code execution. For hermetic child runs, prefer explicit `--mcp-config` plus `--strict-mcp-config` so user/project MCP config is ignored.
 
 ## Sandbox patterns
 

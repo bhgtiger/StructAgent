@@ -1,6 +1,6 @@
 ---
 name: invoke-claude-cli
-description: Guide for invoking Claude Code's `claude` CLI (2.1.158+) as a headless subprocess from another agent or orchestrator. Use before writing or modifying calls like `claude -p`, `subprocess.run(["claude", ...])`, shell pipelines, LangGraph/n8n/AutoGen nodes, or handoffs where GPT/Gemini/local LLM asks Claude to review plans, execute approved changes, continue a session, or ask for user feedback. local operator rollout policy is `--permission-mode bypassPermissions --effort max` with `--max-budget-usd 20` as the delegated review/execution cap (toy/one-shot haiku critiques stay much cheaper); parent agent handles approval, cwd/sandbox safety, structured feedback, resume, JSON/stream parsing, auth/`--bare`, effort/model/budget limits, dangerous-flag rules, and gating of newer cloud/interactive surfaces (`ultrareview`, `--remote-control`, `--brief`, worktrees, `claude agents`).
+description: Guide for invoking Claude Code's `claude` CLI (minimum 2.1.158; verified against 2.1.167) as a headless subprocess from another agent or orchestrator. Use before writing or modifying calls like `claude -p`, `subprocess.run(["claude", ...])`, shell pipelines, LangGraph/n8n/AutoGen nodes, or handoffs where GPT/Gemini/local LLM asks Claude to review plans, execute approved changes, continue a session, or ask for user feedback. local operator rollout policy is `--permission-mode bypassPermissions --effort max` with `--max-budget-usd 20` as the delegated review/execution cap (toy/one-shot haiku critiques stay much cheaper); parent agent handles approval, cwd/sandbox safety, structured feedback, resume, JSON/stream parsing, auth/`--bare`, effort/model/budget limits, dangerous-flag rules, and gating of newer cloud/interactive surfaces (`ultrareview`, `--remote-control`, `--brief`, worktrees, `claude agents`).
 ---
 
 # Invoking the `claude` CLI from another agent
@@ -46,6 +46,12 @@ echo "Review this plan: rewrite auth in Go" | claude -p --permission-mode bypass
 
 That's it. `-p` (a.k.a. `--print`) makes Claude run non-interactively, read the prompt from argv or stdin, print one response, and exit. Without `-p`, `claude` opens an interactive TUI and an agent subprocess will hang. Without `--permission-mode bypassPermissions`, a tool-using headless run can stall or auto-deny when Claude would normally ask for permission. Without `--effort max`, calls may run at lower reasoning depth than the operator wants for delegated work.
 
+### Non-interactive trust & settings caveat (2.1.167)
+
+`-p` and any non-TTY stdout mode skip Claude Code's workspace-trust dialog. For headless orchestration, the trust dialog is **not** a backstop: only run `claude` in a cwd you already trust, or in a disposable worktree/container/VM.
+
+Also, in `-p` mode, settings files that fail validation are silently ignored — no interactive error dialog appears. That includes `--settings` and `--setting-sources`. Do **not** rely on a settings file as your only guardrail for tools, budget, permission mode, or auth. Keep the critical guardrails on the invocation itself: explicit cwd/sandbox, `--tools`, `--max-budget-usd`, subprocess timeout, and parent-agent approval.
+
 The prompt can be passed three ways — pick whichever your host language makes cleanest:
 
 | Method | Example | When to use |
@@ -61,6 +67,8 @@ The prompt can be passed three ways — pick whichever your host language makes 
 - **`text`** (default) — plain prose. Fine for human eyes, fragile for parsing.
 - **`json`** — one JSON object on a single line. **Use this for all programmatic calls.**
 - **`stream-json`** — newline-delimited JSON events as Claude works. Use only when you need progress updates or token-by-token streaming.
+
+Leave `--prompt-suggestions` off for orchestrated calls. If enabled in print/SDK mode, Claude emits an extra `prompt_suggestion` message after each turn; streaming/SDK consumers must ignore that event and wait for the final `result` envelope.
 
 ### The `json` envelope
 
@@ -182,9 +190,10 @@ Claude has built-in tools (Read, Edit, Write, Bash, Grep, Glob, WebFetch, etc.).
 ### Three flags, three meanings
 
 - **`--tools ""`** — disable all tools. Use for pure critique/analysis of pasted input.
+- **`--tools "default"`** — expose the default built-in tool set. Avoid in orchestrators; prefer explicit tools.
 - **`--tools "Edit" "Read" "Write" "Grep" "Glob" "Bash"`** — explicit tool availability for execution. With `bypassPermissions`, Bash is still arbitrary; this is not a command allowlist.
-- **`--allowedTools ...`** — permission allowlist for non-bypass modes. Do not rely on it as the safety boundary in this rollout; use `--tools` + cwd/sandbox + parent-agent approval.
-- **`--disallowedTools ...`** — denylist. Avoid for agents; it fails open on future tools.
+- **`--allowedTools ...` / `--allowed-tools ...`** — permission allowlist for non-bypass modes. Do not rely on it as the safety boundary in this rollout; use `--tools` + cwd/sandbox + parent-agent approval.
+- **`--disallowedTools ...` / `--disallowed-tools ...`** — denylist. Avoid for agents; it fails open on future tools.
 
 ### Bash sub-command syntax
 
@@ -233,7 +242,7 @@ The intended pairing for local operator's agent rollout: **`--permission-mode by
 |---|---|
 | `--model haiku` / `--model sonnet` / `--model opus` | Pick a model family by alias; the alias resolves to the latest model in that family (`opus` → Claude Opus 4.8 today). |
 | `--model claude-sonnet-4-6` | Pick by exact model ID. |
-| `--fallback-model haiku` | If the primary model is overloaded, fall back. **Only works with `-p`.** Must differ from `--model`; do not pair `--model haiku --fallback-model haiku`. |
+| `--fallback-model haiku` | If the primary model is overloaded, fall back. **Only works with `-p`.** Accepts one model or a comma-separated list tried in order; the CLI retries the primary at the start of each user turn. Use a different model than `--model` — same-model fallback is a no-op. |
 | `--max-budget-usd <amount>` | Hard cap on spend. Run aborts if exceeded. Only with `-p`. Required on any unattended automation. local operator policy: `--max-budget-usd 20` for delegated review/execution; `~0.05`–`0.10` for toy haiku critiques. |
 | `--effort max` | Highest reasoning effort (CLI choices: `low`, `medium`, `high`, `xhigh`, `max`). **Default for local operator agents.** Lower only if local operator explicitly asks. |
 
@@ -244,7 +253,7 @@ For all local operator agent calls, include `--effort max` by default. Two budge
 - **Delegated review / execution (local operator policy default):** `--max-budget-usd 20` on Opus or Sonnet for any meaningful review or execution dispatched on local operator's behalf — e.g. `/ultrareview`-style multi-file critiques, headless plan execution, or anything the orchestrator can't redo cheaply. The cap is sized so a single high-effort Opus pass on a real diff can finish; the orchestrator still enforces approval, cwd/sandbox, timeout, and post-run accounting, so a runaway tool loop trips before the wallet does. Note the wallet/extra-usage limit on local operator's account may bite earlier than `$20` per call — read `total_cost_usd` after each run and back off if you see usage-limit errors (see "Usage-limit and partial-success handling" below).
 - **Toy / high-volume one-shots:** Pure pasted-text critique with no tools and `--model haiku` can stay at `--max-budget-usd 0.05`–`0.10` per call. Do not bump these toward `20` — wider caps on cheap loops just mean a wider blast radius if Claude misbehaves.
 
-Omit `--fallback-model` when the primary is already `haiku`; use `--fallback-model haiku` only for primary `sonnet`/`opus`. Escalate to `sonnet`/`opus` for execution tasks where reasoning matters.
+Omit `--fallback-model` when the primary is already `haiku`; use `--fallback-model haiku` or an ordered comma list only for primary `sonnet`/`opus`. Escalate to `sonnet`/`opus` for execution tasks where reasoning matters.
 
 ## Clean, hermetic runs: `--bare`
 
@@ -253,14 +262,15 @@ Omit `--fallback-model` when the primary is already `haiku`; use `--fallback-mod
 - Hook execution
 - LSP integration
 - Plugin sync
+- Attribution
 - Auto-memory loading
 - Background prefetches
 - Keychain reads (so you must use `ANTHROPIC_API_KEY` or `apiKeyHelper` via `--settings`)
 - `CLAUDE.md` auto-discovery
 
-Use it when you want a reproducible, cache-friendly call with zero side effects from the host environment. Skills still resolve, but you must explicitly pass context via `--system-prompt[-file]`, `--append-system-prompt[-file]`, `--add-dir`, `--mcp-config`, `--settings`, `--agents`, `--plugin-dir`.
+It also sets `CLAUDE_CODE_SIMPLE=1`. Use it when you want a reproducible, cache-friendly call with zero side effects from the host environment. Skills still resolve via `/skill-name`, but you must explicitly pass context via `--system-prompt[-file]`, `--append-system-prompt[-file]`, `--add-dir`, `--mcp-config`, `--settings`, `--agents`, `--plugin-dir`.
 
-**Auth warning:** `--bare` disables OAuth/keychain reads. If the host is logged in with Claude Max / claude.ai instead of `ANTHROPIC_API_KEY` or an `apiKeyHelper` passed via `--settings`, `claude -p --bare ...` exits 0 with `is_error: true` and `result: "Not logged in"`. For local OpenClaw agents on local operator's Mac, default to non-bare calls unless an API key/helper is explicitly configured.
+**Auth warning:** `--bare` disables OAuth/keychain reads. If the host is logged in with Claude Max / claude.ai instead of `ANTHROPIC_API_KEY` or an `apiKeyHelper` passed via `--settings`, `claude -p --bare ...` exits 0 with `is_error: true` and `result: "Not logged in"`. Third-party providers (Bedrock, Vertex, Foundry) use their own credentials. For local OpenClaw agents on local operator's Mac, default to non-bare calls unless an API key/helper is explicitly configured. Because invalid settings are silently ignored under `-p`, a malformed `--settings` apiKeyHelper file usually surfaces as `is_error:true` / `Not logged in`, not as a settings-validation error.
 
 For CI and for non-Claude orchestrators driving `claude` with API-key auth, `--bare` is the right baseline. For desktop agents using subscription login, prefer `--no-session-persistence` plus tight tools/budget without `--bare`.
 
@@ -274,6 +284,14 @@ Non-bare runs still receive Claude Code's dynamic cwd/env/git context. For pure 
 - `cd /target/repo && claude -p ...` — preferred for orchestrators; explicit and easy to audit.
 
 If your agent is calling `claude` from one repo to operate on another, **always set cwd**, don't rely on `--add-dir` as the only mechanism.
+
+Remember: `-p` skips the workspace-trust dialog. Treat cwd selection as an explicit security decision, not an interactive prompt Claude will handle later.
+
+## MCP and doctor caveats
+
+`claude doctor` is not a harmless read-only probe in untrusted repos: in current Claude Code it skips the workspace-trust dialog and spawns stdio servers from `.mcp.json` during health checks. Those servers are arbitrary local processes. Do not run `claude doctor` or MCP health checks in untrusted/secret-bearing repositories.
+
+For `claude mcp list` / `claude mcp get`, unapproved project-scoped `.mcp.json` servers are shown as pending and are not connected; approved servers may be health-checked. For hermetic child runs, pass explicit `--mcp-config` plus `--strict-mcp-config` so host/user/project MCP config is ignored.
 
 ## Exit codes and error handling
 
@@ -334,9 +352,15 @@ The three patterns the orchestrating agent will most commonly use are bundled as
 
 A Python wrapper showing how a non-Claude agent (e.g. GPT-based orchestrator) would call these is at `scripts/claude_client.py`.
 
-## Newer CLI workflows (2.1.158+)
+## Newer CLI workflows (minimum 2.1.158; verified on 2.1.167)
 
-The flags and subcommands below appear in `claude --help` on 2.1.158. They mostly target interactive / cloud / plugin surfaces; treat each as **opt-in for orchestrators** and prefer the OpenClaw equivalents where available. Always re-check with `claude --version` and `claude --help` before relying on a flag — the surface drifts release-to-release.
+The flags and subcommands below appear in `claude --help` on 2.1.167. They mostly target interactive / cloud / plugin surfaces; treat each as **opt-in for orchestrators** and prefer the OpenClaw equivalents where available. Always re-check with `claude --version` and `claude --help` before relying on a flag — the surface drifts release-to-release.
+
+### Versioning (`claude update|upgrade`, `claude install`)
+
+- `claude update` / `claude upgrade` checks for updates and installs when available.
+- `claude install <stable|latest|version>` installs a native build target.
+- Orchestrators should verify `claude --version` against a known-good build at startup and avoid auto-updating mid-run. If the CLI is upgraded, re-capture `claude --help` and re-audit this skill before relying on new flags.
 
 ### Worktrees and tmux (`--worktree`, `--tmux`)
 
@@ -350,6 +374,12 @@ The flags and subcommands below appear in `claude --help` on 2.1.158. They mostl
 - `claude agents` opens the background-agent dashboard; `claude agents --json` lists live background sessions for scripting. Useful for inspecting what other Claude sessions are running on the host before spawning more.
 - `--agent <name>` selects a single named agent for the current session; `--agents '{"reviewer": {...}}'` injects custom agent definitions inline. Either can be combined with `-p` for headless calls and is handy when you want a tightly-scoped persona (e.g. "reviewer", "test-writer") without writing a full `--append-system-prompt`.
 - Keep these subordinate to OpenClaw orchestration: the parent agent owns plan approval, cwd/sandbox, budget, and structured feedback. Custom agents are a prompt/role convenience, not a safety boundary — they still run under whatever `--permission-mode` and `--tools` you pass.
+
+### Plugin vs skill terminology
+
+- Claude Code skills are invoked as slash commands like `/skill-name`. In `--bare` mode, skills still resolve, but auto-memory and `CLAUDE.md` discovery do not.
+- `--disable-slash-commands` disables **all skills** despite the name. Use it in hermetic child runs if you want to prevent accidental skill activation.
+- `claude plugin` manages plugins; `claude plugin init|new <name>` scaffolds under `~/.claude/skills/<name>/` and auto-loads as `<name>@skills-dir` next session. Plugins and skills share this tree, so be precise about which surface you mean.
 
 ### `ultrareview` (cloud-hosted multi-agent review)
 
@@ -372,15 +402,27 @@ The flags and subcommands below appear in `claude --help` on 2.1.158. They mostl
 |---|---|
 | `--file <id:path> ...` | Stage file resources at session start (download by ID into the cwd). Use when the parent has already uploaded artifacts the child needs; otherwise pipe via stdin or `--add-dir`. |
 | `--from-pr [value]` | Resume a session linked to a PR number/URL. Convenient for "continue the review we did on PR #123" handoffs; pair with `--resume` semantics. Verify PR access before invoking. |
-| `--plugin-dir <path>` / `--plugin-url <url>` | Load a plugin from disk or a URL for this session only (both repeatable). Useful for sandboxed experiments without mutating user-level plugin config. `--plugin-url` fetches over the network — gate it behind explicit approval. |
+| `-n, --name <name>` | Label a session for `/resume` picker and terminal title; useful for audit trails in spawned runs. |
+| `--plugin-dir <path>` / `--plugin-url <url>` | Load a plugin from a directory/`.zip` or a URL for this session only (both repeatable). Useful for sandboxed experiments without mutating user-level plugin config. `--plugin-url` fetches over the network — gate it behind explicit approval. |
 | `--chrome` / `--no-chrome` | Toggles the Chrome integration. Headless orchestrators should leave it off (default). |
 | `--ide` | Auto-connects to a detected IDE on startup. Interactive convenience; do not pass in `-p` calls. |
+| `--debug [filter]` / `--debug-file <path>` | Diagnose hung, over-budget, MCP, or hook-influenced calls. `--mcp-debug` is deprecated; use `--debug`. |
 | `--include-hook-events` | Emits hook lifecycle events in the stream (only with `--output-format=stream-json`). Useful when debugging hook-driven workflows. |
 | `--include-partial-messages` | Streams partial message chunks (only with `-p` + `--output-format=stream-json`). Use for token-level progress UIs; otherwise wastes bandwidth. |
 | `--input-format stream-json` | Lets the parent feed events into the child in real time (only with `-p`). Pair with `--output-format=stream-json` for bidirectional streaming agents. Text input remains the default for one-shot calls. |
+| `--prompt-suggestions [true|false]` | In print/SDK mode, emits a `prompt_suggestion` message after each turn. Leave off by default; ignore these events if enabled. |
 | `--replay-user-messages` | Echoes user messages back on stdout for acknowledgment (requires `--input-format=stream-json` + `--output-format=stream-json`). Useful when the parent needs receipt confirmation in a streaming loop. |
 | `--setting-sources <user,project,local>` | Restricts which settings layers load. Use with `--bare` or in hermetic CI runs to avoid surprises from project-local settings. |
+| `--strict-mcp-config` | Use only MCP servers passed by `--mcp-config`; ignore other MCP configurations. Preferred for hermetic child runs. |
 | `--exclude-dynamic-system-prompt-sections` | Moves cwd/env/git/memory blocks out of the system prompt into the first user message; improves cross-user prompt-cache reuse. Only applies with the default system prompt — silently ignored when `--system-prompt` replaces it. |
+| `--betas <betas...>` | API beta headers for API-key users only; keep out of default orchestrator calls unless explicitly needed. |
+
+### Informational subcommands
+
+- `claude auth` manages authentication.
+- `claude setup-token` creates a long-lived token for Claude subscription accounts; this can make `--bare` viable on a subscription-login Mac when paired with explicit settings/helper plumbing.
+- `claude auto-mode` inspects the classifier behind `--permission-mode auto`; do not rely on `auto` as an orchestration safety boundary.
+- `claude project` manages Claude Code project state.
 
 ## Common pitfalls
 
@@ -393,9 +435,11 @@ The flags and subcommands below appear in `claude --help` on 2.1.158. They mostl
 7. **Reading `result` without checking `is_error`** — `is_error: true` runs still produce a `result` field (containing the error message). They also exit 0.
 8. **Passing secrets in argv** — argv is visible in `ps`. Use env vars or stdin.
 9. **Letting Claude ask vague questions** — require `status="needs_feedback"` with concrete `questions`, preserve `session_id`, ask the user, then resume.
-10. **Running `ultrareview` without approval** — it uploads branch/PR code to a cloud pipeline and is billable. Always confirm scope with the user before invoking; never wire it into an automatic orchestrator step.
-11. **Passing `--brief` by default** — lets the child Claude talk to the human directly via `SendUserMessage`, bypassing parent orchestration. Omit unless the parent explicitly authorizes it; route everything through the structured-feedback contract instead.
-12. **Using `--worktree`/`--tmux`/`--remote-control`/`--ide`/`--chrome` from `-p`** — these are interactive surfaces. Prefer OpenClaw `sessions_spawn`/ACP for isolated child sessions, and reserve worktree/tmux for explicit human-in-the-loop spikes.
+10. **Assuming `-p` will show trust/settings errors** — it skips workspace trust, and invalid settings can be silently ignored. Run only in trusted cwd and keep guardrails on the CLI invocation.
+11. **Running `claude doctor` in an untrusted repo** — it skips workspace trust and may spawn `.mcp.json` stdio servers. Treat it as code execution.
+12. **Running `ultrareview` without approval** — it uploads branch/PR code to a cloud pipeline and is billable. Always confirm scope with the user before invoking; never wire it into an automatic orchestrator step.
+13. **Passing `--brief` by default** — lets the child Claude talk to the human directly via `SendUserMessage`, bypassing parent orchestration. Omit unless the parent explicitly authorizes it; route everything through the structured-feedback contract instead.
+14. **Using `--worktree`/`--tmux`/`--remote-control`/`--ide`/`--chrome` from `-p`** — these are interactive surfaces. Prefer OpenClaw `sessions_spawn`/ACP for isolated child sessions, and reserve worktree/tmux for explicit human-in-the-loop spikes.
 
 ## Further reading
 

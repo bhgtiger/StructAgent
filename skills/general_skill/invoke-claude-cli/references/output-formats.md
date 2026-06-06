@@ -14,7 +14,7 @@ Use only when a human will read it. Don't grep, don't regex — Claude's phrasin
 
 ## `json` (single-object result)
 
-One JSON object on a single line, terminated by newline, then exit. Schema (captured from `claude` 2.1.x; field names are stable across the 2.x series):
+One JSON object on a single line, terminated by newline, then exit. Schema (verified on `claude` 2.1.167; field names are stable across the 2.x series):
 
 ```jsonc
 {
@@ -91,7 +91,7 @@ session_id = envelope["session_id"]
 
 ### Schema-validated structured output
 
-`--json-schema '<JSON Schema>'` constrains the answer to match the schema. Current Claude Code (2.1.133) returns that parsed object in `structured_output`; older builds returned a JSON string in `.result`. The CLI validates before exiting; a non-conforming output causes `is_error: true` with a validation message.
+`--json-schema '<JSON Schema>'` constrains the answer to match the schema. Current Claude Code (2.1.167) returns that parsed object in `structured_output`; older builds returned a JSON string in `.result`. The CLI validates before exiting; a non-conforming output causes `is_error: true` with a validation message.
 
 ```bash
 claude -p --permission-mode bypassPermissions --effort max --output-format json \
@@ -128,12 +128,15 @@ Event types you'll see, in approximate order:
 | `assistant` | Each assistant-role message | `message.content`, `message.stop_reason` |
 | `tool_use` | Claude invoked a tool | `name`, `input`, `id` |
 | `tool_result` | Tool returned | `tool_use_id`, `content`, `is_error` |
+| `prompt_suggestion` | Only when `--prompt-suggestions` is enabled in print/SDK mode | predicted next user prompt; ignore for result parsing |
 | `result` | Final, equivalent to the single object you'd get from `--output-format json` | (full envelope) |
 
 The **last** event is always a `result` event with the same schema as single-shot `json` output. So a streaming consumer can:
 
 1. Render `assistant` deltas in real time.
 2. On `result`, capture `session_id`, `total_cost_usd`, etc.
+
+Leave `--prompt-suggestions` off for normal orchestration. If someone enables it, treat `prompt_suggestion` as advisory UI data, not as Claude's answer or the final envelope.
 
 ### Streaming parser sketch
 
@@ -186,3 +189,9 @@ This is what orchestrators wanting a persistent Claude subprocess use. The input
 | Token-by-token streaming | `--output-format stream-json --include-partial-messages` |
 | Persistent multi-message subprocess | `--input-format stream-json --output-format stream-json` |
 | Human-only display | `--output-format text` (default) |
+
+## Non-interactive caveats
+
+`-p` and non-TTY stdout skip Claude Code's workspace-trust dialog. Only parse output from runs launched in a cwd you already trust or in a disposable sandbox/worktree.
+
+In `-p` mode, settings files that fail validation are silently ignored with no error dialog. Do not rely on `--settings` / `--setting-sources` as the only way to enforce budgets, tool policy, permission mode, or auth; keep those guardrails explicit on the command line and validate the JSON envelope (`is_error`, `total_cost_usd`, `permission_denials`) after every run.

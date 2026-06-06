@@ -8,6 +8,8 @@
 #
 # Output: each turn's structured payload printed in order; session ID printed to stderr.
 # If a turn returns status=needs_feedback, ask the user and resume this session.
+# In -p/non-TTY mode Claude skips workspace-trust prompts. Keep this in a
+# deliberate trusted cwd, or adapt it to run from a neutral temp dir for Q&A.
 
 set -euo pipefail
 

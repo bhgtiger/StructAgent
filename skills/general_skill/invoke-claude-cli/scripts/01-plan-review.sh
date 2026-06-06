@@ -46,6 +46,8 @@ fi
 
 # Run pure critique from a neutral cwd. Non-bare Claude Code sees cwd/git
 # dynamic context even when tools are disabled; avoid biasing the review.
+# In -p/non-TTY mode Claude skips workspace-trust prompts, so use only a cwd
+# the caller already trusts (here: an empty temp dir).
 RUN_CWD=$(mktemp -d)
 trap 'rm -rf "$RUN_CWD"' EXIT
 
