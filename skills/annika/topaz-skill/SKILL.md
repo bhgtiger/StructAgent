@@ -1,16 +1,16 @@
 ---
 name: topaz-skill
 description: >-
-  Source-grounded assistant for Topaz (tbepler/topaz), the cryo-EM particle
-  picking and micrograph/tomogram denoising package (CLI `topaz`, PyPI
-  `topaz-em`). Use when the user asks to install, configure, understand, or
-  generate commands for Topaz workflows — training/segmentation/extraction for
-  particle picking, denoise/denoise3d, preprocess/downsample/normalize, or
-  coordinate-format conversion. ALWAYS runs a config/environment session first
-  and never installs Topaz or runs Topaz compute jobs without explicit
-  confirmation. Emits concrete, validated commands with the user's real paths
-  and, after explicit confirmation on a probe-'valid' machine, MAY run real
-  Topaz jobs on the user's data with output safeguards.
+  Config-first, VALIDATED, ready-to-use assistant for Topaz (tbepler/topaz), the
+  cryo-EM particle picking and micrograph/tomogram denoising package (CLI `topaz`,
+  PyPI `topaz-em`). Validated end-to-end on GPU (2026-06-06, topaz 0.3.20). Use when
+  the user asks to install, configure, understand, or generate commands for Topaz
+  workflows — training/segmentation/extraction for particle picking, denoise/denoise3d,
+  preprocess/downsample/normalize, or coordinate-format conversion. ALWAYS runs a
+  config/environment session first; on a probe-'valid' machine it emits concrete,
+  validated commands with the user's real paths and, after explicit confirmation, MAY
+  run real Topaz jobs on the user's data with output safeguards — never installs Topaz
+  or runs compute jobs without confirmation.
 version: 1.0.0
 license: Skill text MIT-style for this repo; Topaz itself is GPLv3.
 metadata:

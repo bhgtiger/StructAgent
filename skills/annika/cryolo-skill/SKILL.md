@@ -1,15 +1,15 @@
 ---
 name: cryolo-skill
 description: >-
-  Config-first assistant for SPHIRE-crYOLO, the cryo-EM particle picker. Use when
-  the user asks whether/how to install, configure, or run crYOLO (cryolo_gui.py,
+  Config-first, VALIDATED, ready-to-use assistant for SPHIRE-crYOLO, the cryo-EM
+  particle picker. Validated against crYOLO 1.9.9 on Linux + NVIDIA (GPU, 2026-06-06).
+  Use when the user asks whether/how to install, configure, or run crYOLO (cryolo_gui.py,
   cryolo_predict.py, training, general-model picking, config JSON, BOX/STAR/CBOX
   outputs), whether their machine (macOS/Apple Silicon, Linux, NVIDIA/CUDA) can run
   crYOLO, how to plan crYOLO commands, crYOLO licensing/commercial-use questions, or
   troubleshooting (GPU not used, slow picking). Before any concrete command,
-  device/support claim, or workflow recommendation it REQUIRES reading or running a
-  local environment/config probe. The skill is VALIDATED against crYOLO 1.9.9 on
-  Linux + NVIDIA; on a probe verdict of supported/partial it emits concrete commands
+  device/support claim, or workflow recommendation it reads or runs a local
+  environment/config probe; on a supported/partial verdict it emits concrete commands
   with the user's real paths and may run real jobs after explicit user confirmation;
   it still performs no blind installs or model downloads.
 version: 1.0.0

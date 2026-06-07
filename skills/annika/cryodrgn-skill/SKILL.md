@@ -2,14 +2,14 @@
 name: cryodrgn-skill
 version: 1.0.0
 description: >-
-  Config-first, source-grounded assistant for cryoDRGN (neural heterogeneous
-  cryo-EM / cryo-ET reconstruction). Explains scope, inputs/outputs, the CLI
-  namespace, data formats, workflows, interoperability, and troubleshooting,
-  grounded in pinned cryoDRGN 4.2.1 sources. It REQUIRES a current environment
-  config report before any machine-specific suitability claim, concrete command,
-  or workflow recommendation. Validated against cryoDRGN 4.2.1 on Linux+NVIDIA;
-  on a probe-'ready' host it emits concrete commands and runs jobs after explicit
-  user confirmation; still no blind installs/uploads.
+  Config-first, VALIDATED, ready-to-use assistant for cryoDRGN (neural heterogeneous
+  cryo-EM / cryo-ET reconstruction). Validated against cryoDRGN 4.2.1 on Linux+NVIDIA
+  (GPU, 2026-06-06). Explains scope, inputs/outputs, the CLI namespace, data formats,
+  workflows, interoperability, and troubleshooting, grounded in pinned cryoDRGN 4.2.1
+  sources. REQUIRES a current environment config report before any machine-specific
+  suitability claim, concrete command, or workflow recommendation; on a probe-'ready'
+  host it emits concrete commands and runs jobs after explicit confirmation — still no
+  blind installs/uploads.
 keywords:
   - cryodrgn
   - cryo-em
