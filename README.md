@@ -45,11 +45,12 @@ skills/annika/                Execution-side structural-biology skills/protocols
   ├── chimerax/               UCSF ChimeraX model editing and map fitting
   ├── coot/                   Coot model building and local refinement
   ├── cryosparc/              AI agent skill for cryoSPARC workflows, masks, and cautious automation
-  ├── cryolo-skill/            crYOLO particle-picking skill, config-first and validated against crYOLO 1.9.9 (NEW)
-  ├── cryodrgn-skill/          cryoDRGN heterogeneity reconstruction skill, config-first and validated against cryoDRGN 4.2.1 (NEW)
+  ├── cryolo-skill/            crYOLO particle-picking skill, config-first and validated against crYOLO 1.9.9
+  ├── cryodrgn-skill/          cryoDRGN heterogeneity reconstruction skill, config-first and validated against cryoDRGN 4.2.1
+  ├── deepemhancer-skill/      DeepEMhancer map post-processing skill, config-first and validation-gated
   ├── mask/                   Headless ChimeraX model/map-derived cryo-EM mask generation
   ├── relion/                 RELION 5 SPA/tomo workflow guidance and CLI-grounded automation templates
-  ├── topaz-skill/            Topaz particle-picking/denoising guidance, validated against Topaz 0.3.20 (UPDATED)
+  ├── topaz-skill/            Topaz particle-picking/denoising guidance, validated against Topaz 0.3.20
   ├── emerald/                Rosetta EMERALD ligand docking into cryo-EM density
   ├── isolde/                 ISOLDE interactive refinement in ChimeraX
   ├── phenix/                 Phenix real-space and reciprocal-space refinement
@@ -88,6 +89,10 @@ Connect them with an A2A JSON-RPC gateway or equivalent message bus. Use the tem
 See [`docs/full_system_implementation.md`](docs/full_system_implementation.md). Optional public PDB/PDBe lookup tools can be exposed via [`docs/pdbe_mcp_setup.md`](docs/pdbe_mcp_setup.md).
 
 ## Changelog
+
+### v9 (2026-06-07)
+- **Added** `skills/annika/deepemhancer-skill/` — config-first DeepEMhancer post-processing skill with environment probing, confirmation-gated install/model-download/run scripts, and static packaging validator; local/private config outputs are intentionally not bundled.
+- **Updated** `skills/annika/cryolo-skill/`, `skills/annika/cryodrgn-skill/`, and `skills/annika/topaz-skill/` frontmatter descriptions to mark the live-validated, ready-to-use release status.
 
 ### v8 (2026-06-06)
 - **Added** `skills/annika/cryolo-skill/` — config-first crYOLO particle-picking skill validated against crYOLO 1.9.9 on a Linux + NVIDIA host; local/private probe outputs are intentionally not bundled.
