@@ -73,6 +73,8 @@ Two real paths, both grounded:
 
 Apply the same one-micrograph round-trip / y-flip check (above) on first use.
 
+**CryoSPARC-orchestrated adapter format.** If the workflow starts and ends inside cryoSPARC (for example, a cryoSPARC External Job that runs crYOLO and returns native pick result groups), keep the adapter contract in the cryoSPARC skill: `cryosparc/references/29_external_tool_bridge_format.md` plus `23_external_jobs.md`. This crYOLO skill remains the source of truth for crYOLO commands, native STAR/CRYOSPARC/EMAN/CBOX outputs, and crYOLO-side validation.
+
 ## napari-boxmanager and the box tools
 
 These ship with crYOLO 1.9.9 (confirmed present in `_versions.txt` "which scripts" list):

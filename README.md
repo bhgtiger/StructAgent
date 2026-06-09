@@ -44,7 +44,7 @@ skills/annika/                Execution-side structural-biology skills/protocols
   ├── ccp4/                   Refmac5, AceDRG, CCP4 suite orchestration
   ├── chimerax/               UCSF ChimeraX model editing and map fitting
   ├── coot/                   Coot model building and local refinement
-  ├── cryosparc/              AI agent skill for cryoSPARC workflows, masks, and cautious automation
+  ├── cryosparc/              AI agent skill for cryoSPARC workflows, masks, external-tool bridges, and cautious automation
   ├── cryolo-skill/            crYOLO particle-picking skill, config-first and validated against crYOLO 1.9.9
   ├── cryodrgn-skill/          cryoDRGN heterogeneity reconstruction skill, config-first and validated against cryoDRGN 4.2.1
   ├── deepemhancer-skill/      DeepEMhancer map post-processing skill, config-first and validation-gated
@@ -89,6 +89,11 @@ Connect them with an A2A JSON-RPC gateway or equivalent message bus. Use the tem
 See [`docs/full_system_implementation.md`](docs/full_system_implementation.md). Optional public PDB/PDBe lookup tools can be exposed via [`docs/pdbe_mcp_setup.md`](docs/pdbe_mcp_setup.md).
 
 ## Changelog
+
+### v10 (2026-06-09)
+- **Updated** `skills/annika/cryosparc/` with a cryoSPARC ⇄ RELION focused-3D-classification round-trip add-on: new `28_relion_class3d_roundtrip.md` workflow page plus config-driven `scripts/roundtrip/` bundle for uid-preserving class split/re-refinement.
+- **Updated** `skills/annika/relion/` with the reciprocal cross-link to the cryoSPARC-owned round-trip workflow.
+- **Added** `skills/annika/cryosparc/references/29_external_tool_bridge_format.md` — a hub/spoke adapter manifest for future cryoSPARC-orchestrated crYOLO, cryoDRGN, RELION, or other external-tool integrations while keeping each tool skill independently usable. Cross-linked from crYOLO/cryoDRGN interop references.
 
 ### v9 (2026-06-07)
 - **Added** `skills/annika/deepemhancer-skill/` — config-first DeepEMhancer post-processing skill with environment probing, confirmation-gated install/model-download/run scripts, and static packaging validator; local/private config outputs are intentionally not bundled.

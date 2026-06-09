@@ -181,6 +181,7 @@ These come straight out of the forum corpus and the troubleshooting topic:
 
 - **RELION Bayesian Polishing on a CryoSPARC-aligned particle set.** This is the most-cited reason to round-trip. Bridge support exists but is experimental; raw movies must be imported in CryoSPARC up front.
 - **A specific RELION classification or refinement mode that CryoSPARC does not offer**, when you also want the speed of CryoSPARC's earlier stages.
+- **Focused RELION 3D classification of a CryoSPARC local-refine region, then per-class re-refinement back in CryoSPARC** (preserving native poses/CTF). This is a full workflow with its own page and automation — see `28_relion_class3d_roundtrip.md` (+ `scripts/roundtrip/`).
 - **Side-by-side method comparison for a paper.** Reproduce the result in both packages from the same particles to demonstrate robustness.
 - **Compatibility with collaborators or downstream tools that consume RELION outputs.** This is a workflow decision, not a scientific one — accept the bookkeeping.
 
@@ -304,6 +305,8 @@ See Section 3.4 above for the full version. Compressed checklist:
 
 ## 10. Cross-links
 
+- Focused RELION 3D-classification ⇄ cryoSPARC round-trip (the full workflow that uses this bridge), with config-driven automation: `28_relion_class3d_roundtrip.md` + `scripts/roundtrip/`
+- External-tool bridge manifest/adapter contract for future crYOLO/cryoDRGN/RELION-style integrations: `29_external_tool_bridge_format.md`
 - Canonical import recipe, gain refs, exposure groups, path-suffix mechanics: `02_import.md`
 - External picks need Extract from Micrographs before 2D/3D: `05_extraction_2d.md`
 - FSC honesty, sharpening differences vs RELION PostProcess, mask cautions: `10_postprocessing.md`

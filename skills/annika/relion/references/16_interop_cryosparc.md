@@ -175,6 +175,7 @@ Do **not** treat 2018-2020 forum recipes as current — `.cs` schema and cryoSPA
 - `05_picking_extraction.md` — Extract / `relion_preprocess` `--invert_contrast`, box/scale choices.
 - `01_star_and_metadata.md` — STAR `data_optics`/`data_particles` structure and label semantics.
 - `17_interop_cryodrgn.md`, `18_interop_chimerax_coot_phenix.md`, `19_interop_coordinates.md` — sibling interop pages.
+- **Full round-trip workflow** "focused RELION 3D classification of a cryoSPARC local-refine region → split by class → re-refine each class back in cryoSPARC (native poses/CTF preserved)" is owned by the **cryosparc** skill: `28_relion_class3d_roundtrip.md` + the config-driven `scripts/roundtrip/` bundle. This page (RELION-side binaries: csparc2star, `relion_image_handler` downsample, `relion_mask_create` soften, `relion_refine --skip_align` focused Class3D) supplies the RELION legs that workflow drives.
 - `21_error_lookup.md` — error-string lookup (`ObservationModel::getBoxSize`, missing-stack, KeyError).
 - Sibling skills that own execution: **cryosparc** (the cryoSPARC-side Import recipe, exposure groups, path-suffix tuning, RBMC, forum corpus — `27_relion_interop.md`); **cryolo** (picking), **mask** / **chimerax** (mask generation), **phenix** / **coot** / **chimerax** (downstream model building).
 

@@ -1,6 +1,6 @@
 ---
 name: cryosparc
-description: Guide and automate cryoSPARC SPA processing: import/preprocessing, picking, extraction/2D, ab initio, homogeneous/heterogeneous/non-uniform refinement, 3D classification, 3DVA/3DFlex, local/focused refinement, masks, symmetry, helical, CryoSPARC Live, cryosparc-tools, cryosparcm admin, GPU lanes/queues, storage, RELION interop, troubleshooting, and error lookup. Covers tomography/cryo-ET only at the SPA boundary (e.g. tilted-SPA vs tilt-series, importing tomo-derived particles); it is not a native tomo/cryo-ET pipeline.
+description: Guide and automate cryoSPARC SPA processing: import/preprocessing, picking, extraction/2D, ab initio, homogeneous/heterogeneous/non-uniform refinement, 3D classification, 3DVA/3DFlex, local/focused refinement, masks, symmetry, helical, CryoSPARC Live, cryosparc-tools, cryosparcm admin, GPU lanes/queues, storage, RELION interop, external-tool bridge formats, troubleshooting, and error lookup. Covers tomography/cryo-ET only at the SPA boundary (e.g. tilted-SPA vs tilt-series, importing tomo-derived particles); it is not a native tomo/cryo-ET pipeline.
 ---
 
 # cryoSPARC
@@ -59,6 +59,8 @@ Specialized references:
 - Continuous heterogeneity: 3DVA/3DFlex → `26_continuous_heterogeneity.md`
 - External jobs: DeepEMhancer/ModelAngelo/custom wrappers → `23_external_jobs.md`
 - RELION interop / STAR import-export → `27_relion_interop.md`
+- RELION focused 3D-classification ⇄ cryoSPARC round-trip (workflow + automation) → `28_relion_class3d_roundtrip.md` (executable bundle: `scripts/roundtrip/`)
+- External-tool bridge format for crYOLO/cryoDRGN/RELION-style adapters → `29_external_tool_bridge_format.md`
 - Disk/storage/cleanup/export → `24_disk_and_storage.md`
 
 Automation/admin:
@@ -109,9 +111,11 @@ Ask before:
 - **Official tutorial/case-study by name, EMPIAR ID, or similar dataset phenotype:** load `case_studies_and_tutorials.md` first as a scenario map, choose the dominant matching playbook, then load the smallest listed workflow reference(s). If the user asks generic stage-specific “what next?” without a case-study-like phenotype, use `18_decision_trees.md` first instead. If the request is broader than a single phenotype ("plan a whole dataset", "give me a protocol"), start at `28_spa_playbook.md`.
 - **Continuous heterogeneity (3DVA / 3DFlex):** load `26_continuous_heterogeneity.md` (+ `09_local_refinement.md` if the user is mixing in particle subtraction or masked analysis).
 - **RELION ↔ cryoSPARC interop / STAR import-export:** load `27_relion_interop.md` (+ `02_import.md` for import-side specifics, `particle_set_operations.md` if combining/diffing particle sets across packages).
+- **"Classify a (local-refine) region in RELION then re-refine each class back in cryoSPARC" / RELION 3D-class round-trip / split particles by RELION class and push back preserving poses:** load `28_relion_class3d_roundtrip.md` (workflow, parameter rationale, validation) and use `scripts/roundtrip/` (config-driven cryosparc-tools automation). Defer to `08_classification_3d.md` if the user would rather classify natively in cryoSPARC.
 - **Particle set operations (union / intersect / difference / dedup across jobs):** load `particle_set_operations.md`.
 - **UI label → API parameter name lookup:** load `ui_to_api_crosswalk.md` (+ `13_cryosparc_tools_api.md` if the user is about to script it).
 - **Automation script/API:** load `13_cryosparc_tools_api.md` + `ui_to_api_crosswalk.md`.
+- **External tool integration format / "run crYOLO or cryoDRGN from cryoSPARC and bring results back" / adapter design:** load `29_external_tool_bridge_format.md` + `23_external_jobs.md`, then load the independent tool skill (`cryolo-skill`, `cryodrgn-skill`, or `relion`) for native CLI details.
 - **Queue/GPU problem:** load `21_gpu_lane_queue.md` + `14_cli_admin.md`.
 
 ## Prior-session notes

@@ -418,6 +418,7 @@ Treat the project tree as the primary record; treat MongoDB GridFS assets and th
 - `24_disk_and_storage.md` — where wrapper and External-Job outputs land in the project tree; archive / compact / restore guarantees and what falls outside them.
 - `10_postprocessing.md` — interpretation of DeepEMhancer, FSC, Orientation Diagnostics. The wrapper's *operational* shape lives here; its *scientific* shape lives there.
 - `27_relion_interop.md` — round-trips with RELION; not an External Job in the cryosparc-tools sense, but the same provenance discipline applies.
+- `29_external_tool_bridge_format.md` — standard adapter manifest and hub/spoke pattern for future crYOLO, cryoDRGN, RELION, or other external-tool integrations that start/end in cryoSPARC.
 - `15_troubleshooting.md` — five-bucket triage; external/wrapper failures usually live in buckets 2 (env / SSH / shell) and 5 (workflow misuse / mismatched inputs).
 - `18_decision_trees.md` — branching rules for "do not chase parameters when the failure is at the install / env / wrapper layer."
 - `17_error_lookup.md` — exact-string lookup, including CTFFIND4 failed-output assertion, numpy index errors, worker-launch SSH issues.

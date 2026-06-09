@@ -110,6 +110,8 @@ cryodrgn_utils write_cs    <particles.cs> --ind <indices.pkl> -o <outdir>/kept.c
 > Use `filter_cs` directly. To create a `.cs` from a raw `.mrcs`/`.star` stack, export from
 > cryoSPARC itself — no cryoDRGN util builds one.
 
+**CryoSPARC-orchestrated adapter format.** If the workflow starts and ends inside cryoSPARC (for example, cryoSPARC particles → cryoDRGN latent analysis → class selections or volumes returned to cryoSPARC), keep the adapter contract in the cryoSPARC skill: `cryosparc/references/29_external_tool_bridge_format.md` plus `23_external_jobs.md`. This cryoDRGN skill remains the source of truth for cryoDRGN CLI commands, `.cs`/`.star` parsing, filtering constraints, and cryoDRGN-side validation. Preserve/filter the original cryoSPARC `.cs` when writing selections back; do not pretend cryoDRGN can synthesize a new cryoSPARC particle dataset from arbitrary stacks.
+
 ## Handedness across tools
 
 cryoEM tools differ in handedness conventions. `cryodrgn_utils flip_hand` flips a

@@ -1,0 +1,35 @@
+{
+  "instance": {
+    "license": "PUT-INSTANCE-LICENSE-ID-HERE-or-null",
+    "host": "your-cryosparc-master.example.org",
+    "port": 39000
+  },
+
+  "project": "P###",
+  "workspace": "W###",
+
+  "source_job": "J###",
+  "source_outputs": {
+    "particles": "particles",
+    "volume": "volume",
+    "mask": "mask"
+  },
+
+  "keep_classes": [1, 2, 3, 5],
+
+  "assignment_npz": "/abs/path/relion_proj/JXXX_class3d/class_assign_uid.npz",
+  "work_dir": "/abs/path/relion_proj/JXXX_class3d/cstools",
+
+  "local_refine": {
+    "clone_params_from_source": true,
+    "params_override": {}
+  },
+
+  "nu_refine": {
+    "enabled": true,
+    "whole_mol_ref": { "job": "J###", "output": "volume" },
+    "params": {}
+  },
+
+  "lane": null
+}
