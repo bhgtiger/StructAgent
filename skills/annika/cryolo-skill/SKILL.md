@@ -167,6 +167,7 @@ downloads, GUI auto-launch, and acting on private data without confirmation.
 | Benchmarks, papers, validation claims | `references/08_validation_and_benchmarks.md` |
 | Errors, GPU-not-used, slow picking | `references/09_troubleshooting.md` |
 | Step-by-step branching (gate, support, workflow choice) | `references/10_decision_trees.md` |
+| Pick into a cryoSPARC project / hand picks to cryoSPARC Extract + 2D (general-model → external job) | `references/11_cryosparc_picking_workflow.md` |
 
 ---
 

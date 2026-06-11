@@ -1,0 +1,39 @@
+{
+  "instance": {
+    "license": "PUT-INSTANCE-LICENSE-ID-HERE-or-null",
+    "host": "your-cryosparc-master.example.org",
+    "port": 39000
+  },
+
+  "project": "P###",
+  "workspace": "W###",
+
+  "source_job": "J###",
+  "source_output": "split_0",
+
+  "particle_diameter_A": 110,
+  "cryolo_box_pix": 168,
+  "box_extract_pix": 320,
+  "box_crop_pix": 128,
+  "output_f16": true,
+
+  "threshold": 0.3,
+  "target_per_image": 20,
+
+  "class2D_K": 50,
+  "class2D_window_outer_A": null,
+  "class2D_min_res_align": null,
+
+  "lane": null,
+  "work_dir": "/abs/path/to/cryolo_work",
+
+  "cryolo": {
+    "conda_sh": "/abs/path/to/conda/etc/profile.d/conda.sh",
+    "env": "cryolo",
+    "general_model": "/abs/path/to/LOWPASS_gmodel_phosnet_YYYYMM_NXX_cXX.h5",
+    "filter": "LOWPASS",
+    "low_pass_cutoff": 0.1
+  },
+
+  "montage_python": "/abs/path/to/conda/envs/cryolo/bin/python"
+}

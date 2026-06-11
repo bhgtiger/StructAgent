@@ -1,6 +1,6 @@
 ---
 name: cryosparc
-description: Guide and automate cryoSPARC SPA processing: import/preprocessing, picking, extraction/2D, ab initio, homogeneous/heterogeneous/non-uniform refinement, 3D classification, 3DVA/3DFlex, local/focused refinement, masks, symmetry, helical, CryoSPARC Live, cryosparc-tools, cryosparcm admin, GPU lanes/queues, storage, RELION interop, external-tool bridge formats, troubleshooting, and error lookup. Covers tomography/cryo-ET only at the SPA boundary (e.g. tilted-SPA vs tilt-series, importing tomo-derived particles); it is not a native tomo/cryo-ET pipeline.
+description: Guide and automate cryoSPARC SPA processing: import/preprocessing, picking, extraction/2D, crYOLO general-model picking injection, ab initio, homogeneous/heterogeneous/non-uniform refinement, 3D classification, 3DVA/3DFlex, local/focused refinement, masks, symmetry, helical, CryoSPARC Live, cryosparc-tools, cryosparcm admin, GPU lanes/queues, storage, RELION interop, external-tool bridge formats, troubleshooting, and error lookup. Covers tomography/cryo-ET only at the SPA boundary (e.g. tilted-SPA vs tilt-series, importing tomo-derived particles); it is not a native tomo/cryo-ET pipeline.
 ---
 
 # cryoSPARC
@@ -30,6 +30,7 @@ Core workflow:
 - Import → `02_import.md`
 - Motion/CTF/exposure curation → `03_preprocessing.md`
 - Picking: Blob/Template/Topaz/Filament Tracer → `04_picking.md` (Deep Picker is legacy and was removed in v5.0+; do not propose it for current installs)
+- Picking: crYOLO general-model (template-free) → cryoSPARC extract / 2D (workflow + automation) → `29_cryolo_picking_to_2d.md` (executable bundle: `scripts/cryolo_pick/`)
 - Extraction, 2D classification, box/Fourier crop/Nyquist → `05_extraction_2d.md`
 - Ab initio → `06_abinitio.md`
 - Homogeneous/Heterogeneous/NU refinement → `07_refinement.md`
@@ -104,6 +105,7 @@ Ask before:
 
 - **Error message:** before prescribing fixes, collect (a) the **exact error text** as it appears in the job log, (b) cryoSPARC **master / worker / cryosparc-tools versions**, and (c) whether the offending **path is visible from the worker** (not just the master/UI host) — many "file not found" / permission errors are worker-side path or mount issues. Then load `17_error_lookup.md` + `15_troubleshooting.md` and give cause/fix/inspection commands.
 - **Bad 2D classes:** load `05_extraction_2d.md` + maybe `04_picking.md`.
+- **"Pick with crYOLO's general model and get the picks into cryoSPARC" / template-free picking with no 2D classes yet / inject external crYOLO picks → Extract from Micrographs → 2D:** load `29_cryolo_picking_to_2d.md` (workflow, the external-job pick injection + verified passthrough fix, extract / Y-flip verification / 2D optimization rationale) and use `scripts/cryolo_pick/` (config-driven cryosparc-tools automation; crYOLO runs in its own conda env). Defer to `04_picking.md` for native Blob/Template/Topaz picking, or once you already have a clean seed (Topaz) or good 2D classes (Template Picker).
 - **Bad/refinement streaky map:** load `07_refinement.md`, `10_postprocessing.md`, and if angular bias suspected `orientation_and_preferred_views.md`.
 - **Mask/local refinement question (design, FSC tells, Volume Tools params):** load `20_masks.md` + `09_local_refinement.md`.
 - **"Generate/make mask from model/map", "ChimeraX mask", "molmap", "particle subtraction complement mask":** load `20_masks.md` + `20a_mask_generation_chimerax.md` (+ `09_local_refinement.md` for local-refine / subtraction workflow context). The ChimeraX scripts under `scripts/masks/` are **file-local** — they read maps/models and write `.mrc` + `.json` sidecar; they do **not** touch any cryoSPARC instance and need no live credentials. Importing the resulting `.mrc` into cryoSPARC, running Volume Tools, or queueing Local Refinement / Particle Subtraction still follows the usual cryoSPARC safety confirmation rules below.

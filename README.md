@@ -90,6 +90,10 @@ See [`docs/full_system_implementation.md`](docs/full_system_implementation.md). 
 
 ## Changelog
 
+### v11 (2026-06-11)
+- **Updated** `skills/annika/cryosparc/` with a crYOLO general-model picking → cryoSPARC Extract/2D overlay: new `29_cryolo_picking_to_2d.md` workflow page plus the config-driven `scripts/cryolo_pick/` bundle for external-job pick injection, extraction, Y-flip verification, 2D classification, and optimization.
+- **Updated** `skills/annika/cryolo-skill/` with the reciprocal crYOLO-side workflow reference `references/11_cryosparc_picking_workflow.md`, covering filter-matched general models, box sizing, CBOX re-thresholding, and hand-off to the cryoSPARC automation bundle.
+
 ### v10 (2026-06-09)
 - **Updated** `skills/annika/cryosparc/` with a cryoSPARC ⇄ RELION focused-3D-classification round-trip add-on: new `28_relion_class3d_roundtrip.md` workflow page plus config-driven `scripts/roundtrip/` bundle for uid-preserving class split/re-refinement.
 - **Updated** `skills/annika/relion/` with the reciprocal cross-link to the cryoSPARC-owned round-trip workflow.

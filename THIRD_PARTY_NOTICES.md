@@ -9,6 +9,7 @@ Names of third-party tools, packages, and services are used only to identify int
 - Phenix — the Phenix developers and participating institutions
 - CCP4, Refmac5, AceDRG, Coot, and ISOLDE — their respective project teams and institutions
 - Rosetta and RosettaCommons tools, including EMERALD/GALigandDock workflows — RosettaCommons and the relevant authors/developers
+- SPHIRE-crYOLO — its developers and upstream license terms; this repository ships no crYOLO code or model weights
 - RELION and other external cryo-EM tools referenced in workflow notes — their respective authors/developers
 - PDBe, Protein Data Bank in Europe, and related PDBe API/Search services — EMBL-EBI / PDBe and relevant upstream service maintainers
 
