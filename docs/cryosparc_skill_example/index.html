@@ -240,7 +240,7 @@ export CRYOSPARC_PASSWORD</code></pre>
   </div>
 
   <!-- ===================== Scenario B: one-prompt RELION round-trip ===================== -->
-  <h3 id="roundtrip" style="margin-top:52px;padding-top:30px;border-top:2px solid var(--border)">cryoSPARC - RELION full round-trip in one prompt</h3>
+  <h3 id="roundtrip" style="margin-top:52px;padding-top:30px;border-top:2px solid var(--border)">CryoSPARC - RELION full round trip in one prompt</h3>
   <p>The session above was three separate questions. This one is the opposite shape: <strong>a single instruction</strong>, after which the agent runs an entire <code>cryoSPARC&nbsp;&rarr;&nbsp;RELION&nbsp;focused 3D classification&nbsp;&rarr;&nbsp;cryoSPARC</code> loop on its own &mdash; export, classify, map the classes back, rebuild one refinement per class &mdash; and pauses <em>exactly once</em>, at the single step that starts compute on the instance. The starting point is a consensus refinement <code>J{src}</code> (~258k particles, box 400 @ <code>xxx</code>&nbsp;&Aring;/px). The question: is one small region of the map fully ordered, or only present in a subset of particles?</p>
 
   <div class="chat">
