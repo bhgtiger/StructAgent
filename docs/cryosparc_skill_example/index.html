@@ -64,6 +64,7 @@
     <li><a href="#install">Install</a></li>
     <li><a href="#site-config">Configure for your site</a></li>
     <li><a href="#example">Example session</a></li>
+    <li><a href="#roundtrip">Round-trip example</a></li>
     <li><a href="#snippets">Snippets</a></li>
   </ol>
 </nav>
@@ -164,7 +165,7 @@ export CRYOSPARC_PASSWORD</code></pre>
 <!-- ========================================================= -->
 <section id="example">
   <h2>Example session</h2>
-  <p>A short happy-path session against project <code>Pxxx</code>, showing the three capabilities back-to-back. The baseline is an existing local-refinement job, <code>J{baseline}</code>.</p>
+  <p>A short happy-path session against project <code>Pxxx</code>, showing the three capabilities back-to-back. The baseline is an existing local-refinement job, <code>J{baseline}</code>. <a href="#roundtrip">A second scenario</a> below shows the same skill running an entire cryoSPARC&nbsp;&rarr;&nbsp;RELION&nbsp;&rarr;&nbsp;cryoSPARC classification round-trip from a single instruction.</p>
 
   <h3>1. Consult — what parameters did this job change?</h3>
   <div class="chat">
@@ -237,6 +238,67 @@ export CRYOSPARC_PASSWORD</code></pre>
     <h4>What this shows</h4>
     <p>One short conversation covered all three capabilities: pulling parameters and recommending alternatives (<em>consult</em>), downloading and interpreting job assets (<em>check</em>), and queueing a multi-step protocol after explicit confirmation (<em>run</em>). The agent never touched anything destructive without asking.</p>
   </div>
+
+  <!-- ===================== Scenario B: one-prompt RELION round-trip ===================== -->
+  <h3 id="roundtrip" style="margin-top:52px;padding-top:30px;border-top:2px solid var(--border)">A second scenario &mdash; one prompt, a full RELION round-trip</h3>
+  <p>The session above was three separate questions. This one is the opposite shape: <strong>a single instruction</strong>, after which the agent runs an entire <code>cryoSPARC&nbsp;&rarr;&nbsp;RELION&nbsp;focused 3D classification&nbsp;&rarr;&nbsp;cryoSPARC</code> loop on its own &mdash; export, classify, map the classes back, rebuild one refinement per class &mdash; and pauses <em>exactly once</em>, at the single step that starts compute on the instance. The starting point is a consensus refinement <code>J{src}</code> (~258k particles, box 400 @ <code>xxx</code>&nbsp;&Aring;/px). The question: is one small region of the map fully ordered, or only present in a subset of particles?</p>
+
+  <div class="chat">
+    <div class="msg user"><div class="who">User</div><div class="body"><blockquote>Starting from my consensus refinement <code>J{src}</code>: I think one small region of the map is only ordered in part of the dataset. Using the focus mask <code>xxx_mask.mrc</code>, run a focused 3D classification on just that region in RELION with the cryoSPARC poses held fixed, then split the particles by class and bring each class back into cryoSPARC as its own whole-molecule refinement. Keep the native poses and CTF &mdash; don&rsquo;t re-import the raw stacks.</blockquote></div></div>
+
+    <div class="msg agent"><div class="who">Agent</div><div class="body">
+      <p>Loaded the <code>cryosparc</code> skill (<code>27_relion_interop.md</code> for the metadata bridge, <code>23_external_jobs.md</code> for carrying particle subsets back) plus the companion <code>relion</code> skill for the RELION binaries. This is a <strong>no-re-import</strong> round-trip: the classes get re-joined to the original particles by <code>uid</code>, so cryoSPARC poses + CTF stay native the whole way. Running the export, classification and build legs now; I&rsquo;ll stop before anything queues on the instance.</p>
+
+      <p><strong>1 &middot; cryoSPARC &rarr; RELION.</strong> Exported <code>J{src}</code>&rsquo;s particles with <code>csparc2star.py</code> (<code>--boxsize 400</code>), built a <code>.mrcs</code> symlink farm with absolute paths (the STAR says <code>.mrcs</code> while the data is <code>.mrc</code> on disk &mdash; the documented extension gotcha), and downsampled box <strong>400&nbsp;&rarr;&nbsp;128</strong> for classification (<code>relion_image_handler</code>). Re-softened the hard cryoSPARC mask for RELION (<code>relion_mask_create --width_soft_edge 6</code>).</p>
+
+      <p><strong>2 &middot; Focused Class3D, poses fixed.</strong> <code>relion_refine --K 4 --skip_align</code> over the masked region. First pass at low <code>--tau2_fudge</code>&nbsp;(T) <strong>collapsed</strong> &mdash; every particle fell into one class, the known small-mask failure mode &mdash; so I raised T; <strong>T=300</strong> gave a balanced, reproducible 4-way split (a tiny mask needs a far higher T than a large one). RELION&nbsp;5 runs <code>--skip_align</code> on CPU, so this leg used <code>mpirun</code>, ~2&ndash;3&nbsp;min/iter &times; 25 iters.</p>
+      <table>
+        <thead><tr><th>Class</th><th>State at the site</th><th>Fraction</th></tr></thead>
+        <tbody>
+          <tr><td>c3</td><td>both sub-features ordered</td><td>38.5%</td></tr>
+          <tr><td>c4</td><td>both sub-features weak</td><td>54.6%</td></tr>
+          <tr><td>c2</td><td>sub-feature 2 missing</td><td>3.9%</td></tr>
+          <tr><td>c1</td><td>sub-feature 1 weak</td><td>3.0%</td></tr>
+        </tbody>
+      </table>
+      <p class="dim">In-mask CC 0.54&ndash;0.78 across classes.</p>
+
+      <p><strong>3 &middot; Map the classes back to <code>uid</code>.</strong> Joined the RELION <code>run_it025_data.star</code> rows onto the cryoSPARC particles by (stack file, in-stack index)&nbsp;&rarr;&nbsp;<code>uid</code>. <strong>Every particle matched</strong> (the join aborts on any unmatched row), so each class is a clean subset of the originals &mdash; no stack re-imported, poses + CTF untouched.</p>
+
+      <p><strong>4 &middot; Built on cryoSPARC (no compute yet).</strong> One <em>External Job</em> wrote a particle subset per class by <code>uid</code>; the harness then built one <code>nonuniform_refine_new</code> per subset in dry-run &mdash; whole molecule, <strong>no focus mask</strong>, initial model = the <code>J{src}</code> volume, refinement params read back from <code>J{src}</code> (<code>inspect-job --print-specs</code>). Everything is in <code>building</code> status; nothing is running.</p>
+
+      <div class="card warn" style="margin-top:4px">
+        <h4>Confirm before compute</h4>
+        <p>Ready to queue <strong>4 subsets + 4 whole-molecule refinements</strong> into <code>Pxxx / Wxxx</code>, lane <code>xxx</code> (the lane <code>J{src}</code> used). ~15&nbsp;min each. This is the only step that starts jobs on the instance &mdash; queue them?</p>
+      </div>
+    </div></div>
+
+    <div class="msg user"><div class="who">User</div><div class="body"><blockquote>Yes, queue them.</blockquote></div></div>
+
+    <div class="msg agent"><div class="who">Agent</div><div class="body">
+      <p>Queued (<code>--commit --queue --queue-confirm QUEUE</code>) and waited. The per-class refinements were run <em>without</em> a focus mask, so they are an independent check on the focused classification &mdash; and they reproduce the split:</p>
+      <table>
+        <thead><tr><th>Class &rarr; refine</th><th>State</th><th>Site density (&sigma; over local background)</th></tr></thead>
+        <tbody>
+          <tr><td><code>J{src}</code></td><td>consensus (all particles)</td><td>both sub-features, averaged over states</td></tr>
+          <tr><td>c3 &rarr; <code>J{r3}</code></td><td>both ordered (38.5%)</td><td>sub-feature 1 <strong>+2.1</strong> / sub-feature 2 <strong>+2.8</strong></td></tr>
+          <tr><td>c4 &rarr; <code>J{r4}</code></td><td>both weak (54.6%)</td><td>sub-feature 1 <strong>&minus;0.2</strong> / sub-feature 2 <strong>&minus;0.6</strong></td></tr>
+        </tbody>
+      </table>
+      <p>(The two minor classes, c1/c2 at 3.0% / 3.9%, refined too but are too small to read confidently.)</p>
+      <p><strong>Conclusion:</strong> the region is <em>not</em> uniformly ordered &mdash; it is fully present in only ~38% of the particles, while in the majority class the density is essentially gone. Because the confirming refinements carried <em>no</em> focus mask, the effect is real, not a classification-mask artifact. All jobs are in <code>Pxxx / Wxxx</code>; the class&ndash;<code>uid</code> assignment is saved for reuse.</p>
+    </div></div>
+  </div>
+
+  <div class="card info">
+    <h4>What this shows</h4>
+    <p>One instruction drove a full <strong>cryoSPARC &rarr; RELION &rarr; cryoSPARC</strong> heterogeneity round-trip. The agent owned the multi-tool plumbing across two skills (STAR/MRCS conversion, downsample, mask soften, focused <code>--skip_align</code> classification, the <code>uid</code> re-join, the per-class rebuild), recovered from the low-T collapse on its own, and &mdash; the point of the whole exercise &mdash; kept the cryoSPARC poses native by <strong>mapping classes back by <code>uid</code> instead of re-importing stacks</strong>, stopping for confirmation only at the single step that starts compute.</p>
+  </div>
+
+  <figure>
+    <img src="roundtrip-ui-2026-06-15.png" alt="Sanitized cryoSPARC project view showing completed External and Local Refine jobs for RELION class particle subsets, with density thumbnails, FSC plots, and completed-state cards." />
+    <figcaption>cryoSPARC web UI &mdash; completed per-class External and Local Refine jobs after the RELION focused-classification round-trip.</figcaption>
+  </figure>
 </section>
 
 <!-- ========================================================= -->
@@ -287,7 +349,7 @@ job.download_asset(asset_id, "/tmp/out.png")</code></pre>
 </main>
 
 <footer>
-  <p>Public example for the unofficial StructAgent AI agent skill for cryoSPARC. Server name, port, license, account, project, and workspace identifiers have been replaced with <code>xxx</code>. The cryoSPARC web-UI screenshot shows generic job tiles.</p>
+  <p>Public example for the unofficial StructAgent AI agent skill for cryoSPARC. Server name, port, license, account, project, workspace, and job identifiers have been replaced with <code>xxx</code> or <code>J{&hellip;}</code> placeholders, and dataset-specific biology is described generically; the workflow steps and numbers are from a real round-trip. The round-trip scenario also uses the companion <a href="https://github.com/bhgtiger/StructAgent/tree/main/skills/annika/relion" target="_blank" rel="noopener"><code>relion</code> skill</a>. The cryoSPARC web-UI screenshot shows generic job tiles.</p>
   <p>Repository: <a href="https://github.com/bhgtiger/StructAgent" target="_blank" rel="noopener">github.com/bhgtiger/StructAgent</a></p>
   <p>Actual skill folder: <a href="https://github.com/bhgtiger/StructAgent/tree/main/skills/annika/cryosparc" target="_blank" rel="noopener">github.com/bhgtiger/StructAgent/tree/main/skills/annika/cryosparc</a></p>
   <p>Third-party notices: <a href="https://github.com/bhgtiger/StructAgent/blob/main/THIRD_PARTY_NOTICES.md" target="_blank" rel="noopener">THIRD_PARTY_NOTICES.md</a></p>
