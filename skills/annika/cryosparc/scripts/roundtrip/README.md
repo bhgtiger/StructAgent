@@ -53,6 +53,7 @@ $EDITOR roundtrip.json     # fill instance/project/workspace/source_job/paths
 | `source_job` | the cryoSPARC **Local Refinement** the RELION classification came from (supplies particles + volume + mask) |
 | `source_outputs` | output group names on `source_job` (defaults: particles/volume/mask — verify with `inspect`) |
 | `keep_classes` | RELION class numbers to keep (drop junk classes) |
+| `force_gs_resplit` | force a fresh, balanced gold-standard split on per-class subset refines; leave `true` unless you have a specific reason to reuse the inherited split |
 | `assignment_npz` | output of `map_relion_classes.py` (the uid↔class map) |
 | `work_dir` | where `built_jobs.tsv` / `nu_jobs.tsv` are written |
 | `local_refine.clone_params_from_source` | reuse the source local-refine's params verbatim (recommended) |
@@ -122,7 +123,19 @@ python cs_roundtrip.py inspect  --config roundtrip.json   # read-only: counts + 
 python cs_roundtrip.py build    --config roundtrip.json   # external subsets + Local Refines (no compute)
 python cs_roundtrip.py queue    --config roundtrip.json --confirm   # queue them (needs a lane)
 python cs_roundtrip.py nurefine --config roundtrip.json --confirm   # per-class whole-mol NU refine
+python cs_roundtrip.py verify   --config roundtrip.json   # post-run count + GS split check
 ```
+
+## Gotcha: gold-standard split on subset refines
+
+Always force a fresh GS split on subset refines. A class subset inherits the
+consensus `alignments3D/split` column through passthrough metadata, and that split
+is often imbalanced for the subset. With `refine_gs_resplit=False`, cryoSPARC may
+cull particles from the oversized half to balance the halves. The tools set
+`refine_gs_resplit=True` by default via `force_gs_resplit`; keep that default unless
+you are deliberately reusing the inherited split. After queued jobs finish, run
+`cs_roundtrip.py verify --config roundtrip.json` and check that particle loss is
+small and the split ratio is near 1:1.
 
 ## Safety
 
@@ -137,7 +150,7 @@ python cs_roundtrip.py nurefine --config roundtrip.json --confirm   # per-class 
 | File | Role |
 |---|---|
 | `rt_common.py` | shared config/connect/assignment helpers (env-only credentials) |
-| `cs_roundtrip.py` | `inspect` / `build` / `queue` / `nurefine` subcommands |
+| `cs_roundtrip.py` | `inspect` / `build` / `queue` / `nurefine` / `verify` subcommands |
 | `map_relion_classes.py` | RELION Class3D data.star → `uid`↔`cls` npz |
 | `relion_prep.py` | `.mrcs` symlink farm + absolute-path rewrite (no binaries) |
 | `roundtrip.example.json` | config template (copy to `roundtrip.json`, edit) |

@@ -26,12 +26,14 @@ Subcommands:
   build     create per-class external subsets + build Local Refinements (no queue)
   queue     queue the built Local Refinements to a lane (needs --confirm + lane)
   nurefine  build per-class whole-molecule NU refinements (queue only with --confirm)
+  verify    post-run check: output count and gold-standard split balance
 
 Usage:
   cs_roundtrip.py inspect  --config roundtrip.json
   cs_roundtrip.py build    --config roundtrip.json
   cs_roundtrip.py queue    --config roundtrip.json --confirm
   cs_roundtrip.py nurefine --config roundtrip.json [--confirm]
+  cs_roundtrip.py verify   --config roundtrip.json
 """
 from __future__ import annotations
 
@@ -45,6 +47,7 @@ import numpy as np  # noqa: E402
 from rt_common import (  # noqa: E402
     load_config, connect, load_assignment, clone_source_params, resolve_lane,
     built_jobs_path, nu_jobs_path, read_job_table, die,
+    apply_subset_refine_params,
 )
 
 
@@ -101,6 +104,7 @@ def cmd_build(cfg, args):
     else:
         params = {}
     params.update(cfg["local_refine"].get("params_override", {}))
+    params = apply_subset_refine_params(cfg, params)
 
     if not cfg["keep_classes"]:
         die("config 'keep_classes' is empty — nothing to build")
@@ -181,7 +185,7 @@ def cmd_nurefine(cfg, args):
         nuj = proj.create_job(
             cfg["workspace"], "nonuniform_refine_new",
             connections={"particles": (ext_uid, "particles"), "volume": ref_pair},
-            params=nu.get("params", {}),
+            params=apply_subset_refine_params(cfg, nu.get("params", {})),
             title=f"NU refine (whole mol) - RELION class {c} (n={n})",
         )
         print(f"class {c}: built NU refine {nuj.uid} "
@@ -205,6 +209,58 @@ def cmd_nurefine(cfg, args):
         print("built but NOT queued (no --confirm). Re-run with --confirm + a lane to queue.")
 
 
+def _split_counts(ds):
+    if "alignments3D/split" not in ds.fields():
+        return [], float("inf")
+    vals, counts = np.unique(ds["alignments3D/split"], return_counts=True)
+    split = [(int(v), int(c)) for v, c in zip(vals, counts)]
+    if len(counts) != 2 or min(counts) == 0:
+        return split, float("inf")
+    return split, float(max(counts) / min(counts))
+
+
+def _verify_refine(cs, project, ext_uid, refine_uid, expected_n, tol, max_ratio):
+    di = cs.find_job(project, ext_uid).load_output("particles", slots="all")
+    do = cs.find_job(project, refine_uid).load_output("particles", slots="all")
+    in_n = len(di)
+    out_n = len(do)
+    expected_n = int(expected_n)
+    culled = in_n - out_n
+    split, ratio = _split_counts(do)
+    ok = culled <= tol and ratio <= max_ratio
+    print(f"{refine_uid}: expected {expected_n}; in {in_n} -> out {out_n} "
+          f"(culled {culled}); split {split} ratio {ratio:.2f} "
+          f"{'OK' if ok else 'FAIL'}")
+    if in_n != expected_n:
+        print(f"  WARNING: job table expected n={expected_n}, external subset now has n={in_n}")
+    return ok
+
+
+def cmd_verify(cfg, args):
+    paths = []
+    if args.job_table:
+        paths.append(args.job_table)
+    else:
+        for p in (built_jobs_path(cfg), nu_jobs_path(cfg)):
+            if os.path.isfile(p):
+                paths.append(p)
+    if not paths:
+        die("no job table found; run build/nurefine first or pass --job-table")
+
+    cs = connect(cfg)
+    all_ok = True
+    for path in paths:
+        rows = read_job_table(path)
+        print(f"\nverifying {len(rows)} rows from {path}")
+        for c, ext_uid, refine_uid, n in rows:
+            ok = _verify_refine(cs, cfg["project"], ext_uid, refine_uid,
+                                n, args.tol, args.max_ratio)
+            all_ok = all_ok and ok
+    if not all_ok:
+        die("one or more subset refines failed count/split verification")
+    print("\nverify OK")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -214,12 +270,20 @@ def main():
         ("build", cmd_build, "build per-class external subsets + Local Refinements"),
         ("queue", cmd_queue, "queue the built Local Refinements (needs --confirm)"),
         ("nurefine", cmd_nurefine, "build per-class NU refinements (queue with --confirm)"),
+        ("verify", cmd_verify, "verify completed subset refines kept particles and resplit GS halves"),
     ]:
         p = sub.add_parser(name, help=helptext)
         p.add_argument("--config", required=True, help="path to roundtrip JSON config")
         if name in ("queue", "nurefine"):
             p.add_argument("--confirm", action="store_true",
                            help="actually queue compute (otherwise dry-run)")
+        if name == "verify":
+            p.add_argument("--job-table",
+                           help="specific TSV to verify; defaults to built_jobs.tsv and nu_jobs.tsv if present")
+            p.add_argument("--tol", type=int, default=200,
+                           help="maximum tolerated particle loss, usually duplicate removal (default: 200)")
+            p.add_argument("--max-ratio", type=float, default=1.5,
+                           help="maximum tolerated GS split imbalance ratio (default: 1.5)")
         p.set_defaults(fn=fn)
     args = ap.parse_args()
     cfg = load_config(args.config)

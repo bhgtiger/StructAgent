@@ -147,9 +147,17 @@ Result: `class_assign_uid.npz` with equal-length `uid` (uint64) and `cls` (int32
 | Step | What it does | Compute? |
 |---|---|---|
 | `inspect` | connect read-only; print source job spec; verify uid↔assignment overlap; per-class counts | none |
-| `build` | for each kept class: `save_external_result` (particle subset, **passthrough** from the source job → poses/CTF preserved) + `create_job("new_local_refine")` connected to subset + source volume + source mask; params **cloned from the source job** | none (jobs left *building*) |
+| `build` | for each kept class: `save_external_result` (particle subset, **passthrough** from the source job → poses/CTF preserved) + `create_job("new_local_refine")` connected to subset + source volume + source mask; params **cloned from the source job** with `refine_gs_resplit=True` forced by default | none (jobs left *building*) |
 | `queue` | queue the built Local Refinements to a lane | yes — `--confirm` + lane required |
-| `nurefine` | for each class build `nonuniform_refine_new` (whole molecule) against a consensus ref (e.g. the parent refinement) | queues only with `--confirm` + lane |
+| `nurefine` | for each class build `nonuniform_refine_new` (whole molecule) against a consensus ref (e.g. the parent refinement), also with `refine_gs_resplit=True` forced by default | queues only with `--confirm` + lane |
+| `verify` | after refines finish, compare each output particle count to its external subset and check the `alignments3D/split` balance | none |
+
+**Gotcha — always force a fresh GS split on subset refines.** A class subset inherits
+the consensus `alignments3D/split` column through passthrough metadata. That split is
+often imbalanced for the subset; with `refine_gs_resplit=False`, cryoSPARC may cull
+particles from the oversized half. The automation sets `refine_gs_resplit=True` by
+default through `force_gs_resplit`. Leave it on unless you are deliberately testing
+reuse of the inherited split, and verify finished jobs with `cs_roundtrip.py verify`.
 
 **Interpretation — pair the two refinements per class:**
 - The **local refine** asks: does the *region* resolve better once conformations are
@@ -179,6 +187,7 @@ Map back + re-refine (cryoSPARC):
 - [ ] `cs_roundtrip.py inspect` → counts + 100% uid overlap.
 - [ ] `build` (no compute) → review jobs in the GUI.
 - [ ] `queue --confirm` (+ `nurefine --confirm`) to a confirmed lane.
+- [ ] `verify` after jobs finish → output count ≈ class count and GS split ≈ 50/50.
 - [ ] Compare each class's local-refine and NU-refine maps/FSCs; decide real states vs sub-states.
 
 ---
@@ -194,6 +203,8 @@ Map back + re-refine (cryoSPARC):
 | `map_relion_classes.py` reports unmatched > 0 | wrong `--strip-suffix`, or wrong `source_job` | match the downsample suffix; point at the job csparc2star converted from |
 | `cs_roundtrip inspect` overlap < 100% | npz built against a different particle set | re-run the mapper on the correct source job |
 | Built Local Refine errors on params | a cloned auto-set param isn't settable | drop it via `local_refine.params_override` (set to default) |
+| Per-class refine output has many fewer particles than input | inherited GS split was reused and cryoSPARC culled an oversized half | keep `force_gs_resplit: true`, rebuild/requeue, then run `verify` |
+| `verify` split ratio > ~1.5 | GS halves are still imbalanced or the output lacks two split labels | confirm `refine_gs_resplit=True` on the job and rebuild if needed |
 | All per-class NU maps identical outside the region | heterogeneity is local-only (not a bug) | this is a real result — report it as such |
 
 ---

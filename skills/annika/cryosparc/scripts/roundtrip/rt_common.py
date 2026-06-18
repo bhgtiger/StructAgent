@@ -57,6 +57,7 @@ def load_config(path: str) -> Dict[str, Any]:
     cfg.setdefault("nu_refine", {})
     cfg["nu_refine"].setdefault("enabled", False)
     cfg["nu_refine"].setdefault("params", {})
+    cfg.setdefault("force_gs_resplit", True)
     cfg.setdefault("lane", None)
     # work_dir defaults to the directory holding the assignment npz
     cfg.setdefault("work_dir", os.path.dirname(os.path.abspath(cfg["assignment_npz"])))
@@ -115,6 +116,20 @@ def clone_source_params(job) -> Dict[str, Any]:
     spec = (getattr(job, "doc", {}) or {}).get("params_spec", {}) or {}
     return {k: v.get("value") for k, v in spec.items()
             if isinstance(v, dict) and "value" in v}
+
+
+def apply_subset_refine_params(cfg: Dict[str, Any], params: Dict[str, Any]) -> Dict[str, Any]:
+    """Force a fresh gold-standard split for a per-class subset refinement.
+
+    The subset External Job preserves source-job passthrough metadata, including
+    alignments3D/split. Reusing that inherited split can silently cull particles
+    from an imbalanced class subset, so per-class Local/NU refines should resplit
+    unless the operator explicitly disables force_gs_resplit in the config.
+    """
+    params = dict(params)
+    if cfg.get("force_gs_resplit", True):
+        params["refine_gs_resplit"] = True
+    return params
 
 
 def resolve_lane(cfg: Dict[str, Any]) -> str | None:

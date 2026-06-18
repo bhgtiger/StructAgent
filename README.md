@@ -90,6 +90,10 @@ See [`docs/full_system_implementation.md`](docs/full_system_implementation.md). 
 
 ## Changelog
 
+### v12 (2026-06-18)
+- **Fixed** `skills/annika/cryosparc/scripts/roundtrip/` so per-class cryoSPARC subset refines force a fresh balanced gold-standard split by default (`force_gs_resplit: true`), preventing inherited imbalanced consensus splits from silently culling particles.
+- **Added** a `cs_roundtrip.py verify` post-run check for subset-refine particle retention and `alignments3D/split` balance, with updated round-trip docs and config template.
+
 ### v11 (2026-06-11)
 - **Updated** `skills/annika/cryosparc/` with a crYOLO general-model picking → cryoSPARC Extract/2D overlay: new `29_cryolo_picking_to_2d.md` workflow page plus the config-driven `scripts/cryolo_pick/` bundle for external-job pick injection, extraction, Y-flip verification, 2D classification, and optimization.
 - **Updated** `skills/annika/cryolo-skill/` with the reciprocal crYOLO-side workflow reference `references/11_cryosparc_picking_workflow.md`, covering filter-matched general models, box sizing, CBOX re-thresholding, and hand-off to the cryoSPARC automation bundle.

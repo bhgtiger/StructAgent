@@ -17,6 +17,8 @@
 
   "keep_classes": [1, 2, 3, 5],
 
+  "force_gs_resplit": true,
+
   "assignment_npz": "/abs/path/relion_proj/JXXX_class3d/class_assign_uid.npz",
   "work_dir": "/abs/path/relion_proj/JXXX_class3d/cstools",
 
