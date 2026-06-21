@@ -1,0 +1,4 @@
+interface:
+  display_name: "DAQplugin"
+  short_description: "Cryo-EM map-model DAQ scoring."
+  default_prompt: "Use $daqplugin to compute or visualize residue-wise DAQ scores for a model and cryo-EM map."

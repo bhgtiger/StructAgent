@@ -7,6 +7,8 @@ description: "Automate UCSF ChimeraX on macOS for structural biology: fitting, s
 
 Automate ChimeraX (≥1.8) on macOS. Analysis + model editing only — no rendering in v1.
 
+For residue-wise DAQ quality scoring, DAQ coloring, `.npy` DAQ grids, DAQ B-factor export, sequence-shift arrows, or live DAQ monitoring, load and use the `daqplugin` skill with this ChimeraX batch pattern.
+
 ## Binary Discovery
 
 ```bash
