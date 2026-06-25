@@ -1,0 +1,17 @@
+# Host-specific configs — never shipped/committed
+configs/site_config.local.md
+
+# Eval/run scratch
+*-workspace/
+evals/runs/
+feedback.json
+
+# Python / OS noise
+__pycache__/
+*.pyc
+.DS_Store
+
+# Any accidental prediction outputs
+boltz_results_*/
+*.ckpt
+*.npz

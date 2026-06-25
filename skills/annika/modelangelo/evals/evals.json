@@ -1,0 +1,80 @@
+{
+  "skill_name": "modelangelo",
+  "_comment": "Eval set for skill-creator's with-skill-vs-baseline loop. Prompts are realistic install scenarios; `expectations` are objectively checkable statements about the assistant's RESPONSE (this skill gives install guidance/commands, not a built model). Grader: did the response follow the skill's config-first + confirmation + source-accuracy contract? See reference_answers.md for the long-form expected behavior and the must-NOT list.",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I want to install ModelAngelo on our lab's Linux workstation — it has an RTX 4090 and conda already. How do I do it, and where will the ~10GB of weights end up?",
+      "expected_output": "Personal-conda route: probe first, clone + official install_script.sh (env model_angelo), set TORCH_HOME, download weights with confirmation; explains weights cache at $TORCH_HOME/hub/checkpoints (not $TORCH_HOME). Confirms before any install.",
+      "files": [],
+      "expectations": [
+        "Recommends running the read-only environment probe (or a config check) BEFORE giving machine-specific install commands",
+        "Uses the personal-conda route: git clone + the official install_script.sh creating a conda env named model_angelo",
+        "States the weight cache resolves to $TORCH_HOME/hub/checkpoints (via torch.hub.get_dir()), NOT $TORCH_HOME itself, and defaults to ~/.cache/torch when TORCH_HOME is unset",
+        "Says it will confirm before running the install / ~10 GB download (does not claim the install already ran)",
+        "Notes ModelAngelo builds models but does not validate them / route to refinement + validation",
+        "Does not invent ModelAngelo CLI flags or a pip/conda package that does not exist (install is from source)"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "can i run model angelo on my macbook m3?",
+      "expected_output": "Blocked: non-Linux/Apple Silicon is unsupported (Linux + NVIDIA/CUDA; SBGrid Linux-64 only). Offers Linux workstation, HPC module, or a Linux container/VM. Does not promise Apple GPU support.",
+      "files": [],
+      "expectations": [
+        "States that macOS / Apple Silicon is not a supported ModelAngelo target (official route is Linux + NVIDIA/CUDA)",
+        "Does NOT promise Apple Silicon / MPS / Metal GPU support or give a macOS install recipe",
+        "Offers concrete alternatives: a Linux workstation, an HPC module (e.g. Biowulf/SBGrid), or a Linux container/VM with GPU passthrough"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I'm the admin for our cryo-EM cluster and need to install ModelAngelo once so all ~50 users can use it. What's the right way to handle the big weight files so we don't download them 50 times?",
+      "expected_output": "Shared route: set TORCH_HOME to a world-readable dir BEFORE downloading, install once with --download-weights, expose a wrapper script on users' PATH; ESM .pt is chmod 0555 so all users can read it; ~10 GB downloaded once.",
+      "files": [],
+      "expectations": [
+        "Recommends setting TORCH_HOME to a shared, world-readable directory BEFORE downloading the weights",
+        "Installs once with weight download (install_script.sh --download-weights / setup_weights for nucleotides + nucleotides_no_seq)",
+        "Mentions exposing a thin wrapper script on all users' PATH so they invoke model_angelo",
+        "Notes the weights (~10 GB, incl. the shared ~7 GB ESM-1b model) are downloaded once and made readable to all users",
+        "Confirms before performing the install / download"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "I ran `model_angelo setup_weights` and it finished fine, but now `model_angelo build` says it can't find the weights. what went wrong?",
+      "expected_output": "Two likely causes: (a) setup_weights default bundle is 'original', but build needs 'nucleotides' — fetch the right bundle; (b) weights are under $TORCH_HOME/hub, check torch.hub.get_dir() and TORCH_HOME consistency.",
+      "files": [],
+      "expectations": [
+        "Identifies that `model_angelo setup_weights` with no --bundle-name downloads the 'original' bundle, but build/refine default to 'nucleotides' (and build_no_seq to 'nucleotides_no_seq')",
+        "Tells the user to fetch the correct bundle: model_angelo setup_weights --bundle-name nucleotides (and nucleotides_no_seq)",
+        "Mentions checking the cache location with torch.hub.get_dir() / that weights live under $TORCH_HOME/hub and TORCH_HOME must match between download and run",
+        "Does not invent a nonexistent flag or claim 'original' is runnable for building"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "My RELION 5 model building job keeps failing with `ModuleNotFoundError: No module named 'model_angelo'` even though I installed model angelo and `model_angelo build -h` works in my terminal. help?",
+      "expected_output": "RELION imports model_angelo as a Python module from its compiled-against env, not the PATH binary. Build/point RELION at the env (-DPYTHON_EXE_PATH) where model_angelo is importable and set TORCH_HOME. A standalone PATH install is not enough.",
+      "files": [],
+      "expectations": [
+        "Explains that RELION 5 imports model_angelo as a Python MODULE from the env it was compiled against, not via the model_angelo PATH binary",
+        "States that a working standalone `model_angelo` on PATH is therefore NOT sufficient for RELION integration",
+        "Recommends building/configuring RELION so `import model_angelo` works in its Python env (e.g. -DPYTHON_EXE_PATH) and that TORCH_HOME is set for that env",
+        "Does not misattribute the error to a broken standalone install when build -h already works"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "our HPC cluster firewall blocks most outbound traffic. how do I get the modelangelo weights onto the compute nodes?",
+      "expected_output": "Offline/air-gapped: pre-fetch on a connected host (setup_weights for nucleotides + nucleotides_no_seq, which pulls ESM-1b), then copy the whole hub/checkpoints tree (preserving model_angelo_v1.0/<bundle>/success.txt + the ESM .pt) to the target's TORCH_HOME/hub. Notes the download hits Zenodo + fbaipublicfiles.",
+      "files": [],
+      "expectations": [
+        "Recommends pre-fetching the weights on a network-connected machine, then copying the cache to the cluster",
+        "Specifies copying the hub/checkpoints tree preserving the model_angelo_v1.0/<bundle>/ (+ success.txt) layout and the ESM .pt files into the target's TORCH_HOME/hub",
+        "Identifies the download endpoints (Zenodo for bundles, dl.fbaipublicfiles.com for the ESM-1b model) as what the firewall blocks",
+        "Does not suggest a nonexistent offline installer flag"
+      ]
+    }
+  ]
+}

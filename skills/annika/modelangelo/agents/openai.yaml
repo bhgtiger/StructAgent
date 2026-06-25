@@ -1,0 +1,7 @@
+interface:
+  display_name: "ModelAngelo Installer"
+  short_description: "Install & set up ModelAngelo on Linux/NVIDIA"
+  default_prompt: "Use $modelangelo to check whether this machine can run ModelAngelo and install it."
+
+policy:
+  allow_implicit_invocation: true

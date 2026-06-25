@@ -1,0 +1,33 @@
+# Codex (OpenAI) UI metadata for the boltz skill.
+# Claude reads SKILL.md frontmatter; Codex reads this file for display/triggering.
+# Keep in sync with SKILL.md's name/description.
+name: boltz
+display_name: Boltz (structure + affinity prediction)
+description: >-
+  Config-first, validated assistant for Boltz (jwohlwend/boltz) — biomolecular
+  structure and Boltz-2 ligand binding-affinity prediction. Install/configure/run
+  Boltz, write YAML inputs, generate correct `boltz predict` commands, interpret
+  confidence/affinity outputs, and troubleshoot CUDA/kernel/OOM/MSA errors.
+  Probes the environment first; never installs or runs without confirmation.
+keywords:
+  - boltz
+  - boltz predict
+  - boltz2
+  - biomolecular structure prediction
+  - protein structure
+  - ligand affinity
+  - affinity prediction
+  - colabfold msa
+  - use_msa_server
+  - jwohlwend
+entrypoint: SKILL.md
+runtime:
+  type: cli
+  notes: >-
+    Requires a Python 3.10-3.12 env with `boltz[cuda]` and an NVIDIA GPU for real
+    runs. Scripts are stdlib/portable; run scripts/boltz_env_probe.py first.
+safety:
+  consent_required:
+    - installing or updating Boltz (scripts/install_boltz.sh needs --yes)
+    - running any prediction (real GPU compute)
+    - using --use_msa_server with confidential sequences (external network)

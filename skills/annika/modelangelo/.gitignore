@@ -1,0 +1,13 @@
+# Per-environment, private config report — NEVER commit or package this.
+# It records a specific machine's hostname/arch/GPU/paths. Only the template ships.
+configs/site_config.local.md
+
+# Any other local/private config variants
+configs/*.local.md
+
+# Python caches
+__pycache__/
+*.pyc
+
+# skill-creator eval workspaces (sibling runs/benchmarks)
+../modelangelo-workspace/

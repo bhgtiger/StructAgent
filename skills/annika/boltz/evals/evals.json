@@ -1,0 +1,74 @@
+{
+  "skill_name": "boltz",
+  "evals": [
+    {
+      "id": 0,
+      "name": "basic-protein-run",
+      "prompt": "I have a single protein sequence and want to predict its structure with Boltz on our GPU box. How do I set up the input and run it?",
+      "expected_output": "A YAML with one protein entry; a `boltz predict ... --use_msa_server` command (or custom MSA); mentions output dir boltz_results_<stem>; tells the user it has not run it / to probe the env first.",
+      "files": [],
+      "assertions": [
+        {"text": "Produces a valid YAML with a protein entry (id + sequence)", "type": "manual"},
+        {"text": "Command uses `boltz predict` and a real flag (--use_msa_server or msa path), no invented flags", "type": "manual"},
+        {"text": "Mentions running the env probe / not assuming the host before executing", "type": "manual"},
+        {"text": "Does not claim the prediction was actually run", "type": "manual"}
+      ]
+    },
+    {
+      "id": 1,
+      "name": "affinity-interpretation",
+      "prompt": "Boltz-2 gave me affinity_pred_value = -1.5 and affinity_probability_binary = 0.92 for my ligand. What does this mean, is it a strong binder?",
+      "expected_output": "Explains probability_binary as binder-vs-decoy (0.92 = likely binder), pred_value as comparative log10(IC50) (lower=stronger; -1.5 ~ sub-µM), only meaningful among active molecules; warns it is a triage signal, not an experimental affinity.",
+      "files": [],
+      "assertions": [
+        {"text": "Distinguishes affinity_probability_binary (binder/decoy) from affinity_pred_value (comparative log10 IC50)", "type": "manual"},
+        {"text": "States lower affinity_pred_value = stronger binding", "type": "manual"},
+        {"text": "Warns it is a prediction/triage signal, not an experimental affinity / not for absolute Kd of inactives", "type": "manual"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "msa-privacy",
+      "prompt": "We have an unpublished therapeutic antibody sequence. Can I just run boltz predict with --use_msa_server to get the structure quickly?",
+      "expected_output": "Flags that --use_msa_server sends the sequence to the public ColabFold server (privacy risk for unpublished IP); recommends a custom offline MSA referenced in the YAML instead.",
+      "files": [],
+      "assertions": [
+        {"text": "Identifies that --use_msa_server uploads the sequence to an external server", "type": "manual"},
+        {"text": "Recommends a custom/offline MSA for the confidential sequence", "type": "manual"}
+      ]
+    },
+    {
+      "id": 3,
+      "name": "oom-troubleshoot",
+      "prompt": "boltz predict crashed with CUDA out of memory on a big protein-protein complex. We have an RTX 2080 Ti (11GB). What can I do?",
+      "expected_output": "Suggests lowering diffusion_samples / max_parallel_samples / sampling_steps / recycling_steps, splitting or shrinking the system, using a larger-VRAM GPU; mentions no official size->VRAM table; does NOT reflexively recommend --no_kernels as an OOM fix (it's for kernel errors).",
+      "files": [],
+      "assertions": [
+        {"text": "Recommends reducing diffusion_samples and/or sampling/recycling steps or system size", "type": "manual"},
+        {"text": "Does not claim a guaranteed VRAM number / size table that does not exist", "type": "manual"}
+      ]
+    },
+    {
+      "id": 4,
+      "name": "affinity-ligand-too-large",
+      "prompt": "I want Boltz affinity for a 140-atom macrocycle binder against my protein. Will that work?",
+      "expected_output": "Explains affinity rejects ligands >128 atoms (heavy + RDKit-kept H) so a 140-atom ligand will error; >56 atoms already warns; single ligand chain only; suggests structure-only prediction instead.",
+      "files": [],
+      "assertions": [
+        {"text": "States ligands >128 atoms are rejected for affinity", "type": "manual"},
+        {"text": "Notes the >56 heavy-atom accuracy warning and/or single-ligand-chain constraint", "type": "manual"}
+      ]
+    },
+    {
+      "id": 5,
+      "name": "model-choice",
+      "prompt": "Should I use Boltz-1 or Boltz-2 for predicting a protein-ligand complex and estimating binding?",
+      "expected_output": "Recommends Boltz-2 (default) because affinity (and templates/contacts/method) are Boltz-2 only; Boltz-1 only to reproduce older results.",
+      "files": [],
+      "assertions": [
+        {"text": "Recommends Boltz-2 and explains affinity is Boltz-2 only", "type": "manual"},
+        {"text": "Notes Boltz-2 is the default model", "type": "manual"}
+      ]
+    }
+  ]
+}
