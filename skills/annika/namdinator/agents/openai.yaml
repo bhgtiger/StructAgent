@@ -1,0 +1,45 @@
+# Codex (OpenAI) UI metadata for the namdinator skill.
+# Claude reads SKILL.md frontmatter; Codex reads this file for display/triggering.
+# Keep in sync with SKILL.md's name/description.
+name: namdinator
+display_name: Namdinator
+description: >-
+  Read-only advisor, command-planner, and troubleshooter for Namdinator, the
+  MDFF-based flexible-fitting pipeline for fitting an already roughly docked
+  atomic model into a cryo-EM or crystallographic map. Plans local CLI or web
+  service use, preflights inputs/environment/privacy, interprets outputs/logs,
+  and flags HETATM/ligand loss, Phenix requirements, and known failure modes.
+keywords:
+  - namdinator
+  - namdinator.au.dk
+  - mdff
+  - flexible fitting
+  - cryo-em map fitting
+  - Namdinator_Generic.sh
+  - last_frame.pdb
+  - last_frame_rsr.pdb
+  - HETATM
+  - AutoPSF
+entrypoint: SKILL.md
+runtime:
+  type: advisory
+  notes: >-
+    Read-only skill. It does not run Namdinator, submit the web form, install
+    dependencies, or edit model/map files. The included preflight script only
+    checks PATH/environment and may write an explicit report if requested.
+safety:
+  consent_required:
+    - any future local Namdinator execution
+    - any future web-service submission
+    - uploading unpublished/private maps or models to namdinator.au.dk
+  hard_limits:
+    - no local Namdinator execution in this version
+    - no web form automation or backend API calls
+    - no publication-ready claims
+interface:
+  display_name: "Namdinator"
+  short_description: "Plan Namdinator MDFF fitting safely"
+  default_prompt: "Use $namdinator to decide whether my model/map case is suitable for Namdinator and draft a safe command plan."
+
+policy:
+  allow_implicit_invocation: true

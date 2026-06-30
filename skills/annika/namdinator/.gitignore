@@ -1,0 +1,12 @@
+# Host-specific configs — never shipped/committed
+configs/site_config.local.md
+configs/*.local.md
+
+# Probe/report scratch
+reports/
+*-workspace/
+
+# Python / OS noise
+__pycache__/
+*.pyc
+.DS_Store
