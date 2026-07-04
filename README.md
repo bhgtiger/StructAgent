@@ -90,6 +90,10 @@ See [`docs/full_system_implementation.md`](docs/full_system_implementation.md). 
 
 ## Changelog
 
+### v13 (2026-07-05)
+- **Updated** the sanitized A2A sender template with gateway readiness checks, retry/backoff controls, configurable timeouts, and explicit message-level `agentId` routing.
+- **Documented** remote A2A troubleshooting for VPN/tailnet deployments, including agent-card reachability, gateway bind address, bearer token, and model-runtime timeout checks.
+
 ### v12 (2026-06-18)
 - **Fixed** `skills/annika/cryosparc/scripts/roundtrip/` so per-class cryoSPARC subset refines force a fresh balanced gold-standard split by default (`force_gs_resplit: true`), preventing inherited imbalanced consensus splits from silently culling particles.
 - **Added** a `cs_roundtrip.py verify` post-run check for subset-refine particle retention and `alignments3D/split` balance, with updated round-trip docs and config template.

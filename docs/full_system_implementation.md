@@ -62,6 +62,7 @@ Use a local A2A gateway or equivalent JSON-RPC endpoint. Do **not** hard-code to
 ```bash
 export STRUCTAGENT_A2A_URL="http://127.0.0.1:18800"
 export STRUCTAGENT_A2A_TOKEN="replace-with-generated-token"
+export STRUCTAGENT_A2A_TIMEOUT=180
 ```
 
 A sanitized sender template is provided at [`../scripts/a2a-send-template.sh`](../scripts/a2a-send-template.sh).
@@ -72,6 +73,25 @@ Example:
 ./scripts/a2a-send-template.sh --to maria --message "Review this refinement plan and define stop criteria."
 ./scripts/a2a-send-template.sh --to annika --message "Run PHENIX validation and return MolProbity, clashscore and rotamer outliers."
 ```
+
+The template sends the target `agentId` inside the A2A message payload. Keep it there rather than in a separate configuration object, because many gateways route by message metadata.
+
+For remote agents, set `STRUCTAGENT_A2A_URL` to the peer gateway's reachable base URL, for example a VPN, tailnet or private-network address. Before debugging the agent prompt itself, verify the transport:
+
+```bash
+curl -sf "$STRUCTAGENT_A2A_URL/.well-known/agent-card.json"
+./scripts/a2a-send-template.sh --to maria --message "A2A smoke test"
+```
+
+If the health check reports `Gateway not ready`, check in this order:
+
+1. the peer machine is online on the chosen private network or VPN;
+2. the gateway process is listening on the advertised port;
+3. the gateway's agent card advertises an address the sender can actually reach;
+4. the bearer token belongs to that gateway and has not expired;
+5. the timeout is long enough for the receiver's model/tool runtime.
+
+On macOS hosts, prefer binding the gateway to `::` or another explicitly reachable interface when remote peers must connect; a localhost-only bind is fine for same-host tests but not for remote A2A.
 
 ## 5. Recommended task loop
 

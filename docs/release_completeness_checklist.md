@@ -6,7 +6,7 @@
 - [x] Full-system architecture docs.
 - [x] Annika/Maria collaboration protocol.
 - [x] Skills-only installation and usage path.
-- [x] Sanitized A2A sender template.
+- [x] Sanitized A2A sender template with readiness checks and retries.
 - [x] Structural-biology execution skills included.
 - [x] Maria paper/database/review skills included.
 - [ ] Production wrappers populated where redistribution is safe.
