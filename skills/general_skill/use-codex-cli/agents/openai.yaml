@@ -1,0 +1,4 @@
+interface:
+  display_name: "Use Codex CLI"
+  short_description: "Drive the OpenAI Codex CLI from an agent"
+  default_prompt: "Run a scoped Codex task with codex exec and return a verified result."
