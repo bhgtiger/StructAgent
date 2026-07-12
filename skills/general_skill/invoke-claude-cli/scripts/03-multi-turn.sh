@@ -6,10 +6,9 @@
 # Inputs (positional, one prompt per arg):
 #   $1, $2, $3, ... — turns to send in order
 #
-# Output: each turn's structured payload printed in order; session ID printed to stderr.
-# If a turn returns status=needs_feedback, ask the user and resume this session.
-# In -p/non-TTY mode Claude skips workspace-trust prompts. Keep this in a
-# deliberate trusted cwd, or adapt it to run from a neutral temp dir for Q&A.
+# Output: each turn's `.result` printed in order; session ID printed to stderr.
+#
+# Verified against claude 2.1.207.
 
 set -euo pipefail
 
@@ -18,25 +17,11 @@ if [[ $# -lt 1 ]]; then
   exit 64
 fi
 
-SESSION=$(python3 -c "import uuid; print(uuid.uuid4())")
+SESSION=$(uuidgen | tr 'A-Z' 'a-z')
 echo "Session: $SESSION" >&2
 
-SCHEMA='{
-  "type": "object",
-  "properties": {
-    "status": {"enum": ["completed", "needs_feedback", "blocked"]},
-    "response": {"type": "string"},
-    "questions": {"type": "array", "items": {"type": "string"}},
-    "next_steps": {"type": "array", "items": {"type": "string"}}
-  },
-  "required": ["status", "response"],
-  "additionalProperties": false
-}'
-
 ROLE='You are in a multi-turn dialog with an external orchestrator.
-Each turn is one message in that dialog; respond directly and concisely.
-You are running headless with bypassPermissions; do not wait for interactive permission UI.
-If you need human feedback, credentials, external approval, or a scope decision, return status="needs_feedback" with concise questions and stop.'
+Each turn is one message in that dialog; respond to it directly and concisely.'
 
 first=true
 for prompt in "$@"; do
@@ -52,12 +37,10 @@ for prompt in "$@"; do
       "${SESSION_FLAG[@]}" \
       --append-system-prompt "$ROLE" \
       --tools "" \
-      --permission-mode bypassPermissions \
-      --effort max \
       --model sonnet \
       --max-budget-usd 0.20 \
+      --max-turns 2 \
       --output-format json \
-      --json-schema "$SCHEMA" \
       "$prompt"
   )
 
@@ -66,15 +49,9 @@ for prompt in "$@"; do
     exit 1
   fi
 
-  PAYLOAD=$(echo "$ENVELOPE" | jq -c 'if .structured_output != null then .structured_output else (.result | fromjson? // {"status":"completed","response":.result}) end')
-  STATUS=$(echo "$PAYLOAD" | jq -r '.status // "completed"')
   echo "--- turn ---"
-  echo "$PAYLOAD"
+  echo "$ENVELOPE" | jq -r '.result'
   echo
-  if [[ "$STATUS" == "needs_feedback" || "$STATUS" == "blocked" ]]; then
-    echo "Stop here. Ask the user, then resume with: claude --resume $SESSION" >&2
-    break
-  fi
 done
 
 echo "Resume this session later with: claude --resume $SESSION" >&2

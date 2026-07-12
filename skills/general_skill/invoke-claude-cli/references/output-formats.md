@@ -1,6 +1,7 @@
 # Output formats — full schema details
 
-Read this when you are: parsing `claude` output programmatically, debugging a malformed response, or choosing between `json` and `stream-json`.
+Read this when you are: parsing `claude` output programmatically, debugging a malformed response, or
+choosing between `json` and `stream-json`. Verified against `claude` 2.1.207.
 
 ## `text` (default)
 
@@ -10,44 +11,55 @@ Plain prose written to stdout. No envelope, no metadata.
 The plan looks reasonable. One concern: …
 ```
 
-Use only when a human will read it. Don't grep, don't regex — Claude's phrasing changes between model versions and across runs.
+Use only when a human will read it. Don't grep, don't regex — Claude's phrasing changes between model
+versions and across runs.
 
 ## `json` (single-object result)
 
-One JSON object on a single line, terminated by newline, then exit. Schema (verified on `claude` 2.1.167; field names are stable across the 2.x series):
+One JSON object on a single line, terminated by newline, then exit. Real shape captured from 2.1.207
+(field names are stable across the 2.1.x series; new timing/usage fields are additive):
 
 ```jsonc
 {
   "type": "result",          // always "result" for --output-format json
   "subtype": "success",      // "success" | "error_max_turns" | "error_during_execution" | ...
-  "is_error": false,         // true on auth failure, budget exceeded, refusal, schema violation, etc.
-  "api_error_status": null,  // upstream HTTP status if the Anthropic API itself returned an error
+  "is_error": false,         // true on auth failure, budget/turn cap, API error, schema-invalid, etc.
+  "api_error_status": null,  // upstream HTTP status if the Anthropic API itself errored
 
-  "result": "…",             // answer text; may be empty when --json-schema is used
-  "structured_output": null,   // object/array when --json-schema is used on current Claude Code
-  "stop_reason": "end_turn", // "end_turn" | "max_tokens" | "tool_use" | "stop_sequence" | "refusal"
+  "result": "…",             // the answer text; with --json-schema, the schema JSON as a *string*
+  "structured_output": { },  // present ONLY when --json-schema was used AND the model complied;
+                             //   the answer already parsed into an object
+  "stop_reason": "end_turn", // "end_turn" (prose) | "tool_use" (schema answer) | "max_tokens" | "refusal"
 
   "session_id": "uuid",      // resume with --resume <this>
   "uuid": "uuid",            // per-invocation ID, distinct from session_id
 
-  "num_turns": 3,            // internal turns Claude took
-  "duration_ms": 14233,      // total wall time including tool calls
-  "duration_api_ms": 12100,  // time spent in Anthropic API calls
+  "num_turns": 2,            // internal turns Claude took
+  "duration_ms": 8723,       // total wall time including tool calls
+  "duration_api_ms": 9882,   // time spent in Anthropic API calls
+  "ttft_ms": 3089,           // time to first token
+  "ttft_stream_ms": 1706,    // time to first streamed token
+  "time_to_request_ms": 20,  // client-side setup time before the first request
 
-  "total_cost_usd": 0.0241,  // billed cost in USD (3p providers may report 0)
-  "usage": {                 // token counts
-    "input_tokens": 0,
-    "output_tokens": 0,
-    "cache_creation_input_tokens": 0,
-    "cache_read_input_tokens": 0,
+  "total_cost_usd": 0.0185,  // billed cost in USD (3p providers may report 0)
+  "usage": {                 // token counts (populated with real values)
+    "input_tokens": 20,
+    "output_tokens": 520,
+    "cache_creation_input_tokens": 7321,
+    "cache_read_input_tokens": 7081,
     "server_tool_use": { "web_search_requests": 0, "web_fetch_requests": 0 },
     "service_tier": "standard",
-    "cache_creation": { "ephemeral_1h_input_tokens": 0, "ephemeral_5m_input_tokens": 0 },
-    "inference_geo": "",
-    "iterations": [],
+    "cache_creation": { "ephemeral_1h_input_tokens": 7321, "ephemeral_5m_input_tokens": 0 },
+    "iterations": [ { "input_tokens": 10, "output_tokens": 317, "type": "message" } ],
     "speed": "standard"
   },
-  "modelUsage": {},          // per-model breakdown for multi-model sessions
+  "modelUsage": {            // per-model breakdown, keyed by full model ID
+    "claude-haiku-4-5-20251001": {
+      "inputTokens": 540, "outputTokens": 531,
+      "cacheReadInputTokens": 7081, "cacheCreationInputTokens": 7321,
+      "costUSD": 0.0185, "contextWindow": 200000, "maxOutputTokens": 32000
+    }
+  },
 
   "permission_denials": [],  // tool calls Claude attempted but was denied
   "terminal_reason": "completed", // "completed" | "interrupted" | "error"
@@ -61,95 +73,101 @@ One JSON object on a single line, terminated by newline, then exit. Schema (veri
 import json, subprocess
 
 proc = subprocess.run(
-    ["claude", "-p", "--output-format", "json", prompt],
-    capture_output=True, text=True, timeout=600,
+    ["claude", "-p", "--output-format", "json", "--bare", "--tools", "", prompt],
+    input=stdin_data, capture_output=True, text=True, timeout=600,
 )
 if proc.returncode != 0:
     raise RuntimeError(f"claude crashed: {proc.stderr}")
 
 envelope = json.loads(proc.stdout)
 
-# Always check is_error before trusting result
+# Always check is_error before trusting the answer
 if envelope.get("is_error"):
-    raise RuntimeError(f"claude reported error: {envelope['result']}")
+    raise RuntimeError(f"claude reported error: {envelope.get('result')}")
 
-# Surface cost for accounting
-cost = envelope.get("total_cost_usd", 0.0)
+cost = envelope.get("total_cost_usd", 0.0)       # for accounting
+session_id = envelope["session_id"]              # save for --resume
 
-# If you used --json-schema, current Claude Code puts the answer in
-# .structured_output. Older builds used a JSON string in .result.
-if used_schema:
-    answer = envelope.get("structured_output")
-    if answer is None:
-        answer = json.loads(envelope["result"])
+# --- reading the answer ---
+if "structured_output" in envelope:
+    answer = envelope["structured_output"]       # already a dict/list — preferred
 else:
-    answer = envelope["result"]
-
-# Save session for resumption
-session_id = envelope["session_id"]
+    # No schema, OR schema was used but the model replied in prose (clarify/refuse).
+    answer = envelope["result"]                  # treat as text; do NOT blindly json.loads
 ```
 
-### Schema-validated structured output
+### Schema-validated structured output — where it lands
 
-`--json-schema '<JSON Schema>'` constrains the answer to match the schema. Current Claude Code (2.1.167) returns that parsed object in `structured_output`; older builds returned a JSON string in `.result`. The CLI validates before exiting; a non-conforming output causes `is_error: true` with a validation message.
+`--json-schema '<JSON Schema>'` gives Claude a `StructuredOutput` tool (present even with `--tools ""`).
+
+- **Compliant path** — Claude calls the tool. Envelope gains `structured_output` (parsed object);
+  `result` holds the same JSON as a string; `stop_reason == "tool_use"`.
+- **Non-compliant path** — Claude answers in prose (clarifying question, refusal, or conversational
+  reply). **No `structured_output`**; `result` is prose; `is_error: false`; `stop_reason: "end_turn"`.
+
+So the schema constrains the *tool-call* shape, not whether the model chooses to call it. Never assume
+`result` is schema-valid JSON — branch on the presence of `structured_output` (as above).
+
+The **schema itself** is validated at startup (since 2.1.205): an invalid schema exits non-zero with
+`Error: --json-schema is not a valid JSON Schema` plus the validator diagnostic. Before 2.1.205 an
+invalid schema was silently ignored and returned unstructured text. The `format` keyword is accepted
+but treated as an annotation and not enforced.
 
 ```bash
-claude -p --permission-mode bypassPermissions --effort max --output-format json \
-  --json-schema '{"type":"object","properties":{"verdict":{"enum":["approve","reject","revise"]},"reasons":{"type":"array","items":{"type":"string"}}},"required":["verdict","reasons"],"additionalProperties":false}' \
-  "Review and respond per schema."
+# Extract the structured answer with jq:
+claude -p "Extract the exported function names from auth.py" \
+  --output-format json \
+  --json-schema '{"type":"object","properties":{"functions":{"type":"array","items":{"type":"string"}}},"required":["functions"]}' \
+  | jq '.structured_output'
 ```
 
-Then in your code:
-
-```python
-envelope = json.loads(proc.stdout)
-answer = envelope.get("structured_output")
-if answer is None:
-    answer = json.loads(envelope["result"])
-assert answer["verdict"] in ("approve", "reject", "revise")
-```
-
-Use schemas aggressively — they remove the entire class of "Claude phrased it differently this time" failures.
+Use schemas aggressively for machine-consumed answers — they remove the whole class of "Claude phrased
+it differently this time" failures, as long as you handle the prose fallback.
 
 ## `stream-json` (event stream)
 
-Newline-delimited JSON events, one per line, emitted as Claude works. Use when:
+Newline-delimited JSON events, one per line, emitted as Claude works. In `-p` mode, pair it with
+`--verbose` for the full turn-by-turn stream (and `--include-partial-messages` for token deltas):
 
-- You want to surface progress to a user before Claude is done (live UI).
-- You're piping into another streaming consumer.
-- You want token-by-token incremental output (`--include-partial-messages`).
+```bash
+claude -p "Explain recursion" --output-format stream-json --verbose --include-partial-messages
+```
+
+Use it when you want to surface progress to a user before Claude is done, pipe into another streaming
+consumer, or get token-by-token output.
 
 Event types you'll see, in approximate order:
 
-| `type` | When it fires | Useful fields |
+| `type` (`subtype`) | When it fires | Useful fields |
 |---|---|---|
-| `system` (subtype `init`) | Session start | `session_id`, model, tools |
+| `system` (`init`) | Session start | `session_id`, model, tools, MCP servers, plugins, `capabilities` (2.1.205+) |
+| `system` (`api_retry`) | A retryable API error before a retry | `attempt`, `max_retries`, `retry_delay_ms`, `error`, `error_status` |
 | `user` | Each user-role message Claude internally sends | `message.content` |
 | `assistant` | Each assistant-role message | `message.content`, `message.stop_reason` |
-| `tool_use` | Claude invoked a tool | `name`, `input`, `id` |
-| `tool_result` | Tool returned | `tool_use_id`, `content`, `is_error` |
-| `prompt_suggestion` | Only when `--prompt-suggestions` is enabled in print/SDK mode | predicted next user prompt; ignore for result parsing |
-| `result` | Final, equivalent to the single object you'd get from `--output-format json` | (full envelope) |
+| `stream_event` | Incremental deltas (with `--include-partial-messages`) | `event.delta.text` |
+| `result` | Final — equals the single object you'd get from `--output-format json` | (full envelope) |
 
-The **last** event is always a `result` event with the same schema as single-shot `json` output. So a streaming consumer can:
+The **last** event is always a `result` with the same schema as single-shot `json`. A streaming
+consumer can render `assistant`/`stream_event` deltas live, then capture `session_id`,
+`total_cost_usd`, `structured_output`, etc. from the final `result`.
 
-1. Render `assistant` deltas in real time.
-2. On `result`, capture `session_id`, `total_cost_usd`, etc.
-
-Leave `--prompt-suggestions` off for normal orchestration. If someone enables it, treat `prompt_suggestion` as advisory UI data, not as Claude's answer or the final envelope.
+The `system/init` event's optional `capabilities` array (strings like `interrupt_receipt_v1`, present
+from 2.1.205) lets you feature-detect protocol behaviors instead of comparing version strings — ignore
+values you don't recognize.
 
 ### Streaming parser sketch
 
 ```python
 import json, subprocess
 proc = subprocess.Popen(
-    ["claude", "-p", "--output-format", "stream-json", "--include-partial-messages", prompt],
+    ["claude", "-p", "--output-format", "stream-json", "--verbose", "--include-partial-messages", prompt],
     stdout=subprocess.PIPE, text=True,
 )
+final = None
 for line in proc.stdout:
     event = json.loads(line)
-    if event["type"] == "assistant":
-        render_delta(event["message"]["content"])
+    if event["type"] == "stream_event" and event.get("event", {}).get("delta", {}).get("type") == "text_delta":
+        render_delta(event["event"]["delta"]["text"])
     elif event["type"] == "result":
         final = event
         break
@@ -157,41 +175,28 @@ for line in proc.stdout:
 
 ### `--include-hook-events`
 
-With stream-json, you can additionally request that all hook lifecycle events (PreToolUse, PostToolUse, etc.) appear in the stream:
-
-```bash
-claude -p --permission-mode bypassPermissions --effort max --output-format stream-json --include-hook-events ...
-```
-
-Use for debugging when you suspect a hook is mutating Claude's behavior.
-
-### `--include-partial-messages`
-
-Splits each `assistant` message into chunked deltas as tokens arrive. Required for true token-by-token UI streaming. Only works with `-p` + `--output-format stream-json`.
+With stream-json you can additionally request that all hook lifecycle events (PreToolUse, PostToolUse,
+etc.) appear in the stream. Use it to debug a hook you suspect is mutating Claude's behavior.
 
 ## `--input-format stream-json`
 
-The mirror image: instead of taking one prompt and exiting, you feed JSON messages on stdin and Claude responds to each. Combine with `--output-format stream-json` for a bidirectional channel:
+The mirror image: instead of taking one prompt and exiting, you feed JSON messages on stdin and Claude
+responds to each. Combine with `--output-format stream-json` for a bidirectional channel:
 
 ```bash
-claude -p --permission-mode bypassPermissions --effort max --input-format stream-json --output-format stream-json
+claude -p --input-format stream-json --output-format stream-json --verbose
 ```
 
-This is what orchestrators wanting a persistent Claude subprocess use. The input schema mirrors the output `user`/`assistant` event shapes. For most agent use cases, separate one-shot calls with `--session-id`/`--resume` are simpler.
+Orchestrators wanting a persistent Claude subprocess use this. For most agent use cases, separate
+one-shot calls with `--session-id`/`--resume` are simpler.
 
 ## Choosing between formats
 
 | Goal | Format |
 |---|---|
 | Get an answer, parse it, exit | `--output-format json` |
-| Get a strict structured answer | `--output-format json --json-schema '...'` |
-| Show progress in a UI | `--output-format stream-json` |
-| Token-by-token streaming | `--output-format stream-json --include-partial-messages` |
-| Persistent multi-message subprocess | `--input-format stream-json --output-format stream-json` |
+| Get a strict structured answer | `--output-format json --json-schema '...'` → read `.structured_output` |
+| Show progress in a UI | `--output-format stream-json --verbose` |
+| Token-by-token streaming | `--output-format stream-json --verbose --include-partial-messages` |
+| Persistent multi-message subprocess | `--input-format stream-json --output-format stream-json --verbose` |
 | Human-only display | `--output-format text` (default) |
-
-## Non-interactive caveats
-
-`-p` and non-TTY stdout skip Claude Code's workspace-trust dialog. Only parse output from runs launched in a cwd you already trust or in a disposable sandbox/worktree.
-
-In `-p` mode, settings files that fail validation are silently ignored with no error dialog. Do not rely on `--settings` / `--setting-sources` as the only way to enforce budgets, tool policy, permission mode, or auth; keep those guardrails explicit on the command line and validate the JSON envelope (`is_error`, `total_cost_usd`, `permission_denials`) after every run.

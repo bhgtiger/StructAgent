@@ -1,0 +1,94 @@
+{
+  "skill_name": "invoke-claude-cli",
+  "verified_against": "claude 2.1.207",
+  "evals": [
+    {
+      "id": 1,
+      "name": "gpt-orchestrator-plan-review",
+      "prompt": "I'm building a LangGraph agent where GPT-4 is the planner. After the planner emits a plan (just text), I want to shell out to claude code to review it and tell me whether the plan is solid or needs revision. The verdict has to be a structured object my Python code can branch on (approve / reject / revise + a list of reasons). Write me the subprocess.run call. No tools should fire — claude should just read the plan text and emit a verdict. Keep the cost low because we'll do this on every iteration.",
+      "assertions": [
+        "Uses `claude -p` for non-interactive subprocess use",
+        "Uses `--output-format json` so the response is parseable",
+        "Uses `--json-schema` to constrain the verdict to a structured shape",
+        "Reads the answer from `.structured_output` (not by blindly json.loads-ing `.result`)",
+        "Handles the case where structured_output is absent (model replied in prose)",
+        "Disables tools via `--tools \"\"` or equivalent",
+        "Applies cost discipline: `--model haiku` and/or `--max-budget-usd` (bonus: `--max-turns`)",
+        "Shows actual `subprocess.run(...)` Python code",
+        "Parses `is_error` from envelope before trusting the answer",
+        "Does NOT use `--dangerously-skip-permissions`",
+        "Sets a subprocess timeout"
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "execute-approved-plan-in-repo",
+      "prompt": "My orchestrator decided the plan is good and wants claude code to actually execute it inside /Users/me/projects/myapp. Claude should be allowed to read/edit files, run `pytest`, and check `git status` / `git diff` — and absolutely nothing else. No WebFetch, no arbitrary Bash, no git push. I need to know afterward (a) whether claude succeeded, (b) how much it cost, and (c) if it tried any tool calls that got denied. Show me the bash command and how to parse the result. I want the session preserved so I can resume if it stops partway.",
+      "assertions": [
+        "Uses `claude -p` for non-interactive subprocess use",
+        "Uses `--allowedTools` (allowlist, not denylist)",
+        "Allowlist includes Edit and Read",
+        "Uses permission-rule Bash syntax with a wildcard, e.g. `Bash(git status *)` or `Bash(git status:*)`",
+        "Uses `--permission-mode dontAsk` (or `acceptEdits`)",
+        "Generates session UUID up-front with `--session-id <uuid>`",
+        "Bounds the run with `--max-budget-usd` and/or `--max-turns`",
+        "Uses `--output-format json`",
+        "Parses `total_cost_usd` from envelope",
+        "Parses `is_error` from envelope",
+        "Parses `permission_denials` from envelope",
+        "Does NOT use `--dangerously-skip-permissions`",
+        "Does NOT recommend blanket `Bash` without a sub-command specifier"
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "critique-revise-loop-multi-turn",
+      "prompt": "Help me wire up a critique-and-revise loop. My agent generates a plan (in Python), claude reviews it, my agent revises based on the feedback, claude reviews the revision, up to 3 rounds or until claude says 'approve'. Each round of claude needs to see the previous rounds — same conversation. How do I do this with the claude CLI? I'd rather not paste the whole history each time.",
+      "assertions": [
+        "Uses `claude -p`",
+        "Uses `--session-id <uuid>` on first turn",
+        "Uses `--resume <same-uuid>` on subsequent turns",
+        "Explains session persistence eliminates the need to re-paste history",
+        "Does NOT recommend `--continue` as the primary mechanism",
+        "Shows a Python loop with up to 3 iterations",
+        "Uses `--output-format json`",
+        "Disables tools with `--tools \"\"`",
+        "Checks for approve/reject/revise verdict",
+        "Parses `is_error` from envelope"
+      ],
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "structured-output-parsing-correctness",
+      "prompt": "I'm calling `claude -p --output-format json --json-schema '{...}'` from Node to get a strict JSON object back. Where in the response is the parsed object, and what happens if Claude decides to ask a clarifying question instead of answering? Give me a parsing routine that won't crash in that case.",
+      "assertions": [
+        "States the parsed object is in the top-level `structured_output` field",
+        "Notes `.result` also contains the same JSON but as a string",
+        "Explains `--json-schema` is NOT hard-enforced: the model can reply in prose",
+        "Notes that in the prose case `structured_output` is absent and `is_error` is false",
+        "Parsing routine checks for the presence of `structured_output` before using it",
+        "Parsing routine does NOT blindly JSON.parse `.result`",
+        "Mentions `stop_reason` is `tool_use` when the schema answer was produced (bonus)"
+      ],
+      "files": []
+    },
+    {
+      "id": 5,
+      "name": "background-fanout-poll",
+      "prompt": "From a Python orchestrator I want to kick off three independent claude code jobs at once (each fixing tests in a different package) and then poll for their status without blocking on any one of them. What's the CLI surface for that on current Claude Code, and what should I be careful about across versions?",
+      "assertions": [
+        "Uses `--bg` (or `--background`) with the prompt as a positional argument to launch and return immediately",
+        "Does NOT combine `--bg`/`--background` with `-p`/`--print` (they conflict)",
+        "Polls with `claude agents --json`",
+        "Keeps each background job gated (`--permission-mode dontAsk` + `--allowedTools`)",
+        "Notes that `--print`-only cost flags (`--max-budget-usd`, `--fallback-model`) don't apply to `--bg`",
+        "Warns that fine-grained lifecycle subcommands (logs/attach/stop/respawn) may not exist on the installed build and to check `claude --help`",
+        "Reasonable: notes a self-managed pool of blocking `claude -p` workers is often simpler"
+      ],
+      "files": []
+    }
+  ]
+}

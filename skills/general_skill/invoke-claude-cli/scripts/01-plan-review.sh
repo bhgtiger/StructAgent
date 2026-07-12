@@ -7,6 +7,8 @@
 #   $1 — path to file containing the plan or diff
 #
 # Output (stdout): JSON object: {"verdict": "...", "reasons": [...]}
+#
+# Verified against claude 2.1.207.
 
 set -euo pipefail
 
@@ -30,48 +32,38 @@ SCHEMA='{
 }'
 
 ROLE='You are a code reviewer being called by an external planning agent.
-You have no tools. Read the input on stdin, judge it, and return JSON per the schema.
-Be concise. Reasons should be specific, not generic.'
+You have no tools. Read the input on stdin, judge it, and return your verdict via the
+structured-output schema. Be concise. Reasons should be specific, not generic.'
 
-# Pure Q&A: no tools, no session, capped budget, cheap model.
-# Rollout policy: always run non-interactive Claude CLI with bypassPermissions
-# so it never stalls on an internal permission prompt. With --tools "", there is
-# no tool surface; the calling agent remains the approval/feedback gate.
-# Use --bare only when API-key auth is available; Claude Max / claude.ai
-# desktop login is disabled by --bare and reports is_error: true / Not logged in.
-BASE_ARGS=(--no-session-persistence)
-if [[ -n "${ANTHROPIC_API_KEY:-}" ]]; then
-  BASE_ARGS=(--bare "${BASE_ARGS[@]}")
-fi
-
-# Run pure critique from a neutral cwd. Non-bare Claude Code sees cwd/git
-# dynamic context even when tools are disabled; avoid biasing the review.
-# In -p/non-TTY mode Claude skips workspace-trust prompts, so use only a cwd
-# the caller already trusts (here: an empty temp dir).
-RUN_CWD=$(mktemp -d)
-trap 'rm -rf "$RUN_CWD"' EXIT
-
+# Pure Q&A: hermetic, no tools, capped budget + turns, cheap model.
 ENVELOPE=$(
   cat "$PLAN_PATH" \
-    | (cd "$RUN_CWD" && claude -p \
-        "${BASE_ARGS[@]}" \
+    | claude -p \
+        --bare \
+        --no-session-persistence \
         --tools "" \
-        --permission-mode bypassPermissions \
-        --effort max \
         --model haiku \
+        --fallback-model haiku \
         --max-budget-usd 0.05 \
+        --max-turns 2 \
         --append-system-prompt "$ROLE" \
         --output-format json \
         --json-schema "$SCHEMA" \
-        "Review the content on stdin and respond per the schema.")
+        "Review the content on stdin and respond via the schema."
 )
 
-# Surface errors immediately
+# Surface errors immediately (is_error can be true even though exit code is 0).
 if [[ "$(echo "$ENVELOPE" | jq -r '.is_error')" == "true" ]]; then
   echo "claude reported error: $(echo "$ENVELOPE" | jq -r '.result')" >&2
   exit 1
 fi
 
-# Extract the schema-validated payload. Current Claude Code uses
-# .structured_output; older builds put a JSON string in .result.
-echo "$ENVELOPE" | jq -c 'if .structured_output != null then .structured_output else (.result | fromjson) end'
+# Prefer the already-parsed structured_output. If the model answered in prose
+# instead (clarification/refusal), structured_output is absent — surface that.
+if [[ "$(echo "$ENVELOPE" | jq 'has("structured_output")')" == "true" ]]; then
+  echo "$ENVELOPE" | jq -c '.structured_output'
+else
+  echo "claude did not produce structured output; prose reply follows on stderr" >&2
+  echo "$ENVELOPE" | jq -r '.result' >&2
+  exit 2
+fi
