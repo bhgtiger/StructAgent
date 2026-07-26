@@ -8,7 +8,7 @@
 #
 # Output: each turn's `.result` printed in order; session ID printed to stderr.
 #
-# Verified against claude 2.1.207.
+# Verified against claude 2.1.220.
 
 set -euo pipefail
 

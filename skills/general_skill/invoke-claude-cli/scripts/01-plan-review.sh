@@ -8,7 +8,7 @@
 #
 # Output (stdout): JSON object: {"verdict": "...", "reasons": [...]}
 #
-# Verified against claude 2.1.207.
+# Verified against claude 2.1.220.
 
 set -euo pipefail
 
@@ -43,7 +43,6 @@ ENVELOPE=$(
         --no-session-persistence \
         --tools "" \
         --model haiku \
-        --fallback-model haiku \
         --max-budget-usd 0.05 \
         --max-turns 2 \
         --append-system-prompt "$ROLE" \

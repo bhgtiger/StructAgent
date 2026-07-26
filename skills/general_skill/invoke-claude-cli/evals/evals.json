@@ -1,6 +1,6 @@
 {
   "skill_name": "invoke-claude-cli",
-  "verified_against": "claude 2.1.207",
+  "verified_against": "claude 2.1.220 (CLI help + official changelog refresh)",
   "evals": [
     {
       "id": 1,
@@ -87,6 +87,21 @@
         "Notes that `--print`-only cost flags (`--max-budget-usd`, `--fallback-model`) don't apply to `--bg`",
         "Warns that fine-grained lifecycle subcommands (logs/attach/stop/respawn) may not exist on the installed build and to check `claude --help`",
         "Reasonable: notes a self-managed pool of blocking `claude -p` workers is often simpler"
+      ],
+      "files": []
+    },
+    {
+      "id": 6,
+      "name": "current-model-selection-and-observability",
+      "prompt": "I am updating a headless Claude Code worker after installing Claude Code 2.1.220. Which model alias should I use for the hardest code-change task, which for normal balanced work, and when should I choose Fable? I need a fallback policy that will not silently lower quality. If I consume stream-json from an MCP-enabled run with nested subagents, what two new things should I inspect or enable?",
+      "assertions": [
+        "Identifies the opus alias / Claude Opus 5 as the normal serious-execution default and notes its 1M context",
+        "Identifies the sonnet alias as the balanced current-family choice",
+        "Treats the fable alias / Fable 5 as an intentional availability- and policy-checked choice, not an automatic universal winner",
+        "Explains aliases versus exact model IDs and recommends passing a model explicitly for unattended work",
+        "Describes ordered fallback-model lists as an approved quality downgrade and does not silently fall back to Haiku for consequential execution",
+        "Mentions mcp_server_errors in the stream init event",
+        "Mentions forward-subagent-text with print plus stream-json for nested-agent observability"
       ],
       "files": []
     }

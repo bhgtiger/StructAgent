@@ -1,8 +1,8 @@
 # Flag cheatsheet (alphabetical)
 
-Every flag the skill discusses, with one-line semantics. Verified against `claude --help` /
-observed behavior for version 2.1.207. Flags marked **(2.1.207: works, hidden from `--help`)** are
-accepted by the binary but not listed in top-level help — confirm on your build.
+Every flag the skill discusses, with one-line semantics. Current visible flags were checked against
+`claude --help` 2.1.220. Flags marked **(2.1.207: works, hidden from `--help`)** have prior
+executable evidence but are not listed in top-level help — confirm on your build before scripting.
 
 | Flag | One-line meaning |
 |---|---|
@@ -30,9 +30,10 @@ accepted by the binary but not listed in top-level help — confirm on your buil
 | `--disallowedTools / --disallowed-tools <tools...>` | Denylist of tools. Fails open on new tools. |
 | `--effort <level>` | Reasoning effort: `low` / `medium` / `high` / `xhigh` / `max`. |
 | `--exclude-dynamic-system-prompt-sections` | Move cwd/env/memory/git-status into the first user message for better cache reuse. |
-| `--fallback-model <model[,model...]>` | Auto-fallback if primary is overloaded/unavailable; retries primary each turn. **`-p` only.** |
+| `--fallback-model <model[,model...]>` | Ordered fallback if primary is overloaded/unavailable; retries primary each turn. **`-p` only.** Choose only quality downgrades the task permits. |
 | `--file <specs...>` | Download resources at startup. Format: `file_id:relative_path`. |
 | `--fork-session` | When resuming, branch off with a new session ID. |
+| `--forward-subagent-text` | Forward subagent text/thinking with its parent tool-use ID. Only with `-p --output-format stream-json`. |
 | `--from-pr [value]` | Resume a session linked to a PR. |
 | `-h, --help` | Help. |
 | `--ide` | Auto-connect to an IDE on startup. |
@@ -44,7 +45,7 @@ accepted by the binary but not listed in top-level help — confirm on your buil
 | `--max-budget-usd <amount>` | Hard spend cap. `-p` only. Required for unattended runs. |
 | `--max-turns <n>` | Hard cap on agentic turns. **(2.1.207: works, hidden from `--help`)** |
 | `--mcp-config <configs...>` | Load MCP servers from JSON files or strings. |
-| `--model <model>` | Model alias (`fable`, `opus`, `sonnet`, `haiku`) or full ID (`claude-fable-5`). |
+| `--model <model>` | Model alias (`fable`, `opus`, `sonnet`, `haiku`) or full ID (`claude-opus-5`, `claude-fable-5`). Pass explicitly in unattended work. |
 | `-n, --name <name>` | Display name for the session. |
 | `--no-session-persistence` | Don't save the session to disk. `-p` only. |
 | `--output-format <fmt>` | `text` (default), `json`, or `stream-json`. `-p` only. |
@@ -69,7 +70,19 @@ accepted by the binary but not listed in top-level help — confirm on your buil
 | `-v, --version` | Print version. |
 | `-w, --worktree [name]` | Create a git worktree for the session. |
 
-## Subcommands (2.1.207)
+## Current rolling model aliases
+
+| Alias | Current release state |
+|---|---|
+| `opus` | Claude Opus 5 (`claude-opus-5`) in Claude Code 2.1.219; 1M context. |
+| `sonnet` | Rolling newest Sonnet; Claude Code 2.1.197 introduced Sonnet 5 with 1M context. |
+| `fable` | Claude Fable 5 (`claude-fable-5`), introduced in 2.1.170; 1M context. |
+| `haiku` | Rolling Haiku family alias for cheap, bounded tasks. |
+
+Use aliases for newest-family behavior and exact IDs only for deliberate reproducibility. Do not assume
+an organization or CLI default selects the intended family.
+
+## Subcommands (2.1.220)
 
 | Subcommand | Purpose |
 |---|---|
@@ -86,8 +99,6 @@ accepted by the binary but not listed in top-level help — confirm on your buil
 | `claude ultrareview [target]` | Cloud-hosted multi-agent code review of a branch/PR. |
 | `claude update` / `upgrade` | Check for and install updates. |
 
-> Docs also list `claude attach/logs/stop/respawn/rm <id>` and `claude daemon status\|stop` for
-> background-session lifecycle, plus flags `--exec`, `--teammate-mode`, `--init`, `--maintenance`,
-> `--remote-control`. On 2.1.207: `--teammate-mode`, `--init-only`, `--remote-control` are present;
-> `--exec` is absent; the `attach/logs/stop/respawn/rm/daemon` subcommands are absent. Always confirm
-> against your installed build.
+> Docs may list `claude attach/logs/stop/respawn/rm <id>` and `claude daemon status\|stop` for
+> background-session lifecycle. They are not in the 2.1.220 top-level help verified for this refresh.
+> Always confirm against your installed build before scripting lifecycle operations.

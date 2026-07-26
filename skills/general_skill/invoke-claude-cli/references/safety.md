@@ -1,7 +1,8 @@
 # Safety: dangerous flag combinations and sandbox patterns
 
 Read this whenever you are about to grant Claude any tool capability beyond pure Q&A — especially when
-designing automation that will run unattended. Verified against `claude` 2.1.207.
+designing automation that will run unattended. Reviewed with the 2.1.220 CLI refresh; re-check
+`claude --help` before relying on a version-specific permission behavior.
 
 ## The threat model
 
@@ -156,7 +157,6 @@ claude -p \
   --tools "" \
   --max-turns 2 \
   --max-budget-usd 0.10 \
-  --fallback-model haiku \
   --model haiku
 ```
 

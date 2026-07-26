@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-07-26 — refresh for Claude Code 2.1.220
+
+Updated the skill against the official Claude Code changelog through 2.1.220 and the installed
+2.1.220 CLI.
+
+- **Current model policy.** Corrected the stale Opus 4.8 guidance: the "opus" alias now resolves to
+  Claude Opus 5 ("claude-opus-5", 1M context). Documented the distinct current roles of Opus 5,
+  Sonnet 5, Fable 5, and Haiku; aliases versus exact IDs; and why an implicit default is unsafe for
+  unattended work.
+- **Quality-aware fallback.** Documented ordered fallback lists and made clear that fallback is an
+  approved quality downgrade, not a reason to silently route consequential execution to Haiku.
+  The execution examples and Python client now default to Opus with an explicit Sonnet fallback;
+  removed the redundant Haiku-to-Haiku fallback from the critique examples.
+- **Headless observability.** Added 2.1.219 "mcp_server_errors" handling to stream-json guidance
+  and documented "--forward-subagent-text", current nested-subagent depth, and fan-out controls.
+- **Background guidance.** Refreshed "claude agents" details for 2.1.220, including "--cwd",
+  while preserving the distinction between top-level "--bg" sessions and nested subagents.
+
 ## 2026-07-12 — refresh for Claude Code 2.1.207
 
 Updated the whole skill against the live `claude` 2.1.207 binary. Highlights:

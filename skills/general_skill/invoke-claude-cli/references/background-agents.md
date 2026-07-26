@@ -2,7 +2,7 @@
 
 Read this when your orchestrator wants to launch Claude work and keep going — fan-out across many
 tasks, or a long-running job you'll check on later — rather than blocking on a single `claude -p`.
-Verified against `claude` 2.1.207; the CLI surface here is younger and moving faster than the
+Verified against `claude` 2.1.220; the CLI surface here is younger and moving faster than the
 `-p` flags, so **confirm subcommands with `claude --help` and `claude agents --help` on your build.**
 
 ## When to use this vs. plain `claude -p`
@@ -18,7 +18,7 @@ For most orchestrators, a pool of blocking `claude -p` subprocesses that you man
 simplest, most portable design. Reach for background agents when you specifically want the CLI to own
 session lifecycle and let you attach/inspect later.
 
-## What exists on 2.1.207
+## What exists on 2.1.220
 
 - **`--bg`, `--background`** — start the session as a background agent and return immediately. The
   prompt is a **positional argument**, and `--bg` **conflicts with `-p`/`--print`** (the binary rejects
@@ -28,7 +28,7 @@ session lifecycle and let you attach/inspect later.
   (`--max-budget-usd`, `--fallback-model`, `--no-session-persistence`) do **not** apply here.
 - **`claude agents`** — the background-agent management view. With `--json` it prints active sessions
   as a JSON array and exits (no TTY required — this is the scriptable entry point). Add `--all` to
-  include completed sessions.
+  include completed sessions or `--cwd <path>` to filter by working directory.
 - `claude agents` also accepts defaults applied to *dispatched* sessions:
   `--model`, `--permission-mode`, `--effort`, `--mcp-config`, `--settings`, `--agent`, `--plugin-dir`,
   `--dangerously-skip-permissions`, and `--add-dir`. Note `--add-dir` grants additional **directory**
@@ -56,10 +56,17 @@ claude agents --json | jq '.[] | {id, name, status}'
 > jobs from `claude agents`. If you need hard per-run budget/turn caps, prefer a self-managed pool of
 > blocking `claude -p` workers instead.
 
-## What is documented but NOT on 2.1.207
+Do not confuse top-level `--bg` sessions with nested subagents spawned inside a Claude turn. In
+2.1.219, nested subagents can reach depth 3 by default; set
+`CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1` if nesting is not intended and use
+`CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS` to bound fan-out. With
+`-p --output-format stream-json`, `--forward-subagent-text` exposes nested subagent text and
+thinking with the spawning tool-use ID.
 
-Current docs describe finer-grained lifecycle subcommands. They are **absent from the 2.1.207
-binary** — do not script against them without checking your version first:
+## What is documented but not in the 2.1.220 top-level help
+
+Current docs may describe finer-grained lifecycle subcommands. They are **absent from the 2.1.220
+top-level help verified for this refresh** — do not script against them without checking your version first:
 
 - `claude attach <id>` — attach to a background session in this terminal
 - `claude logs <id>` — print recent output from a background session

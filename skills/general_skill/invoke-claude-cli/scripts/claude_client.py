@@ -12,7 +12,7 @@ SKILL.md:
   - hard subprocess timeouts, budget caps, and turn caps
   - robust envelope parsing (always check is_error)
 
-Verified against claude 2.1.207.
+Verified against claude 2.1.220.
 
 Requires: `claude` CLI on $PATH, Python 3.10+, and working auth. Under --bare
 (used by `critique` below) auth must be ANTHROPIC_API_KEY or an apiKeyHelper
@@ -93,12 +93,14 @@ def critique(
     role: str = "You are a code reviewer being called by an external agent.",
     schema: dict[str, Any] | None = None,
     model: str = "haiku",
+    fallback_models: str | None = None,
     budget_usd: float = 0.05,
     max_turns: int = 2,
     timeout_s: int = 120,
 ) -> ClaudeResult:
     """
     Pattern 1: read-only critique. Hermetic (--bare), no tools, cheap model.
+    Pass fallback_models only when the task explicitly permits that downgrade.
 
     `schema` is a JSON Schema dict — if provided, prefer ClaudeResult.structured.
     If the model answers in prose anyway (clarification/refusal), .structured is
@@ -110,12 +112,13 @@ def critique(
         "--no-session-persistence",
         "--tools", "",
         "--model", model,
-        "--fallback-model", "haiku",
         "--max-budget-usd", str(budget_usd),
         "--max-turns", str(max_turns),
         "--append-system-prompt", role,
         "--output-format", "json",
     ]
+    if fallback_models:
+        cmd += ["--fallback-model", fallback_models]
     if schema is not None:
         cmd += ["--json-schema", json.dumps(schema)]
     cmd.append("Review the content on stdin and respond accordingly.")
@@ -129,7 +132,8 @@ def execute(
     *,
     allowed_tools: list[str],
     role: str = "You are an executor agent invoked by an external planner. The plan is on stdin.",
-    model: str = "sonnet",
+    model: str = "opus",
+    fallback_models: str | None = "sonnet",
     budget_usd: float = 1.0,
     max_turns: int = 24,
     timeout_s: int = 600,
@@ -137,8 +141,9 @@ def execute(
 ) -> ClaudeResult:
     """
     Pattern 2: restricted execution. Tight tool allowlist, dontAsk permission
-    mode, sonnet by default. The session ID is generated up-front and returned
-    in ClaudeResult.session_id so the caller can resume.
+    mode, Opus by default, and an explicit Sonnet fallback. The session ID is
+    generated up-front and returned in ClaudeResult.session_id so the caller can
+    resume.
 
     allowed_tools example (permission-rule syntax, space + '*'):
         ["Edit", "Read", "Write", "Bash(git status *)", "Bash(pytest *)"]
@@ -151,12 +156,13 @@ def execute(
         "--allowedTools", *allowed_tools,
         "--permission-mode", "dontAsk",
         "--model", model,
-        "--fallback-model", "haiku",
         "--max-budget-usd", str(budget_usd),
         "--max-turns", str(max_turns),
         "--output-format", "json",
         "Execute the plan provided on stdin.",
     ]
+    if fallback_models:
+        cmd[-1:-1] = ["--fallback-model", fallback_models]
     envelope = _run(cmd, stdin_data=plan, timeout_s=timeout_s, cwd=cwd)
     return _envelope_to_result(envelope)
 

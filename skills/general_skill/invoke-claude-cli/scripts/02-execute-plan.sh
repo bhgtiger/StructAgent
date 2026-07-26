@@ -9,7 +9,7 @@
 #
 # Output: the run's result on stdout; the JSON envelope summary on stderr.
 #
-# Verified against claude 2.1.207.
+# Verified against claude 2.1.220.
 
 set -euo pipefail
 
@@ -33,8 +33,9 @@ If a step requires a tool you do not have, stop and report it rather than improv
 # Generate a session ID up-front so the caller can resume if needed.
 SESSION=$(uuidgen | tr 'A-Z' 'a-z')
 
-# dontAsk: auto-deny anything not on the allowlist / read-only set. Bounded by
-# both a dollar cap and a turn cap so a stuck loop can't run away.
+# dontAsk: auto-deny anything not on the allowlist / read-only set. Opus is the
+# serious-execution default; Sonnet is an explicit bounded fallback if Opus is
+# overloaded. The dollar and turn caps stop a stuck loop from running away.
 ENVELOPE=$(
   cat "$PLAN_PATH" \
     | claude -p \
@@ -42,8 +43,8 @@ ENVELOPE=$(
         --append-system-prompt "$ROLE" \
         --allowedTools $ALLOWED \
         --permission-mode dontAsk \
-        --model sonnet \
-        --fallback-model haiku \
+        --model opus \
+        --fallback-model sonnet \
         --max-budget-usd 1.00 \
         --max-turns 24 \
         --output-format json \

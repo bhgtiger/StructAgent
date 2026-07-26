@@ -1,7 +1,7 @@
 # Output formats — full schema details
 
 Read this when you are: parsing `claude` output programmatically, debugging a malformed response, or
-choosing between `json` and `stream-json`. Verified against `claude` 2.1.207.
+choosing between `json` and `stream-json`. Verified against `claude` 2.1.220.
 
 ## `text` (default)
 
@@ -140,7 +140,7 @@ Event types you'll see, in approximate order:
 
 | `type` (`subtype`) | When it fires | Useful fields |
 |---|---|---|
-| `system` (`init`) | Session start | `session_id`, model, tools, MCP servers, plugins, `capabilities` (2.1.205+) |
+| `system` (`init`) | Session start | `session_id`, model, tools, MCP servers, plugins, `capabilities` (2.1.205+), `mcp_server_errors` (2.1.219+) |
 | `system` (`api_retry`) | A retryable API error before a retry | `attempt`, `max_retries`, `retry_delay_ms`, `error`, `error_status` |
 | `user` | Each user-role message Claude internally sends | `message.content` |
 | `assistant` | Each assistant-role message | `message.content`, `message.stop_reason` |
@@ -154,6 +154,13 @@ consumer can render `assistant`/`stream_event` deltas live, then capture `sessio
 The `system/init` event's optional `capabilities` array (strings like `interrupt_receipt_v1`, present
 from 2.1.205) lets you feature-detect protocol behaviors instead of comparing version strings — ignore
 values you don't recognize.
+
+In 2.1.219+, inspect `mcp_server_errors` before treating a supplied `--mcp-config` server as
+available. It lists configuration entries skipped by validation. For nested-agent observability,
+`--forward-subagent-text` forwards subagent text and thinking only with
+`-p --output-format stream-json`, keyed by the spawning tool-use ID. Current releases allow nested
+subagents up to depth 3 by default; set `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1` when nesting is
+not intended, and bound fan-out with `CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS`.
 
 ### Streaming parser sketch
 

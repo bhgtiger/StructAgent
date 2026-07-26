@@ -5,10 +5,11 @@ description: Authoritative guide for invoking the `claude` CLI as a subprocess f
 
 # Invoking the `claude` CLI from another agent
 
-> **Verified against `claude` 2.1.207 (Jan 2026).** Where behavior changed across the 2.1.x
+> **Verified against `claude` 2.1.220 (July 2026).** Where behavior changed across the 2.1.x
 > series, the version is noted inline. Re-check with `claude --version` and `claude --help`
-> before relying on any exact field name or flag — the CLI ships almost daily. Current model
-> aliases: `fable` (Fable 5, most capable), `opus` (4.8), `sonnet` (5), `haiku` (4.5).
+> before relying on any exact field name or flag — the CLI ships almost daily. Current rolling
+> aliases: `fable` (Fable 5; availability/usage policy is account-specific), `opus` (Opus 5,
+> 1M context), `sonnet` (Sonnet 5, 1M context), and `haiku` (latest Haiku family).
 
 ## Mental model
 
@@ -260,15 +261,38 @@ Headless behavior with an explicit, auditable tool surface.
 
 | Flag | What it does |
 |---|---|
-| `--model fable` / `opus` / `sonnet` / `haiku` | Pick a model family by alias (latest in that family). |
-| `--model claude-fable-5` | Pick by exact model ID. |
-| `--fallback-model haiku` (or a comma list) | Fall back if the primary is overloaded/unavailable; retries the primary at the start of each turn. **`-p` only.** Recommended for production. |
+| `--model fable` / `opus` / `sonnet` / `haiku` | Pick the newest supported member of a model family. Pass one explicitly in unattended work. |
+| `--model claude-opus-5` / `claude-fable-5` | Pick a fixed current model ID when a reproducibility requirement justifies pinning. |
+| `--fallback-model sonnet,haiku` | Ordered fallback list for a primary model that is overloaded or unavailable; retries the primary at the start of each turn. **`-p` only.** |
 | `--max-budget-usd 0.50` | Hard spend cap; run aborts if exceeded. `-p` only. Use on any unattended automation. |
 | `--max-turns 8` | Hard cap on agentic turns; stops a tool loop even if the budget isn't hit. |
 | `--effort low\|medium\|high\|xhigh\|max` | Reasoning effort for the session. |
 
+### Choose the model deliberately
+
+| Need | Preferred model | Why |
+|---|---|---|
+| Hardest implementation, deep review, or large-codebase reasoning | `opus` | Claude Code 2.1.219 makes this Claude Opus 5 (`claude-opus-5`), the current Opus model with a 1M-token context window. This is the normal serious-execution default. |
+| Strong balanced implementation and ordinary multi-turn work | `sonnet` | Rolling newest Sonnet alias. Claude Code 2.1.197 introduced Sonnet 5 with a 1M-token context window. |
+| Intentional frontier-model experiment with confirmed availability and usage policy | `fable` | Claude Fable 5 (`claude-fable-5`) has a 1M-token context window. Do not select it merely because it is newer. |
+| Cheap high-volume triage or pasted-text classification | `haiku` | Keep it tool-free, structured, and tightly budgeted. |
+
+Do not rely on the CLI's default model: account, organization, role, and user settings can alter it.
+The release notes do not establish a universal Fable-versus-Opus quality ordering. Treat Fable as an
+availability-checked choice; use Opus as the normal high-end default unless the task or user specifies
+otherwise. Use aliases when you want the current family model, and exact IDs only when a true version
+pin is required. Never use informal stale strings such as `opus4.8`.
+
+Fallback is an approved quality downgrade, not merely an availability trick. For an ordinary Opus
+task, `--fallback-model sonnet` is sensible. For a Fable task, use an explicit fallback only if the
+task permits it (normally `opus`). Omit fallback for work that must not silently degrade in quality;
+return a typed unavailable or needs-feedback result instead. Do not silently substitute Haiku for a
+quality-critical file-modifying task.
+
 For high-volume critique, `--model haiku --max-budget-usd 0.05 --max-turns 2` is a sane default.
-Escalate to `sonnet`/`opus`/`fable` for execution tasks where reasoning matters.
+For an auditable run, record the canonical model in the JSON envelope's `modelUsage`. Opus 5 supports
+fast mode; treat that as an account/session setting and inspect `fast_mode_state` rather than assuming
+it is enabled.
 
 ## Clean, hermetic runs: `--bare`
 
@@ -312,7 +336,8 @@ claude agents --json          # list active sessions as JSON (scriptable, no TTY
 session, the `--print`-only cost flags (`--max-budget-usd`, `--fallback-model`,
 `--no-session-persistence`) don't apply — bound background cost with tool gating, model choice, and by
 stopping runaway sessions from `claude agents`. Finer-grained lifecycle subcommands
-(`claude logs/attach/stop/respawn <id>`) appear in current docs but are **not** present on 2.1.207 —
+(`claude logs/attach/stop/respawn <id>`) appear in current docs but are **not** present in the
+2.1.220 top-level help verified for this refresh —
 check `claude --help` and `claude agents --help` on your installed build. See
 `references/background-agents.md`.
 
@@ -352,7 +377,7 @@ Some flag combinations expand the blast radius substantially. Reason about every
 | No subprocess timeout | Process can hang. | Never acceptable. Always set one. |
 
 **Rule of thumb — the safest agent-driven invocation:**
-`claude -p --bare --no-session-persistence --output-format json --tools "" --max-turns 2 --max-budget-usd 0.10 --fallback-model haiku --model haiku`.
+`claude -p --bare --no-session-persistence --output-format json --tools "" --max-turns 2 --max-budget-usd 0.10 --model haiku`.
 Add capabilities back one flag at a time as you need them.
 
 ## Worked examples
