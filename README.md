@@ -41,22 +41,29 @@ architecture/                 System architecture and collaboration protocol
 docs/                         Installation, implementation, privacy, versions, MCP setup, release scope
 scripts/                      Sanitized helper templates for A2A messaging/setup
 skills/annika/                Execution-side structural-biology skills/protocols
+  ├── annika-log/             Auditable project/job logging for reproducibility
+  ├── boltz/                  Boltz-1/2 structure and binding-affinity prediction
   ├── ccp4/                   Refmac5, AceDRG, CCP4 suite orchestration
   ├── chimerax/               UCSF ChimeraX model editing and map fitting
+  ├── colabfold/              Config-first ColabFold planning, execution, output review, and host validation
   ├── coot/                   Coot model building and local refinement
-  ├── cryosparc/              AI agent skill for cryoSPARC workflows, masks, external-tool bridges, and cautious automation
-  ├── cryolo-skill/            crYOLO particle-picking skill, config-first and validated against crYOLO 1.9.9
-  ├── cryodrgn-skill/          cryoDRGN heterogeneity reconstruction skill, config-first and validated against cryoDRGN 4.2.1
-  ├── deepemhancer-skill/      DeepEMhancer map post-processing skill, config-first and validation-gated
-  ├── mask/                   Headless ChimeraX model/map-derived cryo-EM mask generation
-  ├── relion/                 RELION 5 SPA/tomo workflow guidance and CLI-grounded automation templates
-  ├── topaz-skill/            Topaz particle-picking/denoising guidance, validated against Topaz 0.3.20
+  ├── cryoatom/               Portable CryoAtom2 setup, configuration, planning, and gated execution
+  ├── cryoatom-advisor/       Read-only CryoAtom/CryoAtom2 readiness and static CLI guidance
+  ├── cryodrgn-skill/         cryoDRGN heterogeneity reconstruction, validated against cryoDRGN 4.2.1
+  ├── cryolo-skill/           crYOLO particle picking, validated against crYOLO 1.9.9
+  ├── cryosparc/              cryoSPARC workflows, masks, external-tool bridges, and cautious automation
+  ├── daqplugin/              Residue-wise DAQ map–model quality scoring through ChimeraX
+  ├── deepemhancer-skill/     DeepEMhancer map post-processing with validation gates
   ├── emerald/                Rosetta EMERALD ligand docking into cryo-EM density
   ├── isolde/                 ISOLDE interactive refinement in ChimeraX
+  ├── mask/                   Headless ChimeraX model/map-derived cryo-EM mask generation
+  ├── modelangelo/            ModelAngelo installation, configuration, and environment validation
+  ├── namdinator/             Read-only Namdinator MDFF planning and troubleshooting
   ├── phenix/                 Phenix real-space and reciprocal-space refinement
-  ├── annika-log/             Auditable project/job logging for reproducibility
+  ├── relion/                 RELION 5 SPA/tomo guidance and CLI-grounded automation templates
   ├── structural-strategy/    Decision-making for fitting, refinement, validation
-  └── structural_build/       End-to-end model building orchestration
+  ├── structural_build/       End-to-end model building orchestration
+  └── topaz-skill/            Topaz particle picking and denoising, validated against Topaz 0.3.20
 skills/maria/                 Reading/reasoning/database/review skills
   ├── database/               Literature database query and cross-reference
   ├── discovery/              Gap-driven literature expansion via Semantic Scholar
@@ -64,6 +71,7 @@ skills/maria/                 Reading/reasoning/database/review skills
   ├── paper-reader/           Primary paper reading and filing
   └── review-paper/           Review/tutorial paper reading
 examples/                     Placeholder and reviewer-bundle notes only
+wrappers/                     Reserved for redistributable production-tool wrappers
 reviewer_bundle_manifest.md   What belongs in the confidential reviewer bundle
 LICENSE                       Apache-2.0 for original StructAgent material
 THIRD_PARTY_NOTICES.md        Unofficial status, trademarks, upstream-license notice
