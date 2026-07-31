@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0",
+  "profile": "example-workstation",
+  "generated_at": null,
+  "host": {
+    "hostname": null,
+    "patterns": ["*.cluster.example"],
+    "os": null,
+    "os_release": null,
+    "architecture": null
+  },
+  "runtime": {
+    "launcher": "/absolute/path/to/colabfold_batch",
+    "expected_version": "1.6.2",
+    "version": null,
+    "launcher_exists": false,
+    "help_checked": false,
+    "help_ok": false,
+    "help_sha256": null,
+    "container_image": null,
+    "container_sha256": null,
+    "container_observed_sha256": null
+  },
+  "paths": {
+    "params": {"path": null, "exists": false, "npz_count": 0, "multimer_v3_count": 0},
+    "cache_dir": null,
+    "results_root": null
+  },
+  "scheduler": {
+    "type": "local",
+    "submit_command": null,
+    "account": null,
+    "gpu_partition": null,
+    "gpu_gres": null,
+    "cpus_per_task": null,
+    "memory_gb": null,
+    "default_time": null,
+    "scratch_root": null
+  },
+  "compute": {"gpu_visible": false, "gpus": []},
+  "msa": {"policy": "deny_remote", "host_url": "https://api.colabfold.com", "local_databases_installed": false},
+  "validation": {
+    "state": "unknown",
+    "reasons": ["generate this config on the target workstation"],
+    "evidence_manifest": null,
+    "fixture_validated": false,
+    "receipt_consistent": false,
+    "validated_model_types": [],
+    "validated_msa_modes": [],
+    "validated_gpu": null,
+    "validated_at": null
+  }
+}

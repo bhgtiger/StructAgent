@@ -1,0 +1,88 @@
+#!/bin/bash
+# ==========================================================================
+# CryoAtom2 GPU fixture run — Slurm template.
+#
+# Runs the public upstream example (EMD-33198 / PDB 7XHT: one 490-aa protein
+# chain, one RNA, two DNA). PUBLIC DATA ONLY — safe as a first run on a new
+# install. This is the evidence that lets a site config reach state `ready`.
+#
+#   bash scripts/stage_cryoatom_weights.sh --cache <CACHE> fixture
+#   python3 scripts/render_job_template.py templates/smoke_cryoatom.sbatch.template \
+#       --set OUTPUT_ROOT=<SCRATCH>/cryoatom_smoke --output ~/smoke_cryoatom.sbatch
+#   sbatch ~/smoke_cryoatom.sbatch
+#
+# Upstream's own running_time.log for this fixture is 161 s, so one hour is
+# ample even with cold model loading. Any remaining double-brace token means the
+# script is NOT finished — it refuses to run in that case.
+#
+# render-scheduler: slurm
+# ==========================================================================
+#SBATCH -A {{ACCOUNT}}
+#SBATCH -p {{GPU_PARTITION}}
+#SBATCH -N 1
+#SBATCH -n 1
+#SBATCH {{GPU_FLAG}}
+#SBATCH --cpus-per-task={{CPUS_PER_TASK}}
+#SBATCH --mem={{MEMORY_GB}}G
+#SBATCH -t 01:00:00
+#SBATCH -J cryoatom_smoke
+#SBATCH --export=NONE
+#SBATCH -o {{LOG_DIR}}/cryoatom_smoke_%j.out
+#SBATCH -e {{LOG_DIR}}/cryoatom_smoke_%j.err
+
+set -uo pipefail
+
+LAUNCHER="{{LAUNCHER}}"
+FIX="{{FIXTURE_DIR}}"
+OUT="{{OUTPUT_ROOT}}_${SLURM_JOB_ID:-manual}"
+
+# An unrendered placeholder would otherwise become a literal path in the submit
+# directory. Fail loudly instead.
+for _v in "$LAUNCHER" "$FIX" "$OUT"; do
+    case "$_v" in *"{{"*) echo "FATAL: unrendered placeholder in this script: $_v" >&2; exit 1 ;; esac
+done
+
+echo "host      : $(hostname)"
+echo "job       : ${SLURM_JOB_ID:-none}"
+command -v nvidia-smi >/dev/null && \
+    nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv,noheader
+echo "fixture   : $FIX"
+echo "output    : $OUT"
+echo
+
+[ -e "$OUT" ] && { echo "FATAL: $OUT already exists — use a fresh path" >&2; exit 1; }
+mkdir -p "$OUT" || exit 1
+
+for f in emd_33198.map protein.fasta rna.fasta dna.fasta; do
+    [ -s "$FIX/$f" ] || { echo "FATAL: fixture file missing: $FIX/$f" >&2; exit 1; }
+done
+
+echo "=== cryoatom build (protein + RNA + DNA) ==="
+START=$(date +%s)
+"$LAUNCHER" build \
+    -v  "$FIX/emd_33198.map" \
+    -ps "$FIX/protein.fasta" \
+    -rs "$FIX/rna.fasta" \
+    -ds "$FIX/dna.fasta" \
+    -o  "$OUT/7xht"
+RC=$?
+END=$(date +%s)
+
+echo
+echo "=== result ==="
+echo "exit_code : $RC"
+echo "elapsed_s : $((END - START))   (upstream's shipped reference for this fixture: 161 s)"
+find "$OUT" -maxdepth 3 -type f -printf '%10s  %p\n' 2>/dev/null | sort -k2
+
+CIF=$(find "$OUT" -name '*.cif' -type f 2>/dev/null | head -1)
+if [ "$RC" -eq 0 ] && [ -n "$CIF" ]; then
+    echo "SMOKE_RESULT : PASS"
+    echo "Record it:  python3 scripts/cryoatom_env_probe.py … --record-fixture \\"
+    echo "              --fixture-job ${SLURM_JOB_ID:-manual} --fixture-elapsed-s $((END - START))"
+elif [ "$RC" -ne 0 ]; then
+    echo "SMOKE_RESULT : FAIL (cryoatom exited $RC)"
+else
+    echo "SMOKE_RESULT : FAIL (exit 0 but no mmCIF produced)"
+    RC=1
+fi
+exit $RC

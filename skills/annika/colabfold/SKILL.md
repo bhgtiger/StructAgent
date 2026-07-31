@@ -1,224 +1,105 @@
 ---
 name: "colabfold"
-description: "Read-only, source-grounded ColabFold v1.6.2 advisor and NOT-RUN planner with a future-machine test/install handoff."
-status: proposal
-version: "v2"
-date: "2026-07-25T22:24:00.859Z"
+description: "Use for ColabFold/colabfold_batch: configure hosts, plan or run AlphaFold2(-Multimer), choose MSA/privacy, inspect outputs, or troubleshoot."
 ---
 
-# ColabFold v1.6.2 advisor
+# ColabFold
 
-## Purpose
+Use this skill for the stable ColabFold AlphaFold2/AlphaFold-Multimer command-line workflow. Treat upstream v1.6.2 as the pinned source baseline, but prefer captured live help and validated behavior from the configured host whenever they differ.
 
-Provide conservative, source-grounded guidance for the stable ColabFold v1.6.2
-AlphaFold2/AlphaFold-Multimer command-line workflow. This release is strictly
-read-only: explain, assess, and plan. It never installs, downloads weights,
-writes files, runs commands, submits data, or calls an MSA server.
+## Start with intent and configuration
 
-## Version and capability-tier naming
+Classify the request as conceptual guidance, environment/configuration, command planning, execution, existing-output interpretation, or troubleshooting.
 
-- **Package version `v1`** is the version of this skill proposal.
-- It implements the **`v0` read-only capability tier** from the project plan.
-- Support files `00`–`08` say "v0" and mean exactly this read-only tier. The two
-  labels are not two different scopes. When in doubt, the boundary is the one in
-  "Capability boundary" below.
+For general conceptual questions, answer without claiming anything about the current host. For every host-specific claim or action:
 
-## Capability boundary
+1. Resolve the config path from `COLABFOLD_SKILL_CONFIG`, otherwise use `${XDG_CONFIG_HOME:-~/.config}/colabfold-skill/site-config.json`.
+2. If the config is absent, run the default read-only probe from this skill and show the result. Add `--live-help` only when the user wants a runtime check; it starts the configured launcher with `--help` but performs no prediction and may initialize launcher cache files.
+3. Validate an existing config with `python3 scripts/colabfold_env_probe.py --validate-config <path>`.
+4. Bind every readiness claim to the config's host pattern, timestamp, runtime version, and evidence. Configuration records facts; it never grants permission.
 
-Allowed: explain, compare routes, triage a request, interpret documented
-confidence concepts, and produce an explicitly unexecuted command plan as chat
-text.
+Create a private external config, not a file inside the portable skill:
 
-Forbidden, with no exceptions in this release:
+```text
+python3 scripts/colabfold_env_probe.py \
+  --launcher /absolute/path/to/colabfold_batch \
+  --runtime-version 1.6.2 \
+  --scheduler auto \
+  --msa-policy deny_remote \
+  --output ~/.config/colabfold-skill/site-config.json
+```
 
-- Installing, updating, or configuring ColabFold, Conda, Docker, MMseqs2, JAX,
-  CUDA, or model weights.
-- Running any command, including `--help`, a dry run, or a "harmless" check.
-- Uploading a sequence, requesting a public MSA, calling any API, downloading
-  weights, or starting a local or self-hosted MSA server.
-- Writing, editing, or deleting any file, including FASTA/CSV inputs, config
-  files, and command scripts. Plans are returned as text only.
-- Walking, parsing, or diagnosing a user's result tree. Documented artifact
-  names and confidence concepts may be explained from the references only.
-- AlphaFold3 JSON, ligands, nucleic acids (`dna|`, `rna|`, `ccd|`, `smiles|`),
-  Boltz, BioEmu, ESMFold, RoseTTAFold2, beta notebooks, or third-party
-  LocalColabFold. Name these as outside this contract.
-- Treating predicted confidence as experimental validation.
+Use `templates/site-config.example.json` for manual configuration and read `references/configuration.md` for the schema and state rules.
 
-## No-runtime-implied contract
+## State controls what may be claimed
 
-This skill ships documentation only. It carries no ColabFold installation, no
-model weights, and no validated runtime.
+- `ready`: launcher/version plus matching structured CPU/GPU fixture evidence pass for this host/profile. Plan concrete commands; execute only after per-action approval.
+- `probed`: launcher or environment was inspected, but GPU/fixture evidence is incomplete. Give gap-aware plans; do not claim prediction readiness.
+- `blocked`: a required runtime/launcher is absent or unusable. Explain the blocker; do not improvise an install or run.
+- `stale`: version, runtime identity, receipt, or host no longer matches. Treat as unknown and re-probe.
+- `unknown`: no trustworthy config. Give general guidance only.
 
-- Never state or imply that ColabFold is installed, available, working, or
-  reachable on the current host. Whether a runtime exists is unknown to this
-  skill on every host.
-- Never present a flag, default, or output filename as live-verified. Every
-  behavioral claim here traces to pinned v1.6.2 source, the package manifest,
-  official CI, or official docs, never to a local `--help` capture. At authoring
-  time no installed v1.6.2 executable had been validated anywhere in this
-  project.
-- Never claim `https://api.colabfold.com` is up, down, fast, or slow. Service
-  availability is unknown.
-- Never describe a future install, test, or prediction as approved, scheduled,
-  routine, or already agreed. Each is a separate human decision.
-- If asked whether the user "can just try it", answer that this skill cannot try
-  anything, and route to `references/09_testing_and_install_handoff.md`.
+## Action and approval boundaries
 
-## Trigger and non-trigger rules
+Proceed without additional confirmation only for read-only work: read the config/references, inspect files the user supplied, run the default environment probe, capture `--help` after explaining its possible cache initialization, and summarize an existing local result tree.
 
-Use this skill when the user asks how ColabFold works, whether it fits a protein
-or protein-complex prediction task, which supported input form applies, what the
-outputs mean, how to plan a v1.6.2 command, how to interpret pLDDT/PAE
-conceptually, or what would be required before a future install/test/run.
+Obtain explicit confirmation before each action that writes, downloads, submits, or consumes meaningful compute:
 
-Do not use it to perform any action in the Forbidden list above. For those,
-explain the boundary and the preconditions instead.
+- create or alter FASTA/A3M/CSV, job scripts, result directories, or configs;
+- install/update ColabFold, containers, JAX/CUDA dependencies, model weights, or databases;
+- submit/run a CPU, GPU, scheduler, container, or MSA job;
+- send any sequence or template query to a remote MSA/template service;
+- reuse or replace an existing result directory;
+- enable `--zip`, `--overwrite-existing-results`, or another destructive/ambiguous option.
 
-## First response rule
+Before a prediction, echo the exact command, input and result paths, model/MSA route, expected network and weight-download behavior, scheduler/GPU resources, and preservation plan. Never infer blanket approval for future sequences from one approved job.
 
-Classify the request first:
+Every executable-looking command must contain only syntax and values supported by captured live help, the validated config, or explicit user input. Never put illustrative or guessed flag values inside a command block, including recycle, seed, model, scheduler, or resource values. Omit unsupported options or use a visibly non-executable `<NOT_SUPPLIED>` placeholder. Describe the possible loss of evolutionary information from `single_sequence` as a target-dependent tradeoff; do not promise that a particular confidence score will rise or fall.
 
-1. **Conceptual question** — answer from the references and name the v1.6.2
-   boundary. Do not ask for an unpublished sequence merely to answer a
-   conceptual question.
-2. **Workflow/command-plan question** — identify monomer versus protein complex,
-   input form, target environment, whether the sequence may be confidential, and
-   whether a remote MSA would be acceptable. Return an explicitly NOT-RUN plan.
-3. **Existing-output question** — explain documented artifact names and
-   confidence concepts only. Do not inspect or parse the user's output tree.
-4. **Execute/install/test request** — state that this release cannot act. Then
-   explain which of the five distinct stages the user actually means and route to
-   `references/09_testing_and_install_handoff.md`: applying the pending Skill
-   Workshop proposal, installing the resulting skill into an agent runtime,
-   installing/configuring ColabFold itself, testing runtime behavior, or
-   executing a real prediction. Do not collapse these into one step and do not
-   treat any of them as pre-approved.
+## Privacy and destructive options
 
-## Safety contract
+Treat sequences, templates, labels, paths, and result metadata as potentially confidential. Public MSA use can transmit sequence data to a third party. The collected official sources do not establish current retention/processing terms, so unknown must not be presented as safe. Default to `deny_remote`; `per_job_approval` still requires explicit approval for every submitted sequence. Use `single_sequence` or an approved local A3M/database route when off-host transfer is not permitted, while explaining the scientific tradeoff.
 
-- The default MSA path can transmit sequences to a third-party service. Treat
-  sequence, template, job label, and result metadata as potentially
-  confidential. Official Wiki text notes users may not be permitted to send
-  protein sequences to a third-party server, and recommends local
-  `colabfold_search` for large-scale work.
-- Public-MSA retention and privacy terms were **not** located in the collected
-  official repository, Wiki, or domain-focused search. State that as unknown.
-  Absence of a policy is not evidence that retention is absent or safe. Remote
-  capability stays deferred.
-- Never recommend the public service for large-scale work. Its source warning
-  asks for serial submissions from a single source IP and reserves the right to
-  limit access when fair use is exceeded.
-- `--templates` can trigger a server query even when the input is a local A3M.
-  Do not describe an A3M-input plan as automatically network-free.
-- Never add `--zip` silently: source deletes most original result artifacts
-  after a successful archive operation. This is destructive.
-- Never recommend or synthesize `--overwrite-existing-results`: the v1.6.2
-  parser help says "Do not recompute results", while source passes
-  `keep_existing_results = not args.overwrite_existing_results`, which reads as
-  the opposite. Unresolved pending a disposable installed-v1.6.2 fixture.
-- Code is MIT, and the package manifest states "MIT, but separate licenses for
-  the trained weights." Do not imply MIT covers every model-weight use.
-- **pLDDT is local model confidence, not a measured B-factor and not proof of a
-  correct fold.** ColabFold writes it into the PDB B-factor column, which
-  inverts the usual uncertainty convention some downstream tools expect. For
-  complexes, pLDDT alone does not establish an interaction: discuss inter-chain
-  PAE and interface-oriented metrics, and require orthogonal validation. Never
-  derive a biological conclusion from a confidence threshold.
+`--templates` may query a server even with A3M input. `--zip` deletes most original outputs after making the archive. Never add it silently. The v1.6.2 `--overwrite-existing-results` help wording conflicts with source-flow interpretation; do not recommend or synthesize it until behavior is established in a disposable fixture.
 
-## Source trust
+## Plan and execute a workflow
 
-For exact current behavior, prefer in order: an installed v1.6.2 executable with
-captured help and a public fixture; the pinned v1.6.2 source and package
-manifest; official CI and README/wiki/release notes; Mirdita et al. 2022 for
-rationale and historical evidence; then dated issue-tracker signals.
+1. Read and validate the workstation config.
+2. Confirm protein-only scope, input form, monomer versus complex, and colon-separated chain grammar. Route ligand, DNA/RNA, or AlphaFold3 work to a separate grounded workflow.
+3. Choose the MSA route. State whether it transmits sequence data and whether templates add network access.
+4. Select a model from captured live help. Do not claim an untested model type is validated merely because it is listed.
+5. Choose a fresh result directory. Preserve inputs, command, runtime/config snapshot, stdout/stderr, and checksums in the active project/job ledger.
+6. Present the exact command and resource/network effects, then wait for explicit approval.
+7. Execute only within the approved scope. Stop on version/config drift, unexpected download/network behavior, or an existing non-disposable output path.
+8. Inspect outputs with `scripts/summarize_colabfold_output.py`; record missing or extra artifacts rather than inventing them.
+9. Interpret confidence conservatively and recommend orthogonal validation.
 
-Rung 1 does not exist yet in this project. Say so rather than implying the top
-rung was consulted.
+Read `references/workflows.md` for input forms, command planning, scheduler use, and expected outputs. Read `references/validation-and-troubleshooting.md` for fixture and failure gates.
 
-The 2022 paper supports rationale and historical benchmarking only. Its speed
-and accuracy figures are version-, database-, hardware-, and benchmark-specific,
-and the authors state free-modeling CASP14 targets were used to optimize search
-parameters. Never present them as current performance.
+## Interpret results without overclaiming
 
-## Core guidance
+pLDDT is local model confidence, not a measured B-factor or proof of a correct fold. Although ColabFold writes pLDDT into the PDB B-factor column, its direction and meaning differ from experimental displacement parameters. For complexes, discuss inter-chain PAE and interface metrics such as ipTM together with independent biological evidence. Never infer binding, mechanism, oligomeric state, or publication readiness from a threshold alone.
 
-- Pinned baseline: `sokrypton/ColabFold` v1.6.2, commit
-  `c7d1772352cc9619df25c6d36cb0f218c0c6610e` (release commit dated 2026-07-14).
-  At collection, main was one notebook/README commit ahead, with no diff in
-  `batch.py`, `input.py`, `mmseqs/search.py`, `utils.py`, or `pyproject.toml`.
-- v1.6.2 fixes `colabfold_search --pair-mode paired/unpaired` crashes, adds
-  `--use-pallas` and `--compile-mode`, removes TensorFlow, and improves
-  CUDA 12/13 and ARM64 Docker. Do not transplant these to older releases.
-- Accepted inputs: FASTA/FA/FAA, A3M, CSV/TSV with required `id` and `sequence`
-  (optional `a3mpath`, `templatepath`), PDB/mmCIF-derived chain sequences, and
-  directories. Source warns that a FASTA-like file inside a directory
-  contributes only its first record. Colon-separated protein sequences denote
-  chains of a complex. See `references/03_inputs_and_command_plans.md`.
-- A command plan must state the pinned version, input type, monomer/complex
-  classification, chosen MSA route and whether it transmits sequence data, model
-  rationale without certainty claims, expected result directory, expected
-  downloads and network side effects, compute/environment prerequisites,
-  excluded risky flags, and an explicit statement that nothing was run.
-- Environment: the manifest requires Python >=3.10; console entry points are
-  `colabfold_batch`, `colabfold_search`, `colabfold_split_msas`, and
-  `colabfold_relax`. Prediction extras pull AlphaFold/JAX-related dependencies,
-  so installation is not a lightweight package action. Official CI covers Ubuntu
-  on Python 3.10–3.12 and runs `--help` smoke tests; it does not establish
-  macOS/Apple Silicon prediction support. Practical inference is NVIDIA/CUDA
-  oriented; source states GPU Amber relaxation is unsupported on AMD/ROCm and
-  Apple Silicon; `--use-pallas` requires NVIDIA Ampere or newer. Docker CLI
-  presence alone is not evidence of a working NVIDIA runtime or a pulled image.
-- Local database search via `colabfold_search QUERY DBBASE BASE` is a
-  heavyweight MMseqs2/database infrastructure workflow needing prepared
-  databases and substantial disk/RAM. It is not a quick offline fallback.
-- Keep AlphaFold3 JSON conversion and non-protein molecule syntax out of scope
-  even though current source exposes an option: it carries separate model, data,
-  and license questions.
+Use the summarizer for local evidence:
 
-## Known unknowns
+```text
+python3 scripts/summarize_colabfold_output.py /path/to/results
+```
 
-State these as unknown rather than guessing:
+## Reference and resource routing
 
-- Whether any given host has a working, correct v1.6.2 runtime.
-- Live `--help` text, exact current defaults, and whether a `--version` flag is
-  exposed.
-- `--overwrite-existing-results` real semantics.
-- Public-MSA retention, processing, and privacy terms; and current service
-  availability or capacity.
-- Per-model weight licenses and downstream use terms.
-- The full, current result-tree contents and optional score-JSON fields. The one
-  checked-in example carries `plddt`, `pae`, `max_pae`, and `ptm`; optional
-  fields cannot be generalized from a single example.
+- Scope, approvals, privacy, licensing, and scientific claim limits: `references/scope-and-safety.md`.
+- Config path, schema, state machine, host identity, and portability: `references/configuration.md`.
+- Inputs, MSA choices, command plans, execution, and outputs: `references/workflows.md`.
+- Runtime/fixture checks and failure triage: `references/validation-and-troubleshooting.md`.
+- Pinned upstream sources and evidence hierarchy: `references/source-map.md`.
+- Workstation-config generator/validator: `scripts/colabfold_env_probe.py`.
+- Read-only output summarizer: `scripts/summarize_colabfold_output.py`.
+- Package validator: `scripts/validate_skill.py`.
+- Portable config skeleton: `templates/site-config.example.json`.
+- Behavioral eval cases: `examples/evals.json`.
+- Public network-free fixture contract: `examples/gcn4p1-dimer.fasta` and `examples/smoke-expectations.json`.
 
-## Reference routing
+## Portability contract
 
-- Scope, source hierarchy, and safety: `references/00_scope_and_safety.md`.
-- Version and evidence boundary: `references/01_version_and_source_trust.md`.
-- Host/environment decision: `references/02_environment_preflight.md`.
-- Inputs and safe command planning: `references/03_inputs_and_command_plans.md`.
-- Outputs, confidence, and destructive options:
-  `references/04_outputs_and_confidence.md`.
-- Request classification: `references/05_decision_trees.md`.
-- Known risks and escalation:
-  `references/06_failure_modes_and_escalation.md`.
-- Test expectations: `references/07_trigger_tests.md` and
-  `references/08_eval_cases.md`.
-- Applying, installing, and later testing this skill or ColabFold itself:
-  `references/09_testing_and_install_handoff.md`. That document is a checklist
-  for a human operator. It authorizes nothing and records no completed test.
-
-## Common mistakes
-
-- Implying a runtime exists, or that a flag was live-verified.
-- Presenting a future install, test, or run as already approved.
-- Calling every notebook in the repository equivalent to the stable AlphaFold2
-  workflow.
-- Presenting a historical 2022 speed/accuracy number as current performance.
-- Forgetting public-MSA data egress and fair-use limits, or treating a missing
-  privacy policy as reassurance.
-- Assuming an A3M input means no network call, despite `--templates`.
-- Treating high pLDDT or ipTM as proof of biology.
-- Treating local database setup as low-resource.
-- Using `--zip` or `--overwrite-existing-results` without an explicit
-  destructive-action discussion.
+Ship one canonical skill package and keep the filled workstation config external. Never package a real hostname, username, home path, cluster partition, API credential, private sequence, or validation-job path. Another workstation needs this package plus a valid config and an existing ColabFold runtime; configuration does not install ColabFold itself.

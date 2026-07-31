@@ -1,0 +1,7 @@
+{
+  "fixture": "public GCN4-p1 leucine zipper from PDB 2ZTA",
+  "sequence_network_egress": false,
+  "command_settings": {"model_type":"alphafold2_multimer_v3","msa_mode":"single_sequence","num_models":1,"num_seeds":1,"num_recycles":1,"num_relax":0,"random_seed":0,"rank_by":"multimer","version":"1.6.2"},
+  "structural_checks": {"chains":2,"ca_atoms":66,"plddt_range":[0,100],"ptm_range":[0,1],"iptm_range":[0,1],"pae_shape":[66,66]},
+  "do_not_assert": ["exact coordinates","exact pLDDT","exact pTM","exact ipTM","wall time"]
+}

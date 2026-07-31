@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "description": "Contract for the public upstream fixture used to validate a new CryoAtom2 install. Public data only (EMD-33198 / PDB 7XHT). Values are upstream facts, not host facts; timings depend on the GPU and must not be quoted as a guarantee.",
+  "fixture": {
+    "name": "EMD-33198 / 7XHT",
+    "archive_url": "https://yanglab.qd.sdu.edu.cn/CryoAtom/download/7xht.zip",
+    "archive_bytes": 123995068,
+    "expected_files": [
+      "emd_33198.map",
+      "protein.fasta",
+      "rna.fasta",
+      "dna.fasta"
+    ],
+    "content": "one protein chain of 496 aa, one RNA record, two DNA records; map approximately 131 MB",
+    "public": true
+  },
+  "command": {
+    "subcommand": "build",
+    "flags": ["-v <fixture>/emd_33198.map", "-ps <fixture>/protein.fasta", "-rs <fixture>/rna.fasta", "-ds <fixture>/dna.fasta", "-o <FRESH_OUTPUT_DIR>"],
+    "output_dir_must_not_exist": true
+  },
+  "pass_criteria": {
+    "exit_code": 0,
+    "mmcif_produced": true,
+    "expect_files": ["<name>.cif", "<name>_raw.cif"],
+    "note_running_time_log": "CryoAtom2 2.1.1 does NOT write running_time.log (the call is commented out in build.py). The copy inside the fixture archive is upstream's shipped reference output. Its absence after a run is normal.",
+    "atoms_order_of_magnitude": "several thousand",
+    "chains_at_least": 4,
+    "confidence_column": "B_iso_or_equiv carries model confidence, not an experimental B-factor"
+  },
+  "reference_timing": {
+    "upstream_shipped_running_time_log_s": 161,
+    "note": "The value in the running_time.log that ships inside upstream's fixture archive, measured on upstream's hardware. A first run adds cold model loading. Time your own runs; do not present this as an expected runtime for a real map."
+  },
+  "on_failure": [
+    "no mmCIF: the install is not ready — do not proceed to user data",
+    "segfault in stage 1: getp was not compiled for this host",
+    "missing weight error: stage the cache and re-verify",
+    "CUDA OOM on this small fixture: the GPU or its VRAM allocation is wrong, not the map"
+  ]
+}

@@ -1,0 +1,88 @@
+#!/bin/bash
+# ==========================================================================
+# Build cryoatom.sif from install/cryoatom.def — Slurm template.
+#
+#   python3 scripts/render_job_template.py templates/build_sif.sbatch.template \
+#       --set DEF_FILE=<SKILL_DIR>/install/cryoatom.def \
+#       --set IMAGE_PATH=<CONTAINER_DIR>/cryoatom.sif \
+#       --output ~/build_cryoatom_sif.sbatch
+#   sbatch ~/build_cryoatom_sif.sbatch
+#
+# NEVER build on a login node: ~45 min of conda solve plus a multi-GiB PyTorch
+# download, and tens of thousands of temporary files.
+#
+# Build-only. It does NOT stage weights and does NOT install the launcher.
+# After it succeeds:
+#   bash scripts/stage_cryoatom_weights.sh --cache <CACHE> weights
+#
+# A rebuild yields a DIFFERENT image sha256 — expected, because the %post conda
+# solve is not frozen. Record the new hash in the site config.
+#
+# render-scheduler: slurm
+# ==========================================================================
+#SBATCH -A {{ACCOUNT}}
+#SBATCH -p {{BUILD_PARTITION}}
+#SBATCH -N 1
+#SBATCH -n 1
+#SBATCH --cpus-per-task={{CPUS_PER_TASK}}
+#SBATCH --mem=64G
+#SBATCH -t 04:00:00
+#SBATCH -J cryoatom_sif
+#SBATCH -o {{LOG_DIR}}/cryoatom_build_%j.out
+#SBATCH -e {{LOG_DIR}}/cryoatom_build_%j.err
+
+set -uo pipefail
+
+DEF="{{DEF_FILE}}"
+TARGET="{{IMAGE_PATH}}"
+BUILD_BASE="{{BUILD_TMP_ROOT}}"
+RUNTIME="{{CONTAINER_RUNTIME}}"
+
+for _v in "$DEF" "$TARGET" "$BUILD_BASE"; do
+    case "$_v" in *"{{"*) echo "FATAL: unrendered placeholder in this script: $_v" >&2; exit 1 ;; esac
+done
+[ -r "$DEF" ] || { echo "FATAL: definition file not readable: $DEF" >&2; exit 1; }
+case "$RUNTIME" in apptainer|singularity) ;; *) RUNTIME=apptainer ;; esac
+command -v "$RUNTIME" >/dev/null || { echo "FATAL: $RUNTIME not on PATH" >&2; exit 1; }
+
+# Node-local scratch for the build sandbox and cache, so the build's file churn
+# never touches a home/project inode quota.
+BASE="$BUILD_BASE/${USER:-build}"
+mkdir -p "$BASE" 2>/dev/null || BASE="/tmp/${USER:-build}"
+export APPTAINER_TMPDIR="$BASE/ca-tmp-${SLURM_JOB_ID:-$$}"
+export APPTAINER_CACHEDIR="$BASE/ca-cache-${SLURM_JOB_ID:-$$}"
+export SINGULARITY_TMPDIR="$APPTAINER_TMPDIR"
+export SINGULARITY_CACHEDIR="$APPTAINER_CACHEDIR"
+mkdir -p "$APPTAINER_TMPDIR" "$APPTAINER_CACHEDIR" || exit 1
+trap 'rm -rf "$APPTAINER_TMPDIR" "$APPTAINER_CACHEDIR"' EXIT
+
+echo "host=$(hostname) job=${SLURM_JOB_ID:-none} tmpdir=$APPTAINER_TMPDIR"
+df -h "$APPTAINER_TMPDIR" | tail -1
+
+# Stage on node-local scratch and promote only on success, so a failed build
+# never leaves a truncated image at the published path.
+STAGE="$APPTAINER_TMPDIR/cryoatom.sif"
+
+"$RUNTIME" build --fakeroot "$STAGE" "$DEF"
+RC=$?
+if [ $RC -ne 0 ]; then
+    echo "--fakeroot failed (rc=$RC); retrying without it"
+    "$RUNTIME" build "$STAGE" "$DEF"; RC=$?
+fi
+
+if [ $RC -ne 0 ]; then
+    # A failure in %post step [3/7] usually means the exact pin
+    # pytorch=2.1.0=py3.9_cuda11.8_cudnn8.7.0_0 was pruned from the channel.
+    # That is a genuine upstream reproducibility failure — do NOT relax the pin.
+    echo "BUILD FAILED (rc=$RC)" >&2
+    exit $RC
+fi
+
+mkdir -p "$(dirname "$TARGET")" || exit 1
+install -m 0750 "$STAGE" "$TARGET" || exit 1
+SHA=$(sha256sum "$TARGET" | cut -d' ' -f1)
+echo "BUILD OK  $TARGET  ($(ls -lh "$TARGET" | awk '{print $5}'))  sha256=$SHA"
+"$RUNTIME" inspect "$TARGET"
+echo
+echo "Next: bash scripts/stage_cryoatom_weights.sh --cache <CACHE> weights"
+echo "Then record image_sha256=$SHA in the site config."

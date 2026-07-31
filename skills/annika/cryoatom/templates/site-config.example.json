@@ -1,0 +1,85 @@
+{
+  "_comment": "Skeleton only. Every value is a placeholder. Generate the real file on the target machine with scripts/cryoatom_env_probe.py and keep it OUTSIDE this package, at ${XDG_CONFIG_HOME:-~/.config}/cryoatom-skill/site-config.json (mode 0600).",
+  "schema_version": "1.0",
+  "profile": "example-site",
+  "generated_at": null,
+  "generated_by": null,
+  "host": {
+    "hostname": null,
+    "patterns": ["login*.cluster.example", "gpu*.cluster.example"],
+    "os": "Linux",
+    "os_release": null,
+    "kernel": null,
+    "architecture": "x86_64"
+  },
+  "install": {
+    "route": "container",
+    "container_runtime": "apptainer",
+    "container_runtime_version": null,
+    "container_runtimes_available": {},
+    "image_path": "/absolute/path/to/cryoatom.sif",
+    "image_sha256": null,
+    "image_observed_sha256": null,
+    "no_mount_hostfs": false,
+    "extra_binds": [],
+    "launcher": "/absolute/path/to/bin/cryoatom",
+    "launcher_executable": false,
+    "in_image_binary": "/opt/conda/envs/CryoAtom2/bin/cryoatom",
+    "in_image_checkpoint_dir": "/opt/conda/envs/CryoAtom2/lib/python3.9/site-packages/CryoAtom2/checkpoint",
+    "conda_env_prefix": null,
+    "module_load": null
+  },
+  "version": {
+    "expected": "2.1.1",
+    "observed": null,
+    "source_commit": "856e250df7b784b854b892f1b619d32d51188cef",
+    "source_tree": "0058c0c68857b66962f9ad421756513e74de7518",
+    "checked_at": null,
+    "check_error": null
+  },
+  "weights": {
+    "cache_root": "/absolute/path/to/cryoatom_cache",
+    "pin_file": "/absolute/path/to/cryoatom_cache/weights.pin.json",
+    "files": {},
+    "complete": false,
+    "verified_mode": null,
+    "missing": [],
+    "mismatched": []
+  },
+  "compute": {
+    "gpu_visible": false,
+    "gpus": [],
+    "min_vram_gib_required": 14,
+    "meets_vram_requirement": null,
+    "note": null
+  },
+  "scheduler": {
+    "type": "slurm",
+    "submit_command": "/usr/bin/sbatch",
+    "account": "<ACCOUNT>",
+    "gpu_partition": "<GPU_PARTITION>",
+    "build_partition": "<CPU_BUILD_PARTITION>",
+    "gpu_flag": "--gpus=1",
+    "cpus_per_task": 16,
+    "memory_gb": 120,
+    "default_time": "04:00:00",
+    "scratch_root": "/absolute/path/to/scratch",
+    "extra_directives": []
+  },
+  "paths": {
+    "results_root": "/absolute/path/to/scratch/cryoatom",
+    "fixture_dir": "/absolute/path/to/cryoatom_cache/fixture",
+    "log_dir": "/absolute/path/to/logs",
+    "build_tmp_root": "/node-local/scratch"
+  },
+  "validation": {
+    "state": "unknown",
+    "reasons": ["generate this config on the target machine"],
+    "fixture_validated": false,
+    "fixture_job": null,
+    "fixture_elapsed_s": null,
+    "validated_gpu": null,
+    "validated_at": null,
+    "evidence": []
+  }
+}

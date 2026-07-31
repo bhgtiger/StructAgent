@@ -1,0 +1,92 @@
+#!/bin/bash
+# ==========================================================================
+# CryoAtom2 production run — Slurm template.
+#
+# Render it with the site config, read it, then submit:
+#   python3 scripts/render_job_template.py templates/run_cryoatom.sbatch.template \
+#       --set JOB_NAME=my_run --set MAP=/path/map.mrc \
+#       --set OUTPUT_DIR=<SCRATCH>/my_run_fresh \
+#       --output ~/run_cryoatom.sbatch
+#   sbatch ~/run_cryoatom.sbatch
+#
+# Any remaining double-brace token means the script is NOT finished.
+# For PBS/LSF keep the body and swap the directives — see
+# references/02_install_routes.md § Non-Slurm schedulers.
+#
+# render-optional: PROTEIN_FASTA RNA_FASTA DNA_FASTA EXTRA_DIRECTIVES
+# render-scheduler: slurm
+#
+# --export=NONE on purpose: it proves the launcher does not depend on an
+# inherited PATH or bind-path variable. If the job then cannot see its inputs,
+# the fix is install.extra_binds in the site config, not re-exporting the env.
+# ==========================================================================
+#SBATCH -A {{ACCOUNT}}
+#SBATCH -p {{GPU_PARTITION}}
+#SBATCH -N 1
+#SBATCH -n 1
+#SBATCH {{GPU_FLAG}}
+#SBATCH --cpus-per-task={{CPUS_PER_TASK}}
+#SBATCH --mem={{MEMORY_GB}}G
+#SBATCH -t {{WALLTIME}}
+#SBATCH -J {{JOB_NAME}}
+#SBATCH --export=NONE
+#SBATCH -o {{LOG_DIR}}/{{JOB_NAME}}_%j.out
+#SBATCH -e {{LOG_DIR}}/{{JOB_NAME}}_%j.err
+{{EXTRA_DIRECTIVES}}
+
+set -uo pipefail
+
+LAUNCHER="{{LAUNCHER}}"
+CACHE="{{WEIGHTS_CACHE}}"
+MAP="{{MAP}}"
+OUT="{{OUTPUT_DIR}}"
+
+# Optional inputs — delete the lines you do not use.
+PROTEIN_FASTA="{{PROTEIN_FASTA}}"
+RNA_FASTA="{{RNA_FASTA}}"
+DNA_FASTA="{{DNA_FASTA}}"
+
+# An unrendered placeholder would otherwise become a literal relative path.
+for _v in "$LAUNCHER" "$MAP" "$OUT"; do
+    case "$_v" in *"{{"*) echo "FATAL: unrendered placeholder in this script: $_v" >&2; exit 1 ;; esac
+done
+
+echo "host      : $(hostname)"
+echo "job       : ${SLURM_JOB_ID:-none}"
+echo "gpu       : ${CUDA_VISIBLE_DEVICES:-unset}"
+command -v nvidia-smi >/dev/null && \
+    nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv,noheader
+echo "output    : $OUT"
+
+# CryoAtom creates its output dir with exist_ok and deletes intermediates, so a
+# reused directory silently mixes runs. Refuse to start on an existing path.
+if [ -e "$OUT" ]; then
+    echo "FATAL: output path already exists: $OUT" >&2
+    echo "Pick a fresh path; never reuse a CryoAtom output directory." >&2
+    exit 1
+fi
+mkdir -p "$OUT" || exit 1
+
+# The launcher size-checks all six weights before every build and refuses to
+# start if any is missing or truncated. Set CRYOATOM_VERIFY_WEIGHTS=1 here to
+# force a full SHA-256 re-hash first (~5.5 GiB read) when the cache is suspect.
+echo "weights   : $CACHE"
+
+echo "=== cryoatom build ==="
+START=$(date +%s)
+ARGS=(build -v "$MAP" -o "$OUT")
+# Skip any optional input that is empty or still an unrendered double-brace token.
+add_opt() { case "${2:-}" in ""|*"{{"*) return 0 ;; esac; ARGS+=("$1" "$2"); }
+add_opt -ps "$PROTEIN_FASTA"
+add_opt -rs "$RNA_FASTA"
+add_opt -ds "$DNA_FASTA"
+
+"$LAUNCHER" "${ARGS[@]}"
+RC=$?
+END=$(date +%s)
+
+echo
+echo "exit_code : $RC"
+echo "elapsed_s : $((END - START))"
+find "$OUT" -maxdepth 3 -type f -printf '%10s  %p\n' 2>/dev/null | sort -k2
+exit $RC

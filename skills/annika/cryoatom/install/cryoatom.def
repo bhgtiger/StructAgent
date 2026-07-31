@@ -1,0 +1,254 @@
+# ============================================================================
+# cryoatom.def — pinned Apptainer/Singularity recipe for CryoAtom2 2.1.1.
+#
+# Build (NEVER on a login node — use templates/build_sif.sbatch.template):
+#     apptainer build cryoatom.sif cryoatom.def
+#
+#   CryoAtom2        : 2.1.1        (CryoAtom2/__init__.py at the pinned commit)
+#   Upstream repo    : https://github.com/YangLab-SDU/CryoAtom
+#   Pinned commit    : 856e250df7b784b854b892f1b619d32d51188cef
+#   Commit date      : 2026-06-17T14:53:48+0800  ("Add pre-hosted RNA-FM model download")
+#   Nearest tag      : v2.1.0 (10fd7f4be3722d6a1ea6646c69e93476014184ab) — BEHIND master
+#   License          : MIT, (c) 2024 Baoquan Su  (LICENSE:1-3)
+#
+# WHY A COMMIT AND NOT A TAG. The repository carries three tags; v1.0.0 and
+# v2.0.0 dereference to the SAME commit (e2a31f2b), and the newest tag v2.1.0 is
+# behind master, which reports version 2.1.1. No tag names this code, so the
+# 40-hex commit is the only honest pin. %post verifies the commit AND the tree
+# hash — the tree catches a rewritten history that reuses a commit id.
+#
+# BASE IMAGE — PINNED BY DIGEST BEFORE THE BUILD.
+# Upstream ships no Dockerfile and no container recipe, so the base is ours.
+# `From:` below names a content address, not a tag, so the starting point cannot
+# move under this recipe:
+#
+#   index digest  sha256:1808b31ef43e9c521cde5884ba4df9ec26d8d503a314cea787590f8550358a63
+#   (multi-platform OCI index; resolved from continuumio/miniconda3:latest on
+#   2026-07-26 — the tag is provenance only and is never used to build)
+#   linux/amd64 manifest  sha256:ca590c438371363f728233c7344a8ed584a900ed696c31f1d9d9e4a0a1e0dd87
+#   its OCI config        sha256:5dda0b54dc8acbb66b4b9ef2c3a08ac436b054c49c026a40064efafa9cb99147
+#
+# Do NOT replace the digest with a tag "to get a newer base". If you deliberately
+# move to a newer base, resolve its digest first, record all three digests here,
+# and re-run the fixture.
+#
+# HONEST SCOPE. Pinning the base fixes the STARTING POINT. The `conda env create`
+# in %post still solves against live channels, so this recipe produces a
+# CONTENT-ADDRESSED INSTALLED SNAPSHOT — identified by the image's own SHA-256
+# plus the conda-explicit and pip-freeze locks frozen inside it — NOT a
+# byte-identical rebuild recipe. Do not describe it as one.
+#
+# NOT baked in, by design:
+#   - CryoAtom checkpoints RUNet.pth / CryoNet.pth / CryoNet_no_seq.pth
+#       -> an external weight cache, bind-mounted over
+#          /opt/conda/envs/CryoAtom2/lib/python3.9/site-packages/CryoAtom2/checkpoint
+#       This is the ONLY way to externalise them: build.py computes
+#          pkg_dir = abspath(Path(build.py).parent.parent)
+#       and reads pkg_dir + "/CryoAtom2/checkpoint/*.pth". There is no env-var
+#       override anywhere in the upstream source.
+#   - ESM2-650M + its contact regression, and RNA-FM
+#       -> the same cache, bind-mounted at /torchhome with TORCH_HOME=/torchhome.
+#          PNAComplex.py loads esm2_t33_650M_UR50D and rna_fm_t12
+#          UNCONDITIONALLY via get_lm_emb_to_PNAcomplex — including in the
+#          no-sequence path — and torch.hub.get_dir() (i.e. $TORCH_HOME/hub) is
+#          the lookup root.
+#   - genetic/sequence databases: never installed. The -pf/-nf options take
+#          caller-supplied FASTA files.
+#
+# DELIBERATE DEVIATIONS FROM UPSTREAM install.sh:
+#   1. install.sh is NOT executed. It downloads weights into the source tree so
+#      that setup.py package_data bakes them into site-packages — exactly what
+#      an external weight cache must avoid — it hard-fails if a CryoAtom2 conda
+#      env already exists, and it uses `wget --no-check-certificate`.
+#   2. `pip install --no-deps .` replaces `python setup.py install`. Legacy
+#      setup.py install was removed in setuptools >= 80, and it produces a
+#      VERSIONED .egg directory, which would make the checkpoint bind path
+#      version-dependent. A normal package dir keeps that path deterministic.
+#   3. getp is COMPILED from the pinned sources rather than trusting the
+#      prebuilt binary committed to git (built on an unknown host; upstream's
+#      README anticipates segfaults from it). The committed binary is retained
+#      beside it as utils/getp.upstream-prebuilt for comparison. If the compile
+#      fails the BUILD fails — there is no silent fallback.
+#   4. No `wget --no-check-certificate` anywhere. This container performs no
+#      download from yanglab.qd.sdu.edu.cn at all; weight staging happens
+#      outside the image over verified TLS
+#      (scripts/stage_cryoatom_weights.sh).
+# ============================================================================
+
+Bootstrap: docker
+From: continuumio/miniconda3@sha256:1808b31ef43e9c521cde5884ba4df9ec26d8d503a314cea787590f8550358a63
+
+%labels
+    Tool             CryoAtom2
+    Version          2.1.1
+    SourceKind       untagged 2.1.1 master snapshot (NOT a tagged 2.1.1 release)
+    SourceRepo       https://github.com/YangLab-SDU/CryoAtom
+    SourceCommit     856e250df7b784b854b892f1b619d32d51188cef
+    SourceTree       0058c0c68857b66962f9ad421756513e74de7518
+    SourceCommitDate 2026-06-17T14:53:48+0800
+    SourceLicense    MIT
+    BaseImageRepo    continuumio/miniconda3
+    BaseImageIndexDigest    sha256:1808b31ef43e9c521cde5884ba4df9ec26d8d503a314cea787590f8550358a63
+    BaseImageManifestDigest sha256:ca590c438371363f728233c7344a8ed584a900ed696c31f1d9d9e4a0a1e0dd87
+    BaseImageConfigDigest   sha256:5dda0b54dc8acbb66b4b9ef2c3a08ac436b054c49c026a40064efafa9cb99147
+    BaseImageOS      linux
+    BaseImageArch    amd64
+    BaseImageTagProvenance  continuumio/miniconda3:latest (resolved 2026-07-26; provenance only, never built from)
+    ImageClass       content-addressed installed snapshot (image sha256 + in-image conda/pip locks); NOT a byte-identical rebuild recipe
+    CondaEnv         CryoAtom2
+    CheckpointDir    /opt/conda/envs/CryoAtom2/lib/python3.9/site-packages/CryoAtom2/checkpoint
+    TorchHome        /torchhome
+    WeightPolicy     external weight cache, bind-mounted at run time
+
+%environment
+    export PYTHONNOUSERSITE=1
+    export MPLBACKEND=Agg
+    # TORCH_HOME is injected at run time by the launcher (bind-mounted cache).
+    export PATH=/opt/conda/envs/CryoAtom2/bin:$PATH
+
+%post
+    set -eu
+
+    SRC=/opt/src
+    ENV_NAME=CryoAtom2
+    ENV_PREFIX=/opt/conda/envs/$ENV_NAME
+    COMMIT=856e250df7b784b854b892f1b619d32d51188cef
+    EXPECT_TREE=0058c0c68857b66962f9ad421756513e74de7518
+    REPO=https://github.com/YangLab-SDU/CryoAtom
+
+    echo "=== [1/7] base tooling ==="
+    # git fetches the pinned revision; the conda-forge compilers build getp.
+    # Installed into base (not the CryoAtom2 env) so they cannot perturb the
+    # pinned scientific dependency set.
+    conda install -y -n base -c conda-forge git make 'gxx_linux-64=13.*' 'gcc_linux-64=13.*'
+    conda clean -afy
+
+    echo "=== [2/7] fetch pinned source ==="
+    mkdir -p "$SRC"
+    git clone "$REPO" "$SRC/CryoAtom"
+    git -C "$SRC/CryoAtom" checkout --detach "$COMMIT"
+    GOT="$(git -C "$SRC/CryoAtom" rev-parse HEAD)"
+    if [ "$GOT" != "$COMMIT" ]; then
+        echo "FATAL: checked out $GOT, expected $COMMIT" >&2
+        exit 1
+    fi
+    TREE="$(git -C "$SRC/CryoAtom" rev-parse HEAD^{tree})"
+    if [ "$TREE" != "$EXPECT_TREE" ]; then
+        echo "FATAL: tree $TREE, expected $EXPECT_TREE" >&2
+        exit 1
+    fi
+    echo "source pinned at commit $GOT / tree $TREE  [ok]"
+    # Freeze provenance inside the image so it is self-describing.
+    mkdir -p /opt/cryoatom
+    git -C "$SRC/CryoAtom" log -1 --format='%H%n%ci%n%s' > /opt/cryoatom/source_commit.txt
+    git -C "$SRC/CryoAtom" rev-parse HEAD^{tree} > /opt/cryoatom/source_tree.txt
+    cp "$SRC/CryoAtom/LICENSE" /opt/cryoatom/LICENSE
+    cp "$SRC/CryoAtom/linux.yml" /opt/cryoatom/linux.yml
+
+    echo "=== [3/7] conda environment from the pinned linux.yml ==="
+    # If this fails on the exact build string
+    # (pytorch=2.1.0=py3.9_cuda11.8_cudnn8.7.0_0) that pin has been pruned from
+    # the pytorch channel. That is a REAL reproducibility failure: fail here
+    # rather than silently resolving a different build.
+    conda env create -f "$SRC/CryoAtom/linux.yml"
+    conda clean -afy
+
+    echo "=== [4/7] compile getp from the pinned sources ==="
+    # Pure g++/OpenMP, C++11. No CUDA, no nvcc — so this image builds on a
+    # CPU-only build node.
+    export CXX="$(ls /opt/conda/bin/*-linux-gnu-g++ | head -1)"
+    echo "using CXX=$CXX"
+    "$CXX" --version | head -1
+    make -C "$SRC/CryoAtom/CryoAtom2/src/getp" clean || true
+    make -C "$SRC/CryoAtom/CryoAtom2/src/getp" CXX="$CXX"
+    test -x "$SRC/CryoAtom/CryoAtom2/src/getp/getp" || { echo "FATAL: getp did not build" >&2; exit 1; }
+
+    echo "=== [5/7] install the package ==="
+    "$ENV_PREFIX/bin/pip" install --no-deps --no-build-isolation "$SRC/CryoAtom"
+
+    SITE="$ENV_PREFIX/lib/python3.9/site-packages"
+    test -d "$SITE/CryoAtom2" || { echo "FATAL: $SITE/CryoAtom2 missing after install" >&2; exit 1; }
+
+    # setup.py's package_data relies on find_packages() reaching utils/, RUNet/
+    # and CryoNet/. Rather than trust that, copy the pinned tree verbatim so the
+    # installed package is byte-identical to the audited revision.
+    cp -a "$SRC/CryoAtom/CryoAtom2/." "$SITE/CryoAtom2/"
+
+    # Replace the committed prebuilt binary with the one just compiled, keeping
+    # the original for comparison.
+    if [ -f "$SITE/CryoAtom2/utils/getp" ]; then
+        mv "$SITE/CryoAtom2/utils/getp" "$SITE/CryoAtom2/utils/getp.upstream-prebuilt"
+    fi
+    install -m 0755 "$SRC/CryoAtom/CryoAtom2/src/getp/getp" "$SITE/CryoAtom2/utils/getp"
+
+    # Bind mountpoints. Empty directories are never shipped by pip, so create
+    # them explicitly; the launcher binds the external cache over them.
+    mkdir -p "$SITE/CryoAtom2/checkpoint"
+    mkdir -p /torchhome
+
+    # Nothing large may be baked in. A .pth here means weights leaked into the
+    # image, which this recipe forbids.
+    if find "$SITE/CryoAtom2/checkpoint" -name '*.pth' | grep -q .; then
+        echo "FATAL: model weights were baked into the image; that is forbidden" >&2
+        exit 1
+    fi
+
+    echo "=== [6/7] dependency lock ==="
+    # The strongest reproducibility evidence available for a conda env: an
+    # explicit lock plus a pip freeze, frozen inside the image.
+    conda list -n "$ENV_NAME" --explicit > /opt/cryoatom/conda-explicit.txt
+    "$ENV_PREFIX/bin/pip" freeze > /opt/cryoatom/pip-freeze.txt
+
+    echo "=== [7/7] tidy ==="
+    rm -rf "$SRC"
+    chmod -R a+rX /opt/cryoatom
+
+%runscript
+    export PYTHONNOUSERSITE=1
+    exec /opt/conda/envs/CryoAtom2/bin/cryoatom "$@"
+
+%test
+    # Runs at the end of `apptainer build`. CPU-only: a build node has no GPU,
+    # so nothing here may require CUDA.
+    set -eu
+    ENV_PREFIX=/opt/conda/envs/CryoAtom2
+    SITE="$ENV_PREFIX/lib/python3.9/site-packages"
+
+    test -x "$ENV_PREFIX/bin/cryoatom" || { echo "cryoatom entrypoint missing"; exit 1; }
+
+    # Version must equal the pin. Drift here means the wrong revision built.
+    V="$("$ENV_PREFIX/bin/python" -c 'import CryoAtom2; print(CryoAtom2.__version__)')"
+    test "$V" = "2.1.1" || { echo "version mismatch: got '$V', pinned 2.1.1"; exit 1; }
+    echo "CryoAtom2 $V  [ok]"
+
+    # The checkpoint directory must exist (bind mountpoint) and be EMPTY.
+    test -d "$SITE/CryoAtom2/checkpoint" || { echo "checkpoint mountpoint missing"; exit 1; }
+    test -z "$(ls -A "$SITE/CryoAtom2/checkpoint")" || { echo "checkpoint dir is not empty — weights leaked into the image"; exit 1; }
+    echo "checkpoint mountpoint present and empty  [ok]"
+
+    # Data files that find_packages()/package_data could plausibly have missed.
+    for f in config.json utils/getp utils/PNAComplex.py RUNet/inference.py; do
+        test -e "$SITE/CryoAtom2/$f" || { echo "missing installed data file: $f"; exit 1; }
+    done
+    test -x "$SITE/CryoAtom2/utils/getp" || { echo "getp is not executable"; exit 1; }
+    echo "package data present  [ok]"
+
+    # The compiled getp must actually run in THIS image (the whole reason it is
+    # rebuilt rather than trusted).
+    "$SITE/CryoAtom2/utils/getp" >/dev/null 2>&1 || true
+    ldd "$SITE/CryoAtom2/utils/getp" | grep -q 'not found' \
+        && { echo "getp has unresolved shared libraries"; exit 1; }
+    echo "getp links cleanly  [ok]"
+
+    # Imports that would otherwise only fail deep inside a GPU run.
+    "$ENV_PREFIX/bin/python" -c '
+import torch, esm, fm, mrcfile, pyhmmer, Bio, numpy, scipy
+print("torch", torch.__version__)
+print("torch.version.cuda", torch.version.cuda)
+print("esm/fm/mrcfile/pyhmmer/Bio/numpy/scipy import OK")
+assert torch.__version__.startswith("2.1.0"), torch.__version__
+' || { echo "dependency import check failed"; exit 1; }
+
+    # --version does not touch a checkpoint, so it is a valid CPU-only gate.
+    "$ENV_PREFIX/bin/cryoatom" --version
+    echo "cryoatom.def %test OK"
