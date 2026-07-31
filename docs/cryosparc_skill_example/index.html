@@ -154,11 +154,17 @@
   workspace_uid, lane, and params.
 - Never store passwords or session tokens here.</code></pre>
 
-  <p>Credentials are passed via environment variables at run time, never written into the skill folder:</p>
-  <pre><code>export CRYOSPARC_HOST='xxx'
+  <p>The connection endpoint and credentials are passed via environment variables at run time, never written into the skill folder. Use either a master hostname plus base port, or a full base URL:</p>
+  <pre><code># Option A — master hostname + base port
+export CRYOSPARC_MASTER_HOSTNAME='xxx'
 export CRYOSPARC_BASE_PORT='xxx'
+
+# Option B — full base URL (use instead of Option A)
+# export CRYOSPARC_BASE_URL='https://xxx:xxx'
+
+# Use these credentials, or an existing python -m cryosparc.tools login session.
 export CRYOSPARC_EMAIL='xxx@xxx'
-read -s CRYOSPARC_PASSWORD
+read -r -s CRYOSPARC_PASSWORD
 export CRYOSPARC_PASSWORD</code></pre>
 </section>
 
@@ -306,16 +312,11 @@ export CRYOSPARC_PASSWORD</code></pre>
   <h2>Snippets</h2>
 
   <h3>Connect from Python</h3>
-  <pre><code>import os
-from cryosparc.tools import CryoSPARC
+  <pre><code>from cryosparc.tools import CryoSPARC
 
-cs = CryoSPARC(
-    license  = os.environ["CRYOSPARC_LICENSE"],  # xxx-xxx-xxx
-    host     = os.environ["CRYOSPARC_HOST"],     # xxx
-    base_port= int(os.environ["CRYOSPARC_BASE_PORT"]),  # xxx
-    email    = os.environ["CRYOSPARC_EMAIL"],
-    password = os.environ["CRYOSPARC_PASSWORD"],
-)
+# Reads CRYOSPARC_BASE_URL, or CRYOSPARC_MASTER_HOSTNAME +
+# CRYOSPARC_BASE_PORT, together with the credentials above or a login session.
+cs = CryoSPARC()
 assert cs.test_connection()</code></pre>
 
   <h3>Inspect a job&rsquo;s params and assets</h3>
