@@ -1,5 +1,7 @@
 # Topic 21 — GPU, Lanes, Queue, and Worker Assignment
 
+MIG and queue-panel failures have **v5.0.7** fixes; check the current-release table in `version_caveats.md` before changing worker/lane configuration. For v4.7, distinguish the standard and CUDA 12 builds there.
+
 ## Scope
 How CryoSPARC schedules and runs work: the master / worker / lane / target / queue / SSD-cache model, where each resource is configured, how to route everyday operational questions (stuck queued job, worker offline, GPU not visible / missing GPU, OOM, slow job, multi-user contention), and which adjacent page actually owns the underlying mechanic so this topic does not duplicate them.
 

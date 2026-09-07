@@ -129,7 +129,8 @@ Outputs are half-maps plus the corresponding particle set; downstream, use Local
 ## Version-aware highlights
 - **v4.4**: Heterogeneous Reconstruction Only added (clean way to re-reconstruct per-class volumes from ab initio / heterogeneous outputs at a new box size or with a new mask).
 - **v4.5**: Ab-Initio Reconstruction no longer fails when upstream particles already carry `alignments3D` and a number-of-particles cap is set; multi-volume outputs are now exposed as a "volumes group" output that can drive single-input downstream jobs (useful when feeding all ab initio volumes into Heterogeneous Refinement).
-- **v5.0**: Homogeneous Ab-Initio Refinement (BETA) added; Ab-Initio Reconstruction adds spherical / none / cylindrical `Volume window mode` plus configurable inner/outer window diameters, and a new `Minimum alignment resolution` high-pass; NaN failures with near-empty class volumes fixed; Select Volume utility makes "pick the best ab initio map" automatable in workflow templates.
+- **v4.7.1**: Select Volume selects the highest-resolution input volume and corresponding particles for automated workflows (see `version_caveats.md`).
+- **v5.0**: Homogeneous Ab-Initio Refinement (BETA) added; Ab-Initio Reconstruction adds spherical / none / cylindrical `Volume window mode` plus configurable inner/outer window diameters, and a new `Minimum alignment resolution` high-pass; NaN failures with near-empty class volumes fixed.
 
 ## Advisor defaults
 When a user asks "what should I do for the first 3D model?":

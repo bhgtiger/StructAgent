@@ -1,5 +1,7 @@
 # Reference 17 — cryoSPARC Error & Symptom Lookup
 
+For current Live auto-pause, MIG, save-warning, backup-list, or queue-panel symptoms, start with `version_caveats.md`'s **v5.0.7** table. Entries below include historical CLI commands; verify their applicability to the installed version.
+
 ## Scope
 
 Retrieval-first index of error strings, log lines, and symptom patterns observed in cryoSPARC, with the fastest checks and fixes. Not a tutorial. When an error string is generic ("NoneType", "IndexError"), the entry calls out the symptom pattern and tells you what else to confirm before acting.

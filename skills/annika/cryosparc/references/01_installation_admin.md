@@ -1,5 +1,7 @@
 # Topic 01 — Installation and Administration Orientation
 
+Current release and v4.7 standard/CUDA 12 build distinctions: `version_caveats.md`. The [v5 migration guide](https://guide.cryosparc.com/setup-configuration-and-management/software-system-guides/guide-updating-to-cryosparc-v5) confirms stable v5 availability as of May 27, 2026. Do not use the old blanket beta caveat to choose a new installation.
+
 ## Scope
 This page is an **advisor/admin orientation** for a cryoSPARC instance, not a substitute for the official installer. It is meant to give an agent (and the user it is helping) a fast, conservative mental model of how cryoSPARC is laid out on disk and on the network, what the install/connect/update flow actually requires, where the typical failure modes are, and which adjacent topic owns the next layer of detail.
 
@@ -312,7 +314,7 @@ Default advisor recommendations when no strong reason exists to deviate:
 
 | Question | Default | Why |
 |---|---|---|
-| New install, single lab, 1–4 GPUs | Single workstation, v4.7.1 if stability matters, v5.0+ if compatible with OS/driver/GPUs | v5 is still labelled BETA in the bundled docs; single-workstation simplifies almost everything. |
+| New install, single lab, 1–4 GPUs | Single workstation; assess the current v5 release against OS/driver/GPU requirements | v5 is now stable; see `version_caveats.md` for the verified patch. Preserve v4 choices where compatibility requires them. |
 | New install, shared GPU server + small group | Master on a separate lightweight host, worker on the GPU host | Avoids GPU OOM hanging the web app/DB. |
 | New install on an HPC | Master on a small login-adjacent VM, cluster lane via `cryosparcm cluster connect` | Lets the scheduler own GPU/CPU; CryoSPARC just submits scripts. |
 | Should I install CUDA system-wide? | v4.4+: no — bundled. ≤v4.3: yes, 11.8 + matching driver. v5.0+: no — bundled 12.8. | `…__cryosparc-installation-prerequisites.md`. |

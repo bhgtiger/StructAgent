@@ -1,5 +1,9 @@
 # Topic 19 — Symmetry
 
+## Updated learning source — 2026-09-07
+
+The official [Symmetry in CryoSPARC](https://guide.cryosparc.com/symmetry-in-cryosparc) article illustrates rotation-only point groups and their axes. For an icosahedral import/export mismatch, check conventions before changing the imposed symmetry: both I1/I and I2 have twofold axes along X/Y/Z, but the highest-Z vertices lie in YZ for I1 and XZ for I2. A convention mismatch can require reorientation rather than a different biological symmetry.
+
 ## Scope
 Strategy for whether and how to impose, relax, expand, or refuse symmetry across the cryoSPARC SPA workflow: ab initio, consensus refinement, 3D classification / heterogeneous refinement, local refinement, reconstruction-only branches, and the handedness branch. Helical symmetry is included only as a specialized branch; deep helical workflow lives in `11_helical.md`. Mask construction for symmetry-aware classification and local refinement lives in `20_masks.md`. Global refinement branch logic lives in `07_refinement.md`, 3D classification mechanics in `08_classification_3d.md`, local refinement in `09_local_refinement.md`, FSC and postprocessing reading in `10_postprocessing.md`, and orientation diagnostics in `orientation_and_preferred_views.md`.
 

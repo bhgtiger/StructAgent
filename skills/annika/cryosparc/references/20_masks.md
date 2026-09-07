@@ -1,5 +1,9 @@
 # Topic 20 — Masks
 
+## Current tutorial example — checked 2026-09-07
+
+Read [Dynamic Masking in Refinements (v5.0+)](https://guide.cryosparc.com/processing-data/tutorials-and-case-studies/tutorial-dynamic-masking-in-refinements-v5.0) when interpreting the new mask plots. Solid contours mark mask value 1; dashed contours mark the outer soft edge. Inspect the underlying unmasked density too: a weak binding partner can lie outside an automatic mask. Dilation and padding scale with resolution, so do not transfer fixed v4 voxel settings without checking their physical extent. Distinguish refinement masks from resolution/FSC masks when comparing runs.
+
 ## Scope
 
 Choosing, generating, and validating 3D masks for cryoSPARC jobs: refinement FSC, local refinement, particle subtraction, classification focus, 3DVA, postprocessing. Covers mask base creation in ChimeraX (segmentation, volume eraser, molmap) and conversion to final masks via Volume Tools. Mask design is empirical — expect iteration.

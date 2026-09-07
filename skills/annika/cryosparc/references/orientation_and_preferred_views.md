@@ -1,5 +1,7 @@
 # Reference — Orientation Diagnostics and preferred views
 
+For automated metric retrieval, see the **v5.0.7** summary-statistics change in `version_caveats.md`. For repeated datasets with angular bias, the CAK example in `automated_workflow_tutorials.md` adds a worked rebalancing/curation route.
+
 ## Purpose
 
 Use this page when a cryoSPARC refinement looks globally acceptable but the map is directionally weak, streaky, locally uninterpretable, or dominated by one/few particle views. The goal is to separate four related but different questions:

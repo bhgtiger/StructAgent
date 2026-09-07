@@ -1,5 +1,7 @@
 # Topic 24 — Disk and Storage (Planning, Cleanup, Compaction, Export, Archival, Recovery)
 
+For project-results persistence warnings or missing backup UI entries, start with the **v5.0.7** table in `version_caveats.md`; it documents retry and display changes relevant to this runbook.
+
 ## Scope
 How CryoSPARC consumes and releases storage: the four storage layers (project directory tree, MongoDB metadata, SSD particle cache, raw-data symlinks), how each layer grows, what each cleanup operation actually removes (and what it does *not* touch), and the lifecycle runbooks the agent needs to safely move, archive, recover, and shrink an instance without losing data. The page is deliberately conservative about destructive commands — most of the durable risk in cryoSPARC operations is at this layer, and a single confident `rm` is the canonical way to destroy a multi-TB project.
 

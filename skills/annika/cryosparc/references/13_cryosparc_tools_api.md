@@ -44,6 +44,26 @@ Safe handling:
 
 ### Version compatibility
 
+Verified **2026-09-07**: CryoSPARC **5.0.7** pairs with tools **5.0.x**; the latest tools release is [5.0.3](https://github.com/cryoem-uoft/cryosparc-tools/releases/tag/v5.0.3). Tools 5.0.3 corrected session/workspace API signatures. The [tools introduction](https://tools.cryosparc.com/intro.html) requires CryoSPARC 5+ for tools 5 and documents minor-version matching. Keep a matching v4 tools environment for v4 instances.
+
+### v4-to-v5 scripting migration
+
+The [v5.0.0 tools changelog](https://github.com/cryoem-uoft/cryosparc-tools/releases/tag/v5.0.0) explicitly lists breaking changes. Audit old scripts before execution:
+
+| Old assumption | v5 behavior |
+|---|---|
+| `cs.cli`, `cs.rtp`, `cs.vis` | Unified `cs.api`; verify the endpoint rather than replacing names mechanically. |
+| `cs.get_job_specs()` | `cs.job_register`. |
+| Asset/lane/target dictionaries | Models with attribute access; some target fields moved under `.config`. |
+| `job.doc['params_spec']` | Model schema reorganized around `.spec`; prefer `.model`. |
+| Add outputs to completed external jobs | Requires clearing first; saving requires the job to be running. Clearing/restarting changes state and must be authorized. |
+| `download_asset` directory target | Supply a destination filename. |
+| `project.dir()` / `job.dir()` | Prefer `.dir` properties; callable forms are deprecated. |
+
+Use current [job-controller documentation](https://tools.cryosparc.com/api/cryosparc.controllers.job.html) for exact method signatures. Do not clear completed jobs merely to make an old example run; a new external job may better preserve provenance.
+
+### Version selection rules
+
 | Rule | Why it matters |
 |---|---|
 | Match the cryosparc-tools **minor** version to the CryoSPARC minor version (e.g. CryoSPARC v4.6.x → cryosparc-tools `~=4.6.0`) | Tools and master evolve in lockstep; a mismatched minor version commonly produces brittle errors, especially around workspace/session loading |
@@ -145,6 +165,8 @@ dataset = job.load_output("<output_group>")
 The above is a **pattern**, not a verified API call. Before pasting into a production script, the agent should: (a) confirm exact attribute and method names from the live docs at `https://tools.cryosparc.com/`; (b) confirm the job type's code name from `cs.job_register` or the GUI builder; (c) confirm parameter and input/output names from the GUI's Inputs/Outputs tabs as described in §2.
 
 ## 5. Workflow templating (clone & reuse GUI-built workflows)
+
+For official CAK/GPCR JSON examples, adapting references and diameters, Live-export parents, and flagged-parameter behavior, start with `automated_workflow_tutorials.md`.
 
 CryoSPARC ships a first-class **Workflows** feature (`docs/per_page/application-guide__workflows.md`, `docs/per_page/processing-data__automated-workflows.md`). For repeatable end-to-end pipelines this is almost always a better choice than building the job graph from scratch in cryosparc-tools.
 

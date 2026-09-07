@@ -2,11 +2,19 @@
 
 **Consult workflows, inspect results, launch jobs safely.**
 
-This folder contains the StructAgent cryoSPARC skill: a self-contained 44-file agent skill folder with `README.md`, `SKILL.md`, `lessons.md`, 35 on-demand Markdown references, small static assets, a dry-run-first Python helper for cautious `cryosparc-tools` automation, and file-local ChimeraX mask helpers. It is designed for Claude/Codex-style coding agents, but the pattern is runtime-agnostic: any agent can use it if it can load instructions, read reference files on demand, and run approved shell/Python tools.
+This folder contains the portable CryoSPARC agent skill: a concise `SKILL.md` router, 40 on-demand references, reusable automation and mask helpers, and example configurations. Release guidance is verified through CryoSPARC **v5.0.7** as of **2026-09-07**. This is documentation coverage; live execution requires configuration and validation on your own installation.
 
 This is an independent, unofficial project. It is not affiliated with, endorsed by, sponsored by, or approved by Structura Biotechnology Inc. cryoSPARC and CryoSPARC Live are trademarks of Structura Biotechnology Inc. Users are responsible for complying with cryoSPARC licensing, documentation terms, and citation requirements.
 
 Public example page: https://bhgtiger.github.io/StructAgent/cryosparc_skill_example/
+
+## Sources and future updates
+
+This repository maintains the general-purpose skill at `skills/annika/cryosparc/`. Copy it into your agent's skill directory and configure connection details locally. Preserve local settings and lessons when updating an existing installation.
+
+[Maintenance instructions](references/maintenance.md) list authoritative sources and explain how to refresh this skill without loading the whole corpus. Ask: **“Use the cryosparc skill to update its own release guidance and official tutorials, keeping loading lightweight.”**
+
+The current refresh adds [Complex I heterogeneity](references/case_studies_and_tutorials.md), [CAK/GPCR automated workflows](references/automated_workflow_tutorials.md), tools v5 migration notes, and current symmetry/FSC resources. The main entrypoint is 650 words; substantial guidance stays in on-demand references. Keep site configurations, credentials, private lessons, source archives, and run logs outside public commits.
 
 ## What is included
 

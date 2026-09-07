@@ -1,5 +1,25 @@
 # Reference — cryoSPARC Version Caveats
 
+## Current release — verified 2026-09-07
+
+Latest published CryoSPARC: **v5.0.7, August 14, 2026**. The [release index](https://cryosparc.com/updates/v5.0) labels v5.0.0–v5.0.5 beta; v5.0.6/v5.0.7 have no beta label. Individual jobs may still be beta. Check the installed version independently.
+
+The [v5.0.7 release notes](https://cryosparc.com/updates/v5.0.7) change these diagnoses:
+
+| Symptom / task | v5.0.7 change and next check |
+|---|---|
+| Live fails to auto-pause after failed exposures or manual pause/resume | Fixed; establish version before reconfiguring the session. |
+| Job launch with MIG-enabled GPUs | Fixed; a single job still cannot combine MIG and non-MIG devices. |
+| Programmatic Orientation Diagnostics | All computed metrics now appear in summary statistics; inspect returned field names. |
+| Temporary project-results save failure | Automatic retries, default interval one hour, with a warning. Confirm the save eventually succeeds; retry is not proof of persistence. |
+| User Python packages interfere with processes | Isolation fix; record the launch environment if failures continue. |
+| Completed backup absent from the UI | Backup-list display fixed. |
+| Queue panel freezes or sends interactive jobs away from master | Both queue-panel issues fixed. |
+
+[v5.0.6](https://cryosparc.com/updates/v5.0.6), May 5, 2026, fixed incorrect earlier-iteration dashboard charts after switching from the event log. It was in the original raw archive but missing from the distilled version table.
+
+Latest verified **cryosparc-tools: v5.0.3**, May 4, 2026 ([tools release](https://github.com/cryoem-uoft/cryosparc-tools/releases/tag/v5.0.3)). Match major/minor, not patch numbers: CryoSPARC 5.0.7 uses tools 5.0.x. For v4→v5 migration, read `13_cryosparc_tools_api.md`; tools has breaking changes despite the broad compatibility language on the CryoSPARC release page.
+
 ## Scope / how to use
 
 Retrieval-first map of version-specific cryoSPARC behavior, compatibility cliffs, fixed bugs, and stale-advice traps for advisor and automation workflows.
@@ -12,7 +32,7 @@ Use this when:
 
 Always confirm the installed **master version**, **worker version**, **GPU driver/CUDA context**, and **cryosparc-tools version** before applying version-specific advice. If the installed version is older than the source note cited here, verify against installed release notes rather than assuming current behavior.
 
-Primary sources: release-note archive `reference/release_notes/markdown/v4.0.md` through `reference/release_notes/markdown/v5.0.md`, plus cross-checks against `17_error_lookup.md`, `14_cli_admin.md`, `20_masks.md`, `24_disk_and_storage.md`, and `25_cryosparc_live.md`.
+Primary sources: historical release-note archive `reference/release_notes/markdown/` (v4.0–v4.6 and v5.0), supplemented by current [v4.7](https://cryosparc.com/updates/v4.7) and v5 sources linked here. Archive paths are provenance, not bundled dependencies.
 
 ---
 
@@ -48,7 +68,7 @@ Primary sources: release-note archive `reference/release_notes/markdown/v4.0.md`
 | CentOS 7 deprecation | v4.6 | CentOS 7 support deprecated; future versions will not support it. | Warn CentOS 7 users before upgrade; plan OS migration. | `reference/release_notes/markdown/v4.6.md` |
 | v5 OS/GPU hard requirements | v5.0+ | Requires GLIBC 2.28+; oldest compatible OS families include Rocky/RHEL 8 and Ubuntu 20.04; Ubuntu 22.04+ recommended. Requires NVIDIA driver 570.26+; uses CUDA 12.8; supports GPU compute capability 5.0–12.0. | Before v5 upgrade, audit OS, driver, and GPU architecture. Kepler compute 3.5 is no longer supported. | `reference/release_notes/markdown/v5.0.md` |
 | v5 CLI incompatibility | v5.0+ | New improved `cryosparcm` CLI is not compatible with v4 `cli` commands; scripts using v4 CLI need updates, including Live session management. | Automation must branch on version; never blindly run v4 CLI command forms on v5. | `reference/release_notes/markdown/v5.0.md`, `14_cli_admin.md` |
-| cryosparc-tools v5 compatibility | v5.0+ | New backwards-compatible cryosparc-tools version available for scripting with v5; previous scripts continue to function as before per release note. | Still pin/check tools version when debugging scripting failures; update tools alongside major instance upgrade. | `reference/release_notes/markdown/v5.0.md` |
+| cryosparc-tools v5 migration | v5.0+ | Low-level endpoints, model fields, return types and external-job lifecycle changed. | Audit scripts against the tools migration notes; do not promise unchanged v4 scripts will run. | `13_cryosparc_tools_api.md` |
 | Live configuration profiles | v5.0+ | Live configuration profiles in v5 are not backwards compatible; new v5 profiles are not retained when downgrading to v4. | Export/document Live configs before downgrade; do not promise profile round-trip. | `reference/release_notes/markdown/v5.0.md`, `25_cryosparc_live.md` |
 | Performance benchmarks | v5.0+ | v5 performance benchmarking system is not backwards compatible; new benchmarks can be recorded in v5 but not retained when downgrading to v4. | Treat benchmark comparisons across v4/v5 as non-equivalent unless re-run. | `reference/release_notes/markdown/v5.0.md` |
 | Deep Picker removal | v5.0+ | Deep Picker Train and Deep Picker Inference deprecated and no longer present in v5; previously-run jobs remain visible. | Recommend Topaz/newer alternatives for v5 workflows; do not suggest creating new Deep Picker jobs on v5. | `reference/release_notes/markdown/v5.0.md` |
@@ -67,9 +87,14 @@ Primary sources: release-note archive `reference/release_notes/markdown/v4.0.md`
 | v4.4 | Bundles CUDA 11.8; driver 520.61.05+ required. Introduced Workflows/Blueprints, RBMC improvements, faster NU refinement, 3DFlex Reconstruction CTF-aberration support and lower-RAM cache/project read option, experimental improved SSD cache, BILD export for viewing directions. Legacy web app removed. | Fixed Live sessions created before v4.4, template picking in Live with one template, PatchCTF high-magnification assertion, Particle Subtraction half-set bug, 3DVA tile order, hand-flip axis bug, auto batchsize OOM-control parameter, background subtraction bug. | `reference/release_notes/markdown/v4.4.md` |
 | v4.5 | Workflows improved; browser local upload; Rebalance Orientations job; cFSC summary plots during refinement; improved SSD cache enabled by default with distributed locking strategy; Topaz defaults/resources updated. | Fixed v4.4 Patch Motion rerun empirical-dose-weight issue, motion/CTF freeze after abnormal child termination, 2D hard-classification posterior-count bug, 2D duplicate-removal pixel-size override for pre-v4.5 datasets, 3D Classification focus-mask plotting offset, 3DFlex segmentation-loading issues, SSD symlink failures, Live memory leak/export/worker issues. | `reference/release_notes/markdown/v4.5.md` |
 | v4.6 | CentOS 7 deprecated. New high-performance I/O system gives major particle read speedups; job tree/card/table views rebuilt; job groups; Inspect Particle Picks auto-cluster; local upload supports `.seg`; Live data-management tab deprecated in favor of compaction/restoration. | Fixed Falcon C EER import, high-performance I/O edge cases, SSD cache robustness on cluster filesystems, EER upsampling pixel-size display in Live, 3DFlex MRC segmentation off-by-one, Deep Picker workflow restrictions. | `reference/release_notes/markdown/v4.6.md` |
+| v4.7 | Added Micrograph Junk Detector and Subset Particles by Statistic; Topaz Train stopped using denoised inputs by default. | v4.7.1 added Select Volume. The August patch fixes empty-class ab-initio NaNs and manual subset thresholds; the November patch removes Orientation Diagnostics token requirements. | [v4.7 notes](https://cryosparc.com/updates/v4.7) |
 | v5.0 | Major compatibility jump: GLIBC 2.28+, driver 570.26+, CUDA 12.8, GPU compute capability 5.0–12.0, new incompatible `cryosparcm` CLI, dynamic refinement masks, Job Dashboard/Comparison View, new Live run configuration/auto-start/auto-pause/workers-per-GPU, instance recovery via `cryosparcm recover`, per-result file deletion CLI endpoint. Deep Picker jobs removed. | v5.0.1–v5.0.3 fixed several v5.0.0 upgrade validation/project detach issues. v5.0.2–v5.0.5 fixed many Live export/template/auto-pause/config/profile issues, Topaz Cross Validation parameter handling, SSD copy fallback, local refinement SSD use in Extensive Validation. | `reference/release_notes/markdown/v5.0.md` |
 
 ---
+
+## v4.7 standard versus CUDA 12 build
+
+The standard **v4.7.1** retained v4.7.0 dependencies. **v4.7.1-cuda12** is a separate build for CUDA 12.8/Blackwell, requiring GLIBC 2.28+ and driver 570.26+; Blackwell requires the open driver. Do not apply those requirements to every v4.7 install. Templates v1/v2 in `automated_workflow_tutorials.md` require v4.7.1+, not exclusively v5. [Official v4.7 notes](https://cryosparc.com/updates/v4.7).
 
 ## Stale advice map
 
@@ -141,7 +166,7 @@ Primary sources: release-note archive `reference/release_notes/markdown/v4.0.md`
 
 ### Automation / API / CLI
 - v5 CLI incompatibility is the main automation hazard. Branch commands by version. (`v5.0.md`, `14_cli_admin.md`)
-- cryosparc-tools v5 is described as backwards compatible, but tools/package version still matters for scripting failures. (`v5.0.md`)
+- cryosparc-tools v5 has documented breaking changes; audit endpoints, model fields and external-job lifecycle using `13_cryosparc_tools_api.md`.
 - Workflows/Blueprints arrive in v4.4 and expand templating automation, but Deep Picker restrictions and v5 CLI changes affect reusable workflows. (`v4.4.md`, `v4.6.md`, `v5.0.md`)
 - For Live automation, v5 uses updated Live CLI/session-management paths and profiles are not v4-backwards compatible. (`v5.0.md`, `25_cryosparc_live.md`)
 

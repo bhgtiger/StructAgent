@@ -1,5 +1,7 @@
 # Topic 25 — cryoSPARC Live
 
+For auto-pause regressions, check the **v5.0.7** row in `version_caveats.md` before applying older workarounds. For processing exported exposures with official workflow JSONs, see `automated_workflow_tutorials.md`.
+
 ## Scope
 How to use cryoSPARC Live effectively during acquisition or immediate post-collection triage: session setup, preprocessing, picker transitions, streaming jobs, export/handoff, and common failure modes.
 

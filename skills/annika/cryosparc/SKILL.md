@@ -1,125 +1,59 @@
 ---
 name: cryosparc
-description: Guide and automate cryoSPARC SPA processing: import/preprocessing, picking, extraction/2D, crYOLO general-model picking injection, ab initio, homogeneous/heterogeneous/non-uniform refinement, 3D classification, 3DVA/3DFlex, local/focused refinement, masks, symmetry, helical, CryoSPARC Live, cryosparc-tools, cryosparcm admin, GPU lanes/queues, storage, RELION interop, external-tool bridge formats, troubleshooting, and error lookup. Covers tomography/cryo-ET only at the SPA boundary (e.g. tilted-SPA vs tilt-series, importing tomo-derived particles); it is not a native tomo/cryo-ET pipeline.
+description: Guide and automate CryoSPARC single-particle processing, troubleshooting, Live, workflows, cryosparc-tools/CLI administration, masks, and external-tool interoperability. Use for CryoSPARC workflow or parameter questions and to refresh this skill's release notes, tutorials, and sources. Native tomography pipelines are outside scope.
 ---
 
-# cryoSPARC
+# CryoSPARC
 
-Use this skill for cryoSPARC advice, troubleshooting, parameter recommendations, workflow planning, and cautious automation via `cryosparc-tools` / `cryosparcm` when the user explicitly wants commands run.
+## Start here
 
-**Scope.** SPA-focused. Tomography/cryo-ET is in-scope only where it touches SPA (tilted-SPA collection, importing tomo-derived particle stacks, boundary disambiguation) — see `12_tomography.md`. Native tilt-series alignment and subtomogram averaging pipelines are out of scope.
+Latest verified release: **v5.0.7 (2026-08-14)**; sources checked **2026-09-07**. Historical guidance covers v4.0–v5.0.7, with selective patch notes; this is documentation coverage, not live-instance validation. Check [version caveats](references/version_caveats.md) for release-dependent advice; browse official sources when asked for the latest information.
 
-## First response rule
+Load only the relevant reference below, normally one or two files. For long references, search headings or the exact symptom with `rg -n` and read the matching section. Specific requests take precedence over broad workflow routing. Historical `Source basis` paths identify the construction archive, not runtime dependencies; consult [maintenance](references/maintenance.md) only for provenance or updates.
 
-For user questions, do **not** load the whole corpus. Pick the smallest relevant reference file(s) from `references/` and answer with version-aware caveats. The bundled corpus covers cryoSPARC **v4.0 through v5.0**; flag uncertainty when the user is on an earlier or later release than that window. If the user gives an exact error string, start with `17_error_lookup.md` and `15_troubleshooting.md`.
+## Choose a reference
 
-The `Source basis` sections inside reference files are provenance notes from skill construction, not runtime dependencies. Do not try to load those raw source paths unless the user explicitly provides the original source corpus; the actionable guidance is contained in the bundled reference file itself.
+Reference filenames are relative to `references/`; `scripts/` paths are relative to the skill root.
 
-If acting on a live cryoSPARC instance, first identify:
-- cryoSPARC version;
-- whether the task is advisor-only or automation;
-- project/workspace/job IDs;
-- compute context: lane, GPUs, storage constraints;
-- whether destructive actions are involved. Ask before deleting jobs/data, changing cluster config, or restarting services.
+| Request | Read |
+|---|---|
+| Whole dataset / protocol | `28_spa_playbook.md` |
+| Case study, EMPIAR ID, dataset phenotype | `case_studies_and_tutorials.md` |
+| Repeat-target automation, CAK, GPCR Workflows v1/v2, workflow JSON examples | `automated_workflow_tutorials.md` |
+| Stage-specific “what next?” / parameter recipes | `18_decision_trees.md` / `16_tuning_recipes.md` |
+| Exact error / general failure | `17_error_lookup.md` / `15_troubleshooting.md` |
+| Overview / import | `00_overview.md` / `02_import.md` |
+| Motion, CTF, exposure curation | `03_preprocessing.md` |
+| Native picking / extraction and 2D | `04_picking.md` / `05_extraction_2d.md` |
+| crYOLO general-model picks → extraction → 2D | `29_cryolo_picking_to_2d.md`; `scripts/cryolo_pick/` |
+| Ab initio, including Homogeneous Ab-Initio Refinement | `06_abinitio.md` |
+| Homogeneous, heterogeneous, NU refinement | `07_refinement.md` |
+| Discrete / continuous heterogeneity | `08_classification_3d.md` / `26_continuous_heterogeneity.md` |
+| Local refinement / subtraction | `09_local_refinement.md`, `20_masks.md` |
+| Masks / dynamic masking | `20_masks.md` |
+| Generate model/map/complement mask with ChimeraX | `20a_mask_generation_chimerax.md`; `scripts/masks/` |
+| FSC, sharpening, local resolution | `10_postprocessing.md` |
+| Preferred orientation, cFAR/tFAR | `orientation_and_preferred_views.md` |
+| Symmetry / helical / tomography boundary | `19_symmetry.md` / `11_helical.md` / `12_tomography.md` |
+| CTF refinement / RBMC | `ctf_refinement_and_rbmc.md` |
+| Particle union, intersection, deduplication, scale subsets | `particle_set_operations.md` |
+| Live | `25_cryosparc_live.md` |
+| Python API / GUI-to-API parameters | `13_cryosparc_tools_api.md`, `ui_to_api_crosswalk.md` |
+| Installation / CLI / GPU lanes / storage | `01_installation_admin.md` / `14_cli_admin.md` / `21_gpu_lane_queue.md` / `24_disk_and_storage.md` |
+| External jobs / adapter formats | `23_external_jobs.md` / `29_external_tool_bridge_format.md` |
+| RELION STAR import/export | `27_relion_interop.md` |
+| RELION focused classification → CryoSPARC refinement | `28_relion_class3d_roundtrip.md`; `scripts/roundtrip/` |
 
-## Reference routing
+## Working rules
 
-Core workflow:
-- Overview/project structure → `00_overview.md`
-- Installation/admin → `01_installation_admin.md`, `14_cli_admin.md`
-- Import → `02_import.md`
-- Motion/CTF/exposure curation → `03_preprocessing.md`
-- Picking: Blob/Template/Topaz/Filament Tracer → `04_picking.md` (Deep Picker is legacy and was removed in v5.0+; do not propose it for current installs)
-- Picking: crYOLO general-model (template-free) → cryoSPARC extract / 2D (workflow + automation) → `29_cryolo_picking_to_2d.md` (executable bundle: `scripts/cryolo_pick/`)
-- Extraction, 2D classification, box/Fourier crop/Nyquist → `05_extraction_2d.md`
-- Ab initio → `06_abinitio.md`
-- Homogeneous/Heterogeneous/NU refinement → `07_refinement.md`
-- Discrete heterogeneity / 3D classification → `08_classification_3d.md`
-- Local/focused refinement, particle subtraction, symmetry expansion → `09_local_refinement.md`
-- Postprocessing/FSC/sharpening/local resolution → `10_postprocessing.md`
-- Helical → `11_helical.md`
-- Tomography/cryo-ET boundaries → `12_tomography.md`
-- CryoSPARC Live → `25_cryosparc_live.md`
+- Diagnose from the processing stage and evidence. Give the first inspection, a justified next step, and its validation. Tutorial parameters are dataset-specific examples.
+- For errors, obtain the exact traceback, master/worker/tools versions, and worker-side path visibility. Historical CLI commands require version checks.
+- Deep Picker was removed in v5; use supported picking routes. For v5 scripting, check the migration section in the API reference before adapting old examples.
+- Before live work, establish installed version, project/workspace/job IDs, lane, resources, and whether the user wants advice, job creation, or queueing. Reuse authorization already given. Obtain missing authorization before queue/start, deletion, service restart, configuration changes, shared GPU computation, or private-data export.
+- `scripts/cryosparc_harness.py` defaults to a local plan. `--commit` creates jobs; queueing additionally requires `--queue --queue-confirm QUEUE`, project, workspace, and lane. Inspect actual job schemas; do not infer API names from GUI labels.
+- Mask scripts read/write local files without a CryoSPARC connection. Importing their outputs and running downstream jobs follows the live-work rules. Use the native tool skill for external CLI details.
+- Consult `lessons.md` only for relevant site-specific history; keep credentials outside the skill.
 
-Decision and troubleshooting:
-- Common failures → `15_troubleshooting.md`
-- Error string lookup → `17_error_lookup.md`
-- Parameter cookbook → `16_tuning_recipes.md`
-- “What next?” branch logic → `18_decision_trees.md`
-- Broad workflow/protocol/run-dataset planning + phenotype router → `28_spa_playbook.md`
-- Version-specific behavior/bugs → `version_caveats.md`
+## Update this skill
 
-Specialized references:
-- Official tutorials/case-study scenario playbooks → `case_studies_and_tutorials.md`
-- Masks (design & validation) → `20_masks.md`
-- Mask generation in headless ChimeraX (model→mask via `molmap`, map-only fallback, complementary subtraction masks, bundled `scripts/masks/*.py`) → `20a_mask_generation_chimerax.md`
-- Symmetry → `19_symmetry.md`
-- CTF refinement / RBMC → `ctf_refinement_and_rbmc.md`
-- Orientation diagnostics / preferred views → `orientation_and_preferred_views.md`
-- Particle set operations → `particle_set_operations.md`
-- Continuous heterogeneity: 3DVA/3DFlex → `26_continuous_heterogeneity.md`
-- External jobs: DeepEMhancer/ModelAngelo/custom wrappers → `23_external_jobs.md`
-- RELION interop / STAR import-export → `27_relion_interop.md`
-- RELION focused 3D-classification ⇄ cryoSPARC round-trip (workflow + automation) → `28_relion_class3d_roundtrip.md` (executable bundle: `scripts/roundtrip/`)
-- External-tool bridge format for crYOLO/cryoDRGN/RELION-style adapters → `29_external_tool_bridge_format.md`
-- Disk/storage/cleanup/export → `24_disk_and_storage.md`
-
-Automation/admin:
-- `cryosparc-tools` API → `13_cryosparc_tools_api.md`
-- `cryosparcm` CLI/admin → `14_cli_admin.md`
-- UI label → API parameter crosswalk → `ui_to_api_crosswalk.md`
-- GPU lanes/queues/workers → `21_gpu_lane_queue.md`
-
-## Operating guidance
-
-### Advisor mode
-
-1. Identify the processing stage and symptom.
-2. Load the relevant reference(s), then answer with:
-   - likely cause;
-   - what to inspect first;
-   - safest next job/parameter change;
-   - what not to overinterpret.
-3. Prefer upstream fixes over cosmetic postprocessing when the issue is alignment, heterogeneity, masks, preferred orientation, or bad particles.
-4. Include version caveats when behavior changed across v4.4–v5.0.
-
-### Automation mode
-
-Do not assume connection details. Use `cryosparc-tools` for job orchestration and `cryosparcm` for admin/status only when appropriate. Before queueing **any** `cryosparc-tools`-created job, explicitly confirm with the user: `project_uid`, `workspace_uid`, target lane, and whether they want a dry run (build the job but do not queue) vs. an actual `queue()` call. Do not run `.queue()` / `.start()` on the user's behalf without that confirmation, even if the surrounding script already shows it.
-
-The bundled helper `scripts/cryosparc_harness.py` is a safe starting point for local automation: read-only commands plus dry-run-first job creation by default; actual queueing requires `--commit --queue --queue-confirm QUEUE`, explicit `project_uid`, `workspace_uid`, and lane. It contains no credentials and expects `cryosparc-tools` login/session state or standard `CRYOSPARC_*` environment variables.
-
-For code examples, favor minimal, inspectable snippets. Use `ui_to_api_crosswalk.md` before translating GUI labels to API parameters. For lanes/GPUs, check `21_gpu_lane_queue.md`.
-
-### Safety boundaries
-
-Ask before:
-- queueing or starting any `cryosparc-tools`-created job (confirm `project_uid`, `workspace_uid`, lane, dry-run vs. queue);
-- deleting jobs, projects, workspaces, cache, or raw data;
-- restarting/stopping cryoSPARC services;
-- modifying cluster/worker/lane configuration;
-- running long GPU jobs that consume shared resources;
-- exporting private datasets outside the project.
-
-## Common answer shapes
-
-- **Error message:** before prescribing fixes, collect (a) the **exact error text** as it appears in the job log, (b) cryoSPARC **master / worker / cryosparc-tools versions**, and (c) whether the offending **path is visible from the worker** (not just the master/UI host) — many "file not found" / permission errors are worker-side path or mount issues. Then load `17_error_lookup.md` + `15_troubleshooting.md` and give cause/fix/inspection commands.
-- **Bad 2D classes:** load `05_extraction_2d.md` + maybe `04_picking.md`.
-- **"Pick with crYOLO's general model and get the picks into cryoSPARC" / template-free picking with no 2D classes yet / inject external crYOLO picks → Extract from Micrographs → 2D:** load `29_cryolo_picking_to_2d.md` (workflow, the external-job pick injection + verified passthrough fix, extract / Y-flip verification / 2D optimization rationale) and use `scripts/cryolo_pick/` (config-driven cryosparc-tools automation; crYOLO runs in its own conda env). Defer to `04_picking.md` for native Blob/Template/Topaz picking, or once you already have a clean seed (Topaz) or good 2D classes (Template Picker).
-- **Bad/refinement streaky map:** load `07_refinement.md`, `10_postprocessing.md`, and if angular bias suspected `orientation_and_preferred_views.md`.
-- **Mask/local refinement question (design, FSC tells, Volume Tools params):** load `20_masks.md` + `09_local_refinement.md`.
-- **"Generate/make mask from model/map", "ChimeraX mask", "molmap", "particle subtraction complement mask":** load `20_masks.md` + `20a_mask_generation_chimerax.md` (+ `09_local_refinement.md` for local-refine / subtraction workflow context). The ChimeraX scripts under `scripts/masks/` are **file-local** — they read maps/models and write `.mrc` + `.json` sidecar; they do **not** touch any cryoSPARC instance and need no live credentials. Importing the resulting `.mrc` into cryoSPARC, running Volume Tools, or queueing Local Refinement / Particle Subtraction still follows the usual cryoSPARC safety confirmation rules below.
-- **Broad "run cryoSPARC" / "process this dataset" / "what protocol or workflow should I use" / unscoped phenotype-matching requests:** load `28_spa_playbook.md` first — it routes by trigger phrase to the right per-stage refs, case-study cards, or decision trees, and bundles a per-job-type checklist. Do **not** load it ahead of more specific routing: preferred-orientation, mask, local-refinement, continuous-heterogeneity, exact-error-string, `cryosparc-tools`/`cryosparcm` automation, RELION interop, particle-set, Live, and helical queries still go straight to their dedicated refs below.
-- **Official tutorial/case-study by name, EMPIAR ID, or similar dataset phenotype:** load `case_studies_and_tutorials.md` first as a scenario map, choose the dominant matching playbook, then load the smallest listed workflow reference(s). If the user asks generic stage-specific “what next?” without a case-study-like phenotype, use `18_decision_trees.md` first instead. If the request is broader than a single phenotype ("plan a whole dataset", "give me a protocol"), start at `28_spa_playbook.md`.
-- **Continuous heterogeneity (3DVA / 3DFlex):** load `26_continuous_heterogeneity.md` (+ `09_local_refinement.md` if the user is mixing in particle subtraction or masked analysis).
-- **RELION ↔ cryoSPARC interop / STAR import-export:** load `27_relion_interop.md` (+ `02_import.md` for import-side specifics, `particle_set_operations.md` if combining/diffing particle sets across packages).
-- **"Classify a (local-refine) region in RELION then re-refine each class back in cryoSPARC" / RELION 3D-class round-trip / split particles by RELION class and push back preserving poses:** load `28_relion_class3d_roundtrip.md` (workflow, parameter rationale, validation) and use `scripts/roundtrip/` (config-driven cryosparc-tools automation). Defer to `08_classification_3d.md` if the user would rather classify natively in cryoSPARC.
-- **Particle set operations (union / intersect / difference / dedup across jobs):** load `particle_set_operations.md`.
-- **UI label → API parameter name lookup:** load `ui_to_api_crosswalk.md` (+ `13_cryosparc_tools_api.md` if the user is about to script it).
-- **Automation script/API:** load `13_cryosparc_tools_api.md` + `ui_to_api_crosswalk.md`.
-- **External tool integration format / "run crYOLO or cryoDRGN from cryoSPARC and bring results back" / adapter design:** load `29_external_tool_bridge_format.md` + `23_external_jobs.md`, then load the independent tool skill (`cryolo-skill`, `cryodrgn-skill`, or `relion`) for native CLI details.
-- **Queue/GPU problem:** load `21_gpu_lane_queue.md` + `14_cli_admin.md`.
-
-## Prior-session notes
-
-`lessons.md` (at the skill root) holds running notes from earlier sessions about this user's cryoSPARC environment, recurring pitfalls, and confirmed-working recipes. Consult it as a **last-resort** context source after the relevant reference file, and only when current question hints at site-specific behavior. It may be empty — that is expected and not a problem.
+For “update/refresh the CryoSPARC skill,” follow [references/maintenance.md](references/maintenance.md): inspect sources, review release/tutorial changes, edit affected references, validate, and synchronize the authorized local copies. This maintains the knowledge bundle; a CryoSPARC installation upgrade is a separate task.

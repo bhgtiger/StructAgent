@@ -5,7 +5,7 @@
 This file is a **planning router and per-job checklist**, not an executor. It is the entry point for **broad** SPA workflow requests ("run cryoSPARC", "process this dataset", "what workflow/protocol should I use", "match my dataset to a case study"). It does **not** replace the per-stage references, the decision trees in `18_decision_trees.md`, or the scenario cards in `case_studies_and_tutorials.md` — it points at them.
 
 - Do not run, queue, start, restart, or delete cryoSPARC jobs based on anything in this file. Job execution must follow the safety rules in `SKILL.md` (confirm `project_uid`, `workspace_uid`, lane, dry-run vs queue).
-- Case studies are **curated successes on well-behaved datasets**; do not force-fit a messy dataset into the closest playbook. If no phenotype clearly matches, use the escape hatch at the bottom of this file.
+- Case studies illustrate particular datasets, including difficult mixtures and failed branches; do not force-fit a dataset into the closest playbook. If no phenotype clearly matches, use the escape hatch at the bottom of this file.
 - For exact parameter values, defer to the relevant per-stage reference. Parameter defaults drift across CryoSPARC versions (v4.0–v5.0 corpus window); see `version_caveats.md`.
 - For specific phrases that already have dedicated routing in `SKILL.md` (preferred orientation, masks, local refinement, continuous heterogeneity / 3DVA / 3DFlex, exact error strings, `cryosparc-tools` / `cryosparcm` automation, RELION interop, particle set operations, helical, Live), route directly to that file. This playbook is for the general "I have a dataset, what do I do" case.
 
@@ -13,6 +13,8 @@ This file is a **planning router and per-job checklist**, not an executor. It is
 
 | User phrase pattern | Load order |
 |---|---|
+| "repeat-target automation", "CAK", "GPCR Workflow v1/v2", "workflow JSON examples" | `automated_workflow_tutorials.md` → relevant stage refs |
+| "Complex I", "EMPIAR-10927", "unexpected species", "bimodal particle scales" | `case_studies_and_tutorials.md` → Complex I card |
 | "run cryoSPARC", "process this dataset", "what's the workflow", "from scratch", "end-to-end" | this file → `00_overview.md` → §2 stage spine refs as needed |
 | "what protocol/pipeline should I use for X" with no concrete error/phenotype yet | this file (§5 playbooks) → `case_studies_and_tutorials.md` → loaded playbook's listed refs |
 | "my data looks like / I have a [GPCR / TRPV1 / nucleosome / ferritin / HA trimer / tri-snRNP / FaNaC1 / membrane protein / negative stain / phase plate / EER / EPU AFIS]" | `case_studies_and_tutorials.md` (jump straight to that card) → its listed refs |

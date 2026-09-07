@@ -1,5 +1,9 @@
 # Topic 10 — Postprocessing
 
+## Updated learning sources — 2026-09-07
+
+[The FSC and Gold-Standard Refinement](https://guide.cryosparc.com/the-fsc-and-gold-standard-refinement) explains half-set independence, overfitting, mask-induced correlation and noise substitution. Example: when a tighter mask improves an FSC number, inspect correction and map features before inferring improved structure. A global estimate cannot establish local ligand quality. The [plots tutorial](https://guide.cryosparc.com/processing-data/tutorials-and-case-studies/tutorial-common-cryosparc-plots) distinguishes v4 loose/tight curves from v5 resolution-mask curves; compare mask/correction definitions across versions.
+
 ## Scope
 What to do — and what *not* to do — after a refinement converges: reading FSCs honestly, sharpening without inventing detail, looking at local resolution and anisotropy as cautions rather than scores, and recognizing when an ugly postprocessing plot is telling you to go upstream rather than polish downstream. Mask construction details belong in `20_masks.md`; refinement branch logic in `07_refinement.md`; local refinement in `09_local_refinement.md`; external job mechanics in `23_external_jobs.md`; deep troubleshooting in `15_troubleshooting.md`.
 
