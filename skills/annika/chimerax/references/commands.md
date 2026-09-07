@@ -226,3 +226,13 @@ For tasks needing loops/branching, write a standalone `.py` instead of using the
 ```bash
 "$CHIMERAX" --nogui --exit --script /path/to/interface_contacts.py complex.cif contacts.csv 4.0
 ```
+
+## Current release and workflow caveats
+
+Checked 2026-09-07: the [production metadata](https://www.rbvi.ucsf.edu/chimerax/data/release-info/production.json) identifies **1.12, 11 June 2026**. The [change log](https://www.rbvi.ucsf.edu/trac/ChimeraX/wiki/ChangeLog) also lists later development work: NumPy 2 on July 6 and Python 3.14 on July 15. Do not attribute those changes to production 1.12 or assume compiled bundles work on daily builds. Confirm ChimeraX version and each required Toolshed bundle before adapting the historical ≥1.8 macOS scripts.
+
+For **a fit that looks correct but exports in the wrong frame**, the [save manual](https://www.rbvi.ucsf.edu/chimerax/docs/user/commands/save.html#pdb) specifies scene coordinates by default and `relModel #reference` to preserve the relationship to an unmoved reference file. Save only the intended model, reopen it together with the original map, and verify the fit. Do not bake a transform into coordinates while retaining the same model transform. To extract atoms, select the residue(s) and use `selectedOnly true`; model restriction and atom selection are separate options.
+
+The [fitmap manual](https://www.rbvi.ucsf.edu/chimerax/docs/user/commands/fitmap.html) distinguishes atom-in-map fitting (default overlap) from map correlation fitting with `resolution R`. `moveWholeMolecules false` permits local coordinate edits; global search always moves whole models. Use that distinction when handing a rigid fit to ISOLDE or transferring domain transforms. A higher correlation alone does not establish a correct register or geometry.
+
+For a worked map/model exercise, use the official [cryo-EM introduction](https://www.rbvi.ucsf.edu/chimerax/data/stanford-apr2022/cryoem_intro.html): inspect maps and model placement before fitting, then verify the saved coordinate frame. It is a historical tutorial retained in the current [tutorial index](https://www.rbvi.ucsf.edu/chimerax/tutorials.html), not a 1.12 execution test. Route domain mask construction to the `mask` skill and its model-on-target-grid tutorial.

@@ -95,7 +95,7 @@ daqcolor points ./daq_scores.npy metric aa_top:ALA radius 0.3
 daqcolor clear
 ```
 
-For point display, supported metrics include `aa_conf` and `aa_top:<AA>`.
+For point display, the current manual documents `aa_conf` and `aa_top:<AA>`; these differ from model-coloring metrics.
 
 ### Sequence-shift arrows and optional ISOLDE restraints
 
@@ -143,3 +143,13 @@ python cli/daq_write_bfactor.py \
 ```
 
 Prefer ChimeraX `daqcolor apply` + `save` when DAQplugin is installed in ChimeraX; use the CLI when working from an upstream checkout or when a non-interactive Python path is easier.
+
+## Versions, backend diagnosis, and inspection tutorial
+
+Checked 2026-09-07: [Toolshed](https://cxtoolshed.rbvi.ucsf.edu/apps/chimeraxdaqplugin) lists **1.0.7, released 17 July 2026**; [GitHub Releases](https://github.com/kiharalab/DAQplugin/releases) still marks **1.0.1, 12 May 2026** latest. [Source metadata at `7c158f3`](https://github.com/kiharalab/DAQplugin/blob/7c158f35604d7647078ce62afd7e907afc16bdc5/daqcolor/pyproject.toml) says **1.0.8**. Record which distribution the user has. A main-branch version is not evidence of a published wheel, nor does this source review replace the historical `8a367f6`/1.0.4 command provenance above with a new execution test.
+
+For **unexpected CPU inference on NVIDIA**, Toolshed 1.0.7 fixes GPU detection for CUDA minor-version compatibility/nonstandard library paths. Check bundle version and the actual backend log before diagnosing the machine as GPU-less. The 1.0.4 notes distinguish forced-backend errors from `auto` fallback. Source 1.0.8 caps Linux ONNX Runtime below 1.27 to retain its CUDA-12 dependency stack; do not unpin ORT or mix CUDA-13 packages as an isolated workaround. That pin is source metadata, not a verified property of the 1.0.7 wheel. The 1.0.1 release lazily downloads MLX weights on first use, so an installed wheel alone does not establish offline readiness.
+
+For **inspecting a suspicious chain**, the [current manual](https://github.com/kiharalab/DAQplugin/blob/7c158f35604d7647078ce62afd7e907afc16bdc5/MANUAL.md) describes the Per-Residue DAQ Plot (added in Toolshed 1.0.5). Load the matching `.npy`, color with `aa_score`, choose a chain, refresh the plot, drag a residue range, and use Zoom In to inspect it against density. Compare with the residue table using the same metric/half-window. Green marks missing/invalid nearby support rather than proof of a good residue; inspect coverage before rebuilding. Save a separate scored model because DAQ export replaces B-factors.
+
+Live monitoring re-samples the existing probability grid as coordinates change; it does not recompute map inference. Select `backend` on `daqscore compute_grid`/`compute_pdb`. Although one manual example appends it to `daqcolor monitor`, the same manual's monitor signature omits it: check installed help before using that example. For point clouds the manual explicitly documents `aa_conf` and `aa_top:<AA>`; use these rather than assuming every structure-color metric is accepted.

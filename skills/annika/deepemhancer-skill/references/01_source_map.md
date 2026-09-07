@@ -1,5 +1,9 @@
 # 01 — Source map (claim → evidence)
 
+## Documentation check — 2026-09-07
+
+[GitHub release 0.17](https://github.com/rsanchezgarc/deepEMhancer/releases/tag/0.17) was published 2025-06-26 and remains the latest listed release. The repository master commit resolves to the same `961f028ca609017990de4473ab368cf1787e8282` pin below. This refresh checked release metadata, README usage/installation, and the pinned argument parser; it did not retest TensorFlow, download models, or establish the installed version. The README's special masked-input normalization route is reconciled in [inputs/models](04_inputs_outputs_models.md); follow [maintenance](maintenance.md) for future updates.
+
 Every operational claim in this skill traces to a captured source. Pinned source is the spine; the live target machine overrides it for its own runtime. Project-local evidence lives under `sources/` (not shipped); this file is the distilled index.
 
 ## Pinned source snapshot

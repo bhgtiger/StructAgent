@@ -210,7 +210,7 @@ Concrete checks:
 | v4.3.x | Data cleanup/benchmarking available. For Topaz import, 3DFlex, Live, cache, or UI-scale issues, check later v4 fixes. |
 | v4.4.x | Check driver 520.61.05+. Good for Workflows/RBMC/NU speedups; for cache/Live/2D/3D classification fixes, v4.5+ may help. |
 | v4.5.x | Strong v4 baseline; if EER import, high-performance I/O, tree/card scale, or CentOS migration planning matters, check v4.6/v5. |
-| v4.6.x | Last major v4 family in this corpus; warn that CentOS 7 is deprecated and v5 has hard OS/driver/GPU cliffs. |
+| v4.6.x | Check the later v4.7 guidance in this corpus; CentOS 7 is deprecated and v5 has hard OS/driver/GPU cliffs. |
 | v5.0.0 | Patch update before diagnosing migration validation failures. Check 3D Classification required-parameter and project-attach validation fixes in v5.0.1/v5.0.3. |
 | v5.0.1–v5.0.2 | Patch to v5.0.3+ if project attach/detach validation errors involve large ints, empty titles, or similar migration validation issues. |
 | v5.0.3–v5.0.5 | Check latest v5 patch for Live auto-pause, SSD copy fallback, Topaz CV, and Live config fixes. |

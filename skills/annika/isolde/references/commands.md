@@ -137,7 +137,7 @@ isolde jumpto next       # Jump to next chain
 isolde parameterise #1/A:501   # GAFF2/ANTECHAMBER
 ```
 
-Time scales as (atoms)^3. Only: C, N, O, S, P, H, F, Cl, Br, I. Hydrogens must be present and correct.
+Time scales roughly as (atoms)^3; large ligands may take over an hour. Only C, N, O, S, P, H, F, Cl, Br, I are supported, and hydrogens must be correct. The documented route excludes ligands covalently bonded to other residues. It writes `{resname}.xml`, loads it for the current session, and requires reloading in later sessions via the GUI residue-parameter loader. Use `netCharge` when the inferred charge is demonstrably wrong; `override true` replaces existing parameterization. The 1.12 release notes also announce `isolde load parameters`; inspect installed help before generating its arguments because the fetched command page does not document its full syntax.
 
 ---
 
@@ -206,3 +206,25 @@ python3 -c "print(session.isolde.simulation_running)"
 | `isolde parameterise` | 60-3600s | Scales as (atoms)^3 |
 | Merizo | 1-10s | Fast on CPU |
 | `isolde write` | 30s | |
+
+## Current release preflight and tutorials
+
+Official [Toolshed release history](https://cxtoolshed.rbvi.ucsf.edu/apps/chimeraxisolde), checked 2026-09-07: **1.12.1 macOS (4 September)** fixes missing preflight/validation commands in the macOS 1.12.0 wheel. **1.12.0 Linux/Windows (26 June)** and 1.12.1 macOS require **ChimeraX 1.12.x**. The online manual still labels itself 1.12.0. Check the installed platform-specific bundle; a GitHub Releases list is empty and cannot substitute for Toolshed history.
+
+Before simulation, the [documented command interface](https://tristanic.github.io/isolde/static/isolde/doc/commands/isolde.html) supports:
+
+```chimerax
+isolde status
+isolde preflight hydrogens #1
+isolde preflight parameters #1
+isolde preflight disulfides #1
+isolde preflight altlocs #1
+```
+
+Use hydrogen recommendations and unmatched/ambiguous residue details to target repairs, then repeat preflight. Parameter checks do not create an OpenMM Context; readiness does not test the GPU or map forces. Disulfide/altloc checks change acknowledgment flags to suppress their dialogs but do not edit atoms. Resolve the reported choices before simulation; avoid automatically accepting all GUI warnings.
+
+For geometry reports use `isolde validate peptidebonds #1`, `isolde validate rama #1`, `isolde validate rotamers #1`, and `isolde validate clashes #1`. Each supports `saveFile /path/report.json`; inline `limit` does not truncate the saved report. Compare before/after geometry alongside map fit, and preserve unexpected-stop outcomes as failures even if coordinates could be saved.
+
+For **map association**, follow [Getting Started](https://tristanic.github.io/isolde/static/isolde/doc/tools/gui/getting_started.html): rigid-fit before ISOLDE model initialization, then `clipper associate #2 to #1` for map #2 and model #1. If fitting after initialization is necessary, local `fitmap ... moveWholeMolecules false` updates atoms without adding a model transform. Verify both existing MDFF flags before sim start. The older private Clipper API is a fallback requiring installed-version inspection.
+
+For **AlphaFold multimer models with domain disagreement**, use the official [multimer cryo-EM tutorial](https://tristanic.github.io/isolde/static/isolde/doc/tutorials/alphafold/multimer/alphafold_multimer_cryoem.html): inspect inter-domain confidence, place domains, and tune restraints to allow justified movement. The [tutorial index](https://tristanic.github.io/isolde/static/isolde/doc/tools/ISOLDE.html#tutorials) marks Bulk Flexible Fitting superseded; use its current AlphaFold routes for new modelling work. Tutorials were read, not executed in this refresh.

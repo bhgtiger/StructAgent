@@ -1,23 +1,22 @@
 ---
 name: boltz
 description: >-
-  Config-first, validated assistant for Boltz (jwohlwend/boltz) — biomolecular
-  structure and binding-affinity predictor (Boltz-1/Boltz-2; CLI `boltz
-  predict`). Validated against Boltz v2.2.1 on Linux+NVIDIA (2026-06-23). Use
-  whenever the user wants to install, configure, understand, or run Boltz:
-  writing YAML inputs (protein/DNA/RNA/ligand, MSA, templates,
-  pocket/contact/bond constraints), generating `boltz predict` commands without
-  hallucinating flags, choosing Boltz-2 vs Boltz-1, running structure or
-  ligand-affinity prediction, interpreting outputs (confidence/PAE/pLDDT,
-  affinity_pred_value vs affinity_probability_binary), MSA-server vs custom MSA,
-  or troubleshooting install/CUDA/kernel/OOM/MSA errors. ALWAYS runs a read-only
-  env probe first; on a validated host it emits concrete commands with real
-  paths and, after explicit confirmation, MAY run real Boltz jobs — never
-  installs or runs without confirmation. Triggers: boltz, boltz predict, boltz2,
-  affinity prediction, ColabFold MSA, use_msa_server.
+  Configure, explain and run Boltz-1/Boltz-2 structure and binding-affinity
+  prediction. Use for boltz predict, protein/DNA/RNA/ligand YAML, MSA and
+  templates, pocket/contact/bond constraints, confidence and affinity outputs,
+  CUDA/kernel/OOM/MSA troubleshooting, or refreshing this skill's releases and
+  tutorials. Historical validation: v2.2.1 on Linux/NVIDIA, 2026-06-23.
+  Probe before host-specific work; installs and predictions require authorization.
 ---
 
 # Boltz
+
+## Software knowledge and self-update
+
+Release/source review: **2026-09-07**; latest release remains **v2.2.1**.
+For an update/refresh request, use [references/maintenance.md](references/maintenance.md)
+before the runtime workflow below. Documentation maintenance needs no host probe.
+The June GPU validation remains historical evidence for its original environment.
 
 Boltz (`jwohlwend/boltz`) predicts 3D structures of biomolecular complexes and,
 with Boltz-2, ligand **binding affinity**. This skill helps you choose a model,
@@ -25,7 +24,7 @@ write valid YAML inputs, generate correct `boltz predict` commands, run them on 
 validated host, and interpret outputs — without inventing flags or overstating
 what affinity numbers mean.
 
-Everything here is grounded in the pinned upstream tag **v2.2.1**
+Runtime guidance is grounded in the pinned upstream tag **v2.2.1**
 (commit `cb04aec`) and a live run on the host `volta`. When live behavior and
 docs disagree, live behavior wins — re-probe rather than trust memory.
 

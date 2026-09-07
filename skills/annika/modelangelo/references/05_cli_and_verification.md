@@ -34,6 +34,14 @@ Console script `model_angelo = model_angelo.__main__:main`. Seven subcommands:
 - Optional: same `-o/-m/-d/-c` family + `--model-bundle-name`/`-path` +
   `--keep-intermediate-results`.
 
+**Sequence completeness (source checked 2026-09-07):** in sequence-aware
+`build`, [inference.py at v1.0.18](https://github.com/3dem/model-angelo/blob/v1.0.18/model_angelo/gnn/inference.py)
+sets `skip_nucleotides` when no RNA/DNA sequence is supplied. A protein-only
+FASTA example therefore cannot establish that a mixed protein/NA map will be
+fully modeled. Inspect the expected polymer classes and pass the matching
+RNA/DNA files, or plan the separate `build_no_seq` route. A future build
+fixture should check polymer retention as well as file existence.
+
 **`hmm_search`** — search `build_no_seq` profiles vs a FASTA DB (uses bundled
 `pyhmmer`; **no external HMMER binary required**).
 - Required: `--input-dir/-i/--i` (the `build_no_seq` output dir),

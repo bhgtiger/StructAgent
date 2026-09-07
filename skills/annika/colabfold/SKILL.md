@@ -1,11 +1,19 @@
 ---
 name: "colabfold"
-description: "Use for ColabFold/colabfold_batch: configure hosts, plan or run AlphaFold2(-Multimer), choose MSA/privacy, inspect outputs, or troubleshoot."
+description: "Use for ColabFold/colabfold_batch: configure hosts, plan or run AlphaFold2(-Multimer), choose MSA/privacy, inspect outputs, troubleshoot, or refresh this skill's releases and tutorials."
 ---
 
 # ColabFold
 
 Use this skill for the stable ColabFold AlphaFold2/AlphaFold-Multimer command-line workflow. Treat upstream v1.6.2 as the pinned source baseline, but prefer captured live help and validated behavior from the configured host whenever they differ.
+
+## Update this skill
+
+Latest release/source review: **v1.6.2, checked 2026-09-07**. For a knowledge
+refresh, follow [references/maintenance.md](references/maintenance.md) without a
+runtime probe. This authorizes the requested documentation edits; host installs,
+predictions and remote MSA queries follow the action boundaries below.
+New notebook/backend discovery is covered in [workflows](references/workflows.md).
 
 ## Start with intent and configuration
 

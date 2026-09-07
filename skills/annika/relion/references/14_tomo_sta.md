@@ -180,7 +180,7 @@ relion_tomo_align --i CtfRefine/jobNEW/optimisation_set.star \
 - **3.1:** optics groups (the tomo particle set carries an optics table).
 - **4.0:** full tomo rewrite (`relion_tomo_*` family, optimisation-set model, 3D pseudo-subtomos), VDAM, Schemes. The validation fixture `<RELION_PROJECT_FIXTURE>` is a 4.0-beta *SPA* project read by this 5.0 install (READ-ONLY) — older projects opening fine is normal.
 - **5.0:** 2D-stack pseudo-subtomos (preferred), `rlnCenteredCoordinate<X/Y/Z>Angst` replacing pixel coords, Napari picker, cryoCARE denoise wrapper, AreTomo2 tilt-series alignment, Blush regularisation in refine, ModelAngelo, AMD/Intel GPU support, `relion --tomo` GUI.
-- **5.1:** amyloid-specific features (out of scope here; see `13_helical_amyloid.md`).
+- **5.1.0 prerelease** (documentation checked 2026-09-07): in addition to amyloid features, upstream adds an AreTomo2 **tomogram reconstruction** wrapper and an option for real 3D subtomograms in classification/refinement. Do not confuse this with the existing 5.0 AreTomo2 tilt-alignment wrapper or assume all 5.0 extraction commands select this path. Check target help and data representation first. Source: [5.1.0 release](https://github.com/3dem/relion/releases/tag/5.1.0).
 
 ---
 
@@ -204,3 +204,7 @@ relion_tomo_align --i CtfRefine/jobNEW/optimisation_set.star \
 - Source (relion_ver5.0): `src/pipeline_jobs.h` lines 327-371, 398-441 (tomo PROC_/LABELNEW/DIRNAME); `src/jaz/tomography/` + `.../programs/` listing.
 - Captured CLI: `references/cli/.../help/relion_prepare_subtomo.txt`.
 - Live `--help` (RELION 5.0.0-commit-3d6c20, <RELION_BIN>): `relion_refine` (grep ios/tomogram/trajector), `relion_tomo_reconstruct_particle`, `relion_tomo_subtomo`, `relion_tomo_reconstruct_tomogram`, `relion_tomo_align`, `relion_tomo_refine_ctf`, `relion_tomo_make_optimisation_set`, `relion_align_tiltseries`, `relion_python_tomo_{import,align_tilt_series,exclude_tilt_images,denoise,pick}`; binary inventory `ls <RELION_BIN> | grep -E "relion_(tomo|python_tomo)"`.
+
+## Refinement-cycle tutorial check — 2026-09-07
+
+The current [stable tomo refinement tutorial](https://relion.readthedocs.io/en/release-5.0/STA_tutorial/TomoRefinement.html) requires **Reconstruct particle** half maps for CTF refinement/polishing: their intensity conventions match those jobs. Do not substitute 3D-auto-refine half maps. Both references and alignment/FSC masks must use bin-1 sampling even when the preceding refinement was binned. Carry forward the optimisation set, regenerate pseudo-subtomograms after updated CTF/geometry, then validate another reconstruction/FSC. The tutorial's cycle count and resolution are dataset outcomes, not convergence guarantees.

@@ -18,6 +18,26 @@ Do not invent aliases such as --protein-fasta or --hmm-db. Do not recommend sour
 
 ## Output risk
 
+### Tutorial and output traps — source checked 2026-09-07
+
+The [v2.1.0 README](https://github.com/YangLab-SDU/CryoAtom/blob/v2.1.0/README.md)
+provides 7XHT sequence-guided and 9ENB database-identification examples.
+Choose the mode from known polymer classes and sequence coverage, and return
+only a NOT-RUN plan. A tutorial download or cloud notebook is not part of this
+advisor's execution capability.
+
+In [the pinned output filter](https://github.com/YangLab-SDU/CryoAtom/blob/v2.1.0/CryoAtom2/utils/flood_fill.py),
+sequence-guided output masks nucleotide positions when both RNA and DNA
+sequences are absent. A protein-only FASTA example must not be treated as a
+complete mixed-polymer reconstruction. Plan all applicable sequence inputs,
+or the fully sequence-free mode, and require an eventual output polymer check.
+This is static source evidence, not a new observed run.
+
+The [pinned build implementation](https://github.com/YangLab-SDU/CryoAtom/blob/v2.1.0/CryoAtom2/build.py)
+comments out the `running_time.log` write. Do not promise that file, diagnose
+its absence as failure, or treat a log shipped in an example archive as timing
+evidence for a later run.
+
 The source creates the chosen output directory with exist_ok behavior, moves/replaces files under it, and deletes intermediates unless the keep flag is used. Never tell a user to reuse a real result directory. This advisor never creates a directory.
 
 ## Interpretation

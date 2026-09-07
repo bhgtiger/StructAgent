@@ -52,6 +52,4 @@ Poses are written as `<prefix>_NNNN.pdb`. Rank by:
 2. `total_score` — overall Rosetta energy
 3. `if` (interface energy) — protein–ligand complementarity
 
-The paper's metric for "confident solution" combines density score with a
-cluster-size criterion (top-20 poses clustering to ≤2 Å RMSD). See
-Methods §"Pose selection" of the paper.
+The [paper](https://www.nature.com/articles/s41467-023-36732-5) assesses confidence from convergence of top-ranked poses across **three independent trajectories**, alongside density fit and receptor contacts. A cluster among the top 20 outputs of one trajectory is not that test. Keep independent replicates distinct and report ambiguous alternatives; do not turn a favorable energy or density score into a confidence guarantee.

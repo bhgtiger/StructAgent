@@ -80,3 +80,9 @@ Namdinator is GPL-3.0, but its dependencies are not freely redistributable:
 Rosetta needs a RosettaCommons license, Phenix has its own download/license
 terms, VMD/NAMD have theirs. Advise the user to obtain each through its official
 channel; never bundle binaries or assume redistribution rights. See ref 09.
+
+## Concrete modern Phenix compatibility check
+
+The [Phenix 2.0 changelog](https://phenix-online.org/version_docs/2.2.1-6174/CHANGES) says `phenix.map_correlations` replaces `phenix.map_model_cc`. The pinned Namdinator script still calls the old command and extracts `CC_mask` from its text logs. A modern Phenix installation can therefore satisfy a presence probe while failing that step or its parser. Do not solve this by silently replacing a binary name: a future executor must compare command arguments and reported metric definitions, then validate parsed values on a known fixture. This is a source-identified compatibility risk, not a tested failure with Phenix 2.2.1.
+
+For tutorial planning, retain the README's generic-script route and the corrected NPC1 fixture in [10_examples_and_evals.md](10_examples_and_evals.md). The untested alternative scripts are not a supported migration path for newer NAMD/Phenix or retained glycans. Never upgrade the dependency stack merely to make all version numbers current.

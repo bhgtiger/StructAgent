@@ -17,7 +17,7 @@ volume gaussian <#id> sDev <σ_Å>
 ```
 - σ in **Å**, not voxels.
 - Use early to denoise a map (σ = 2 × apix is typical).
-- Use late to soften a binarized mask (σ = 5 × resolution).
+- Use late to soften a binarized mask, choosing sigma by the required profile. Sigma is not a cosine-padding width; prefer Volume Tools for the Guide’s padding recipe.
 
 ## volume threshold (binarize / clamp)
 ```
@@ -32,8 +32,8 @@ Keywords are exactly: `minimum`, `set`, `maximum`, `setMaximum`. (`setMinimum` d
   2. `volume threshold #Y maximum 0 setMaximum 1`   → values > 0 → 1
 - ⚠ Each call produces a **new volume**. Track the new ID.
 
-## Dilation (no native command — use a trick)
-ChimeraX has no built-in mathematical morphology. To dilate a binary mask by ~d Å:
+## Approximate expansion (blur and threshold)
+The bundled scripts use Gaussian blur plus thresholding. The parameter d is Gaussian sigma, not an exact morphological dilation radius:
 ```
 volume gaussian #X sDev <d>        # blur (smears the 1s outward)
 volume threshold #Y minimum 0.25 set 0     # cut low-value tail
@@ -53,7 +53,7 @@ volume copy <#id>
 volume subtract <#A> <#B> [minRMS false]
 volume add <#A> <#B>
 ```
-- `volume subtract` for the complementary subtraction mask. Negative results possible → clamp with `volume threshold #X maximum 0 set 0`.
+- `volume subtract` for the complementary subtraction mask. Negative results possible → clamp with `volume threshold #X minimum 0 set 0`. If needed, cap values above 1 with a subsequent `maximum 1 setMaximum 1` operation.
 
 ## save
 ```
@@ -85,3 +85,7 @@ volume #1 settings    # print box, step, origin
 vop                   # volume operations sub-command list
 info models           # list models with ids
 ```
+
+## Verified command basis
+
+Checked 2026-09-07 against the official [volume manual](https://www.rbvi.ucsf.edu/chimerax/docs/user/commands/volume.html): `sDev` is a standard deviation in map distance units; threshold replacement uses `minimum ... set ...` and `maximum ... setMaximum ...`. Blur/threshold expansion is approximate and topology-dependent. [molmap](https://www.rbvi.ucsf.edu/chimerax/docs/user/commands/molmap.html) supports `onGrid` for generating directly on a reference grid. The scripts’ final resampling remains useful because intermediate operations can create new grids. Validate dimensions, voxel size, origin, values in [0,1], and coverage in the target frame; resampling cannot restore a domain already clipped out of an earlier box.

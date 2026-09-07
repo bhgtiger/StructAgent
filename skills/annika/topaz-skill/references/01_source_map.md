@@ -1,5 +1,9 @@
 # 01 — Source map (how this skill is grounded)
 
+## Documentation check — 2026-09-07
+
+[GitHub releases](https://github.com/tbepler/topaz/releases) list **v0.3.20** (2026-05-11) as the latest stable release. This agrees with the historical 0.3.20 local validation, which has not been repeated. The [ReadTheDocs tutorial](https://topaz-em.readthedocs.io/en/latest/tutorial.html) still identifies itself as **0.2.5**, says tutorials are pending, and redirects readers to repository notebooks. It is not a current-version CLI authority. Use the [v0.3.20 notebooks](https://github.com/tbepler/topaz/tree/v0.3.20/tutorial), reconcile commands with captured/live help, and follow [maintenance](maintenance.md) for refreshes. A moving `master` URL must be resolved again; the historical master-equals-tag statement below applies only to its fetch date.
+
 ## Pin
 - Repo: `https://github.com/tbepler/topaz`
 - Commit: `58fe52370f4accb8215525df2ea8f2c7ee6d340a`
@@ -54,7 +58,7 @@ method claims `[paper]`.
 - PyTorch install: https://pytorch.org/get-started/locally/
 
 ## Re-grounding procedure (when pin changes)
-1. Re-clone at the new tag; update `references/source/SNAPSHOT.md`.
+1. Follow [maintenance](maintenance.md); save the new tagged snapshot and manifest outside the installable skill. Historical `references/source/` paths are construction-archive paths, not a required local directory.
 2. Update `scripts/topaz_env_probe.py` `SOURCE_EVIDENCE` (commit/tag + device evidence).
 3. Re-verify device dispatch (`grep -i mps topaz/`), `--device` defaults, CLI help.
    - At **0.3.20** the device defaults are validated against live help, with the evidence

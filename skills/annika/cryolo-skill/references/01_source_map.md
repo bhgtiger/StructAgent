@@ -1,5 +1,9 @@
 # 01 · Source map (what backs each claim)
 
+## Documentation check — 2026-09-07
+
+The official [stable changelog](https://cryolo.readthedocs.io/en/stable/changes.html) still tops at **1.9.9**. It provides no release date for that entry, so do not infer one from the documentation fetch. Version 1.9.9 fixes a potential crash in 3D particle tracing; 1.9.8 fixes filament resampling that could produce sparse training. These are targeted fixes, not evidence of accuracy improvements for ordinary SPA picking. The historical 1.9.9 CLI/GPU validation remains unchanged. Current tutorial decisions live in [core workflows](05_core_workflows.md); future refreshes use [maintenance](maintenance.md).
+
 **This file is the source map for the skill: it records what backs each claim and at
 what tier of authority.** If a flag, config key, output folder, support status, or
 license term is not traceable to an entry here, treat it as a **source gap** and do not

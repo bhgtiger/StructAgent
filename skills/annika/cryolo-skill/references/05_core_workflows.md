@@ -54,7 +54,8 @@ Key defaults (captured `cryolo_gui.config.help.txt`):
 ### Filter selection (resolved from captured defaults)
 
 - `LOWPASS` (default): low-pass filter with `--low_pass_cutoff` (default `0.1`). The robust
-  default for ordinary picking.
+  default for the low-pass general model. Match preprocessing to the chosen weights;
+  the JANNI and negative-stain general models require different filters (see tutorial route below).
 - `JANNI`: neural-network denoising — requires `--janni_model <.h5>` (default `None`); tune
   with `--janni_overlap` / `--janni_batches`. `janni_denoise.py {config,train,denoise}` is the
   underlying denoiser (`janni_denoise.py.help.txt`).
@@ -215,3 +216,9 @@ Deeper parameter tuning is soft guidance.
 3. Confirm the machine is `supported`/`partial` (ref 02) before running; on an unsupported
    probe verdict (e.g. macOS) keep it explanatory only. On a supported machine, emit concrete
    commands with the user's real paths and run only after explicit confirmation.
+
+## Official tutorial choices (checked 2026-09-07)
+
+[The stable tutorials](https://cryolo.readthedocs.io/en/stable/tutorials/tutorial_overview.html) provide six distinct routes: general model (1), dataset-specific training (2), 2D filaments (3), fine-tuning a general model (4), tomogram particles (5), and tomogram filaments (6). Choose the route from the data and existing model; a general SPA model is not a tomography tutorial.
+
+For general-model picking, match preprocessing to the weights: LOWPASS with cutoff 0.1, JANNI with its matching denoiser, or NONE for the negative-stain model. The smoke-run NONE example above only establishes execution. Review confidence/size in CBOX using napari-boxmanager before exporting a fresh selection; EMAN/STAR already contain thresholded picks, so lowering the threshold there cannot restore discarded detections. Validate coordinate overlays and image-name matching before extraction. The tutorial's CPU oversubscription example describes its cluster; use the current scheduler allocation and measured I/O for another host.

@@ -13,7 +13,7 @@ description: Run Rosetta EMERALD (EM Maps ERoded for Automatic Ligand Docking) t
 
 Rosetta EMERALD automatically docks a ligand into a cryo-EM map using
 GALigandDock + density-weighted scoring (`beta_genpot`). See Muenks et al.,
-*Nat. Commun.* 2023 (PMC9976687). Requires Rosetta ≥ 2023.06.
+*Nat. Commun.* 2023 (PMC9976687). Use an EMERALD-capable Rosetta build; the paper's 2023.06 minimum is insufficient for some demo options. See `references/install.md`.
 
 ## Failure contract
 Skills never guess. Missing Rosetta install, map, apo/holo PDB, or ligand
@@ -29,7 +29,7 @@ ROSETTA3="${ROSETTA3:-$HOME/rosetta/main}"       # path to rosetta/main
 Run `scripts/check_env.sh` before any real run. It verifies:
 1. `ROSETTA3/source/bin/rosetta_scripts.*` exists
 2. `generic_potential/generic_bonded.round6p.txt` is present in the database
-3. Rosetta version ≥ 2023.06 (EMERALD not available before that)
+3. Best-effort release metadata display (it does **not** enforce a version minimum or validate XML/options)
 
 If Rosetta is not installed, read `references/install.md` — covers the
 non-commercial license, download, build, and env-var setup.
@@ -68,8 +68,7 @@ Drop `--dry-run` to execute. The wrapper prints the full command first so you
 can sanity-check it.
 
 ### 3. Pre-placed seed (known approximate site)
-Pass `--seed site.pdb` — the wrapper adds `-s seed.pdb` and wires
-`initial_pool` in the XML.
+The bundled `--seed` branch does not wire `initial_pool` and currently assembles duplicate `-s` arguments. Do not use it as an automatic seed recipe. Supply an explicit, reviewed XML/input setup with the receptor and ligand in one coordinate frame; see `references/xml_template.md`.
 
 ## What the XML does (conceptually)
 
@@ -88,7 +87,7 @@ Full annotated template in `references/xml_template.md`. The `flags` file at
 - **Wrong `edensity::mapreso`** — don't use the global/nominal reso; use the local resolution in the binding site. ±0.5 Å matters.
 - **PDB & map frame mismatch** — Rosetta expects the map origin to match the PDB coordinates. Re-grid with `phenix.map_box` or ChimeraX `vop resample` before running.
 - **Non-AM1-BCC charges** — params generated with default Rosetta charges give poor density agreement. Always use GenFF/AM1-BCC.
-- **Version too old** — pre-2023.06 Rosetta has no EMERALD demo; `check_env.sh` rejects these.
+- **Missing demo options** — a presence probe can pass on an incompatible build. Match the XML/options to the installed Rosetta build; see the documented 2023.06 caveat in `references/install.md`.
 
 ## Deep dives
 - `references/install.md` — license, download, build options for Rosetta
@@ -99,3 +98,7 @@ Full annotated template in `references/xml_template.md`. The `flags` file at
 
 ## Lessons
 See `lessons.md`.
+
+## Update this skill
+
+For release, tutorial, or self-update requests, follow [references/maintenance.md](references/maintenance.md). Documentation checked 2026-09-07: Rosetta 3.15 (numbered release 2025-09-09); EMERALD has no independent release number. This is upstream evidence, not a new local runtime validation. Preserve historical tests and probe the actual environment before applying version-dependent advice. Updating this knowledge bundle does not authorize software upgrades, compute jobs, or web submissions.

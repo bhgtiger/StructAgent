@@ -48,6 +48,24 @@ source defaults as recommended parameters.
 
 ## Modes
 
+### Official examples — checked 2026-09-07
+
+The [pinned README](https://github.com/YangLab-SDU/CryoAtom/blob/856e250df7b784b854b892f1b619d32d51188cef/README.md)
+provides these distinct starting points:
+
+| Scenario | Example / decision | Validate |
+|---|---|---|
+| Known protein/NA sequences | 7XHT / EMD-33198, with separate protein, RNA and DNA inputs | Match expected polymer classes to supplied files and output chains. |
+| Unknown identity but known species | 9ENB / EMD-19830, database identification followed by a new sequence-guided run | Check database coverage and identified sequences before reuse; preserve separate result directories. |
+| Local density or an existing backbone | Mask `-m`, or backbone `-r` with identification databases | Check map/mask coordinates and selected backbone coverage. |
+
+These are upstream examples, not new smoke-test results. Read the linked
+notebook for tutorial changes without executing it. Downloading fixtures,
+weights or sending data to Colab still requires the corresponding task scope;
+do not copy the upstream example's certificate-verification bypass.
+
+### Choose the input mode
+
 - **With sequence** — pass `-ps` / `-rs` / `-ds` for **every polymer class the map
   contains**. Omitting a class does not mean "build it without a sequence" — it
   means **delete it**. See the warning below.

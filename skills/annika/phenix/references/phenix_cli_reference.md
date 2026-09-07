@@ -93,3 +93,21 @@ refinement.pdb_interpretation.apply_cif_link {
 ```
 
 Refs: elbow.html, ready_set.html, ligandfit.html, dock_in_map.html
+
+## Current release and tutorial decisions (checked 2026-09-07)
+
+The [official build table](https://www.phenix-online.org/download/nightly_builds.cgi) identifies **2.2.1-6174, 2026-09-03**, as an official release. The [versioned changelog](https://phenix-online.org/version_docs/2.2.1-6174/CHANGES) labels its changes August 2026: distinguish this development heading from the installer release date. No new local Phenix runtime was tested; entrypoint observations labeled Phenix 2.0 retain that historical scope.
+
+- **Cryo-EM ligand placement:** the [LigandFit manual](https://phenix-online.org/documentation/reference/ligandfit.html) documents `map_in` for MRC/CCP4/MAP input and requires resolution. A command template is:
+
+  ```bash
+  phenix.ligandfit map_in=boxed_map.mrc resolution=3.2 \
+    model=receptor.pdb ligand=ligand.pdb
+  ```
+
+  This uses internal map-coefficient conversion. Keep receptor and boxed map in one frame, inspect conversion cost and verify the ligand sits in the intended density. This is a documented template, not a validated local fixture. Supply ligand restraints for subsequent refinement.
+
+- **Ligand validation:** Phenix 2.2 adds `phenix.validate_ligands`, covering local fit, geometry and environment; check installed help before selecting its arguments. In 2.2.1, cryo-EM validation summary tables and Table 1 export receive fixes, and GUI transfers to Coot use mmCIF. For an export failure or changed atom identifiers, record the exact build and re-read the exported model before attempting coordinate repair. These changes are documented in the [release changelog](https://phenix-online.org/version_docs/2.2.1-6174/CHANGES).
+- **Real-space refinement tutorial:** use the examples and linked video in the [RSR manual](https://phenix-online.org/documentation/reference/real_space_refine.html). Start with defaults, inspect the resulting `.eff` and geometry report, and change one justified strategy at a time. ADP refinement is documented as enabled by default; a custom `run=` selection can omit it. Preserve `adp` when needed. The manual supports reference-model restraints with selected chain/range mappings, so reference suitability is not determined by a universal resolution threshold. Inspect actual restraint counts when SS outlier filtering removes long hydrogen bonds.
+
+The runner's `--resolution`, `--labels` and other dashed options belong to `scripts/runner.py`; native Phenix uses PHIL `name=value` syntax. The online manual is not the installed PHIL schema. Retest old failure-specific workarounds against an authorized small fixture before declaring them fixed in 2.2.1.

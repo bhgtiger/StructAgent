@@ -1,16 +1,14 @@
 ---
 name: cryodrgn-skill
-version: 1.0.0
-description: >-
-  Config-first, VALIDATED, ready-to-use assistant for cryoDRGN (neural heterogeneous
-  cryo-EM / cryo-ET reconstruction). Validated against cryoDRGN 4.2.1 on Linux+NVIDIA
-  (GPU, 2026-06-06). Explains scope, inputs/outputs, the CLI namespace, data formats,
-  workflows, interoperability, and troubleshooting, grounded in pinned cryoDRGN 4.2.1
-  sources. REQUIRES a current environment config report before any machine-specific
-  suitability claim, concrete command, or workflow recommendation; on a probe-'ready'
-  host it emits concrete commands and runs jobs after explicit confirmation — still no
-  blind installs/uploads.
-keywords:
+description: Config-first, VALIDATED, ready-to-use assistant for cryoDRGN (neural heterogeneous cryo-EM
+  / cryo-ET reconstruction). Validated against cryoDRGN 4.2.1 on Linux+NVIDIA (GPU, 2026-06-06). Explains
+  scope, inputs/outputs, the CLI namespace, data formats, workflows, interoperability, and troubleshooting,
+  grounded in pinned cryoDRGN 4.2.1 sources. REQUIRES a current environment config report before any machine-specific
+  suitability claim, concrete command, or workflow recommendation; on a probe-'ready' host it emits concrete
+  commands and runs jobs after explicit confirmation — still no blind installs/uploads.
+metadata:
+  version: 1.0.0
+  keywords:
   - cryodrgn
   - cryo-em
   - cryo-et
@@ -19,16 +17,24 @@ keywords:
   - relion
   - train_vae
   - abinit
-license_note: >-
-  cryoDRGN itself is GPLv3. This skill ships NO cryoDRGN source code, weights,
-  or datasets — only distilled references. Not legal advice.
-target:
-  cryodrgn_version: 4.2.1
-  commit: 23ae1a3303b1e623f421b816fc7ea426c9d5b580
-  tag_object: 2f4db4c02021fd136c53f03a572684921369b268
+  license_note: cryoDRGN itself is GPLv3. This skill ships NO cryoDRGN source code, weights, or datasets
+    — only distilled references. Not legal advice.
+  target:
+    cryodrgn_version: 4.2.1
+    commit: 23ae1a3303b1e623f421b816fc7ea426c9d5b580
+    tag_object: 2f4db4c02021fd136c53f03a572684921369b268
 ---
 
 # cryodrgn-skill
+
+## Documentation maintenance lane
+
+For a skill/source/tutorial refresh, follow [references/maintenance.md](references/maintenance.md).
+This documentation-only lane skips environment probing and runtime command gates;
+those gates still apply to machine-specific advice, installation, data operations, and jobs.
+Upstream documentation checked **2026-09-07**: cryoDRGN **4.3.1** (stable, 2026-08-04); local validation remains **4.2.1** (2026-06-06).
+This does not establish the software installed on the current host. New documentation-only
+claims must not inherit historical `VALIDATED` labels.
 
 A **config-first**, source-grounded assistant for **cryoDRGN** — a neural-network
 method for *heterogeneous* cryo-EM (and, via cryoDRGN-ET, cryo-ET) reconstruction
@@ -199,8 +205,8 @@ first workflow."*
 
 Grounded in pinned cryoDRGN **4.2.1** (PyPI latest captured 2026-06-05; commit
 `23ae1a3303b1e623f421b816fc7ea426c9d5b580`; tag object
-`2f4db4c02021fd136c53f03a572684921369b268`). A beta `4.3.0-b2` exists but is out
-of scope for this release. Cite sources as in `references/01_source_map.md`.
+`2f4db4c02021fd136c53f03a572684921369b268`). The historical `4.3.0-b2` beta pin is retained as provenance;
+upstream stable 4.3.1 is now covered in the maintenance/version notes, without new runtime validation. Cite sources as in `references/01_source_map.md`.
 
 Live `--help` + a GPU smoke run were captured **2026-06-06 on Linux+NVIDIA**
 (a Linux + NVIDIA GPU host) against an installed

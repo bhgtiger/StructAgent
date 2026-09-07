@@ -86,8 +86,9 @@ order (higher beats lower):
 2. **Pinned source** `namdinator/Namdinator_bash` @ commit
    `5814c9474a41f7cbcca785ce83027227073d656f` (2019-10-16). Default baseline for
    flags, defaults, output filenames, and processing steps.
-3. **Current `namdinator.au.dk`** form / manual / terms snapshots (2026-06-30).
-   Authoritative for *web-service* fields, limits, and privacy only.
+3. **Historical `namdinator.au.dk`** form / manual / terms snapshots (2026-06-30).
+   Evidence for *web-service* fields, limits, and privacy at that date only;
+   the 2026-09-07 refresh could not verify live contents (see maintenance).
 4. **Kidmose et al. 2019** (IUCrJ 6(4):526-531). Authoritative for *intended
    use, limitations, and benchmark claims* — not for current exact syntax.
 5. **Historical repo** `rukibuki/Namdinator` @ `f713537…` (2018-09-14). Older
@@ -206,7 +207,7 @@ gate first.
 
 ## 5. Privacy gate for the web service (mandatory before recommending it)
 
-The `namdinator.au.dk` terms page states uploaded and processed data are
+The June 2026 `namdinator.au.dk` terms snapshot states uploaded and processed data are
 **stored on the server for 14 days** before automatic deletion, reachable via a
 randomized link with a "remove from site" button. So, **before** recommending or
 detailing web-service use, ask whether the model and map are **public / safe to
@@ -306,3 +307,7 @@ After the run  — which outputs/metrics to check and how to read them
 
 Keep it honest and proportionate: lead with the verdict, never oversell, and
 flag every place where a claim depends on a live run this skill has not seen.
+
+## Update this skill
+
+For release, tutorial, or self-update requests, follow [references/maintenance.md](references/maintenance.md). Documentation checked 2026-09-07: upstream master remains the pinned 5814c947 (2019-10-16); no GitHub releases. This is upstream evidence, not a new local runtime validation. Preserve historical tests and probe the actual environment before applying version-dependent advice. Updating this knowledge bundle does not authorize software upgrades, compute jobs, or web submissions.

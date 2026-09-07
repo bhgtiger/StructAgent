@@ -43,7 +43,7 @@ path inside the XML if you prefer.
 ```
 
 - `runmode="dockflex"` — flexible side chains around the ligand. Use `"dockrigid"` if your receptor is trusted and you only want to place the ligand (faster).
-- `sidechains="aniso"` — Ile/Leu/Val/Thr use anisotropic sampling. Alternative: `"auto"` (Rosetta picks) or an explicit residue list `"22A,25A,29A"`.
+- `sidechains="aniso"` — selects flexible side chains using the ligand shape (ellipsoid/covariance), as shown in the [current mover source](https://github.com/RosettaCommons/rosetta/blob/main/source/src/protocols/ligand_docking/GALigandDock/GALigandDock.cc). It is not an Ile/Leu/Val/Thr-specific torsion mode; check the installed schema for allowed alternatives.
 - `final_exact_minimize="bbsc1"` — one round of bb+sc cartesian minimization on the top 20 poses.
 - `favor_native="2"` — keep starting side-chain rotamers unless there's a strong reason to move.
 - `optimize_input_H="true"` — re-place polar hydrogens before docking.
@@ -69,8 +69,7 @@ For a known approximate site, add an `initial_pool` pointing at a seed PDB:
 <GALigandDock ... initial_pool="seed.pdb" reference_pool="seed.pdb" reference_frac="0.5">
 ```
 
-The `run_emerald.sh --seed <pdb>` flag wires this up automatically (it
-substitutes `-s seed.pdb`, but the XML attribute you'd want is `initial_pool`).
+The bundled `run_emerald.sh --seed <pdb>` does **not** edit these attributes. Static inspection on 2026-09-07 found that it prepends `-s seed.pdb` while retaining the original `-s receptor.pdb`. Treat this branch as unsupported until repaired and validated; use an explicit reviewed XML/input setup instead. A seed must not silently replace the receptor with a ligand-only model.
 
 ## Running with `-parser:script_vars`
 
@@ -85,3 +84,9 @@ rosetta_scripts.* -parser:protocol emerald.xml \
 This template covers the core protocol; for production benchmarking pull the
 reference XML from **Supplementary Data 2** of Muenks et al. 2023. Commit that
 to your project alongside this template so future-you can tell them apart.
+
+## Matching current Rosetta and the published tutorial
+
+Documentation reviewed 2026-09-07; this bundled XML was not executed against Rosetta 3.15. The [paper](https://www.nature.com/articles/s41467-023-36732-5) starts from a specified binding region and uses density skeletonization to initialize conformers. Generic GALigandDock with a density weight is not by itself evidence that every EMERALD stage is active. Compare the protocol with the paper's linked code/materials and the installed mover schema before a production run; keep any reproduced reference XML distinct from this template.
+
+The [3.15 release notes](https://docs.rosettacommons.org/docs/latest/Release-Notes) also describe newer GALigandDock density capabilities. Those additions do not retroactively validate this historical XML. The guessed `demos/latest/public/EMERALD/README` URL was unavailable during review, and the public demos tree did not establish an EMERALD tutorial location. Use the paper's actual links and installation's matching sources instead of fabricating a demo path. See [maintenance](maintenance.md) for the source map and unresolved verification scope.

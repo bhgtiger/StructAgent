@@ -1,9 +1,13 @@
 # 01 — Source map (citations, pins, drift)
 
+## Documentation refresh — 2026-09-07
+
+[Upstream 4.3.1](https://github.com/ml-struct-bio/cryodrgn/releases/tag/4.3.1) is stable (2026-08-04); [4.3.0](https://github.com/ml-struct-bio/cryodrgn/releases/tag/4.3.0) shipped 2026-06-12. The old beta-only account below describes the June capture, not current availability. Version 4.3.1 broadens Python support through 3.14 and dependency ranges; inspect its [tagged packaging](https://github.com/ml-struct-bio/cryodrgn/blob/4.3.1/pyproject.toml) when planning an upgrade. Do not apply 4.2.1 dependency ceilings to 4.3.1. See [core workflows](05_core_workflows.md) for dashboard/tutorial changes, [interop](06_interoperability.md) for parser changes, and [maintenance](maintenance.md) for refresh procedure. This refresh did not install or run 4.3.1.
+
 All facts in this skill trace to the sources below. Cite as
 `[src: <artifact/URL> @ <pin/fetch-date>]`.
 
-## Pin block (authoritative)
+## Historical local-validation pin (authoritative for 4.2.1)
 
 ```text
 Repo                   : https://github.com/ml-struct-bio/cryodrgn.git
@@ -13,7 +17,7 @@ Commit (4.2.1^{})      : 23ae1a3303b1e623f421b816fc7ea426c9d5b580
 Fetched                : 2026-06-05T21:46:02Z
 PyPI latest captured   : 4.2.1  (2026-06-05)
 Repo main HEAD @ fetch : cb28f71b32a92e1a75331968eee86921b16796f6
-Beta tag (out of scope): 4.3.0-b2  → tag object 28736aea04817e9ceb1cb7582ebeb6d7db0d6304,
+Historical beta tag   : 4.3.0-b2  → tag object 28736aea04817e9ceb1cb7582ebeb6d7db0d6304,
                                       commit 392bfc2e4f8ae56da637ec41a2d37fe1c831dc9d
 ```
 
@@ -62,13 +66,13 @@ command templates actually run; commands are **VALIDATED against cryoDRGN 4.2.1*
 
 ## Drift / caveats to keep labeled
 
-1. **Python range drift.** `pyproject` `requires-python` is `>=3.10` (unbounded);
+1. **Historical 4.2.1 Python range drift.** `pyproject` `requires-python` is `>=3.10` (unbounded);
    README says "3.10 through 3.13"; installation docs say tested 3.10–3.12 (3.13
    mentioned); README "Updates" notes Python 3.13 + PyTorch 2.9 support and that
    PyTorch <2.0 is dropped. Effective torch cap `<2.10.0` comes from `pyproject`.
-   → Report a **range (3.10–3.13)**, flag anything outside as drift; never assert
+   → For this **4.2.1 baseline**, report a **range (3.10–3.13)** and flag outside versions as drift; never assert
    a single exact supported version. The probe marks `within_tested_range`.
-2. **`4.3.0-b2` beta exists** (test.pypi beta channel) but this skill targets
+2. **Historical `4.3.0-b2` beta capture:** this local-validation snapshot targets
    **stable 4.2.1** (the validated runtime). Re-pin reminder: repo `main` had moved
    to `cb28f71…` at capture.
 3. **Tag-object vs commit SHA** (`2f4db4c0…` vs `23ae1a33…`) — see pin block.

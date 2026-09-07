@@ -2,6 +2,14 @@
 
 Pinned baseline: `sokrypton/ColabFold` v1.6.2, commit `c7d1772352cc9619df25c6d36cb0f218c0c6610e`, released 2026-07-14.
 
+Release/docs checked **2026-09-07**: the explicit
+[v1.6.2 release](https://github.com/sokrypton/ColabFold/releases/tag/v1.6.2)
+and GitHub release API agree; a cached `/releases/latest` page returned v1.6.1.
+Resolve such disagreements from dated direct release data.
+Main `c35de0221f4d297a39edf4cf292ba2832e321edc` adds an OpenFold3 notebook,
+which is separate from this pinned AF2 CLI. See [maintenance](maintenance.md)
+for source discovery and [workflows](workflows.md) for version-specific guidance.
+
 Prefer evidence in this order:
 
 1. captured live executable help and a preserved public fixture on the configured host;

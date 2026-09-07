@@ -1,57 +1,25 @@
 # Mask Theory — Why & How
 
-## What a mask is
-A 3D volume, same box & apix as the target map, with values in `[0, 1]`:
-- `1.0` inside region of interest
-- `0.0` outside
-- soft transition in between
+A mask is a volume on the target map’s grid, with values 1 inside the included region, 0 outside, and a smooth transition for downstream refinement. Hard boundaries create Fourier ringing that can bias alignment and inflate masked FSC. Source checked 2026-09-07: [CryoSPARC Mask Creation](https://guide.cryosparc.com/processing-data/tutorials-and-case-studies/mask-selection-and-generation-in-ucsf-chimera).
 
-## Why soft edges
-Alignment happens in Fourier space. A hard 0/1 step in real space → infinitely-ringing sinc in Fourier space → ringing artifacts cross-correlate during alignment → noise gets aligned to noise. Soft edges damp the ringing.
+## Cosine padding versus Gaussian smoothing
 
-**Minimum recommended soft padding** (CryoSPARC guide):
-```
-soft_width_Å  ≥  5 × resolution_Å
-soft_width_px ≥  5 × resolution_Å / apix
-```
-For a 3 Å map at 1.0 Å/voxel → ≥ 15 Å ≈ 15 px soft edge.
+The Guide recommends a starting **cosine-padding width** of at least `5 × GSFSC_resolution / apix` pixels, with empirical tuning. Volume Tools measures this width in **final resampled pixels**. For resolution 3.4 Å and final pixel size 1.06 Å, round up to 17 pixels to meet that recommendation. Dilation adds an interior 1-valued region; padding adds a graded exterior edge.
 
-## Pitfalls
+ChimeraX [volume gaussian](https://www.rbvi.ucsf.edu/chimerax/docs/user/commands/volume.html#gaussian) takes **sigma**, the standard deviation, in physical distance units. The scripts pass `--soft` directly to `sDev`. Therefore **`--soft 17` is not equivalent to 17 Å of cosine padding**. Gaussian blur also softens inward and can reduce small regions’ peak values; a narrow structure may no longer have a 1-valued core. The model script’s legacy default of `5 × apix` (or `5 × gsfsc-resolution`) remains an implementation heuristic, not a calibrated Guide conversion. Prefer `--soft 0 --dilation 0` for a base and finish in Volume Tools when following the official recipe.
 
-### Too tight
-- Mask hugs the structure → introduces high-frequency correlations between half-maps → **Tight FSC > Corrected FSC** by a wide margin → "spuriously good" resolution.
-- Tell: in the FSC plot, the *tight* curve runs noticeably above the *corrected* curve.
-- Fix: more dilation, more soft padding, or lower molmap resolution.
+Likewise, the scripts’ `--dilation` blurs and re-thresholds rather than performing exact spherical morphology; expansion depends on sigma, threshold, and topology. Use Volume Tools’ dilation radius for a controlled radius in pixels.
 
-### Too loose / large soft edge
-- Includes noise from outside the region → alignment drifts → effective resolution drops.
-- Less catastrophic than too-tight.
+## Resolution and coverage
 
-### Too small
-- Region itself too small for stable alignment → overfitting artifacts ("blips", shells at mask boundary).
-- Fix: enlarge region, or use Gaussian prior in Local Refinement.
+The current molmap tutorial uses **16 Å** and recommends **12 Å or coarser**. The older `2 × map resolution` table was a local heuristic, not an upstream rule. A single resolution cutoff cannot guarantee freedom from FSC artifacts: mask topology, threshold, dilation, and edge profile also matter. Prefer a trustworthy model selection; if the model lacks a flexible domain or unbuilt density that belongs in the mask, inspect a map-derived base instead.
 
-### Wrong box / origin
-- Output mask must have the **exact same box, apix, origin** as the map it will be applied to.
-- Always finish the pipeline with `volume resample onGrid #map`.
+## Diagnose the result
 
-## molmap resolution ↔ tightness
+- **Too tight:** Tight FSC above Corrected FSC suggests mask-induced correlation; expand or soften and reassess.
+- **Too loose:** added solvent or neighboring-domain signal can reduce useful alignment specificity; inspect masks and reconstructions together.
+- **Too small:** insufficient alignment signal can produce noise, shells, or edge blobs; enlarge the region or consider the Local Refinement Gaussian prior.
+- **Wrong grid:** match dimensions, voxel size, origin, and coordinate frame. Resample to the target grid and verify the saved file.
+- **Complement mismatch:** generate region and particle-bounded complement on the same grid. Independent filtering can destroy exact complementarity; inspect coverage and avoid assuming their sum is exactly the full mask.
 
-| `molmap resolution` (Å) | Behaviour |
-|---|---|
-| ≤ 2× map resolution | **Too tight** — avoid. Will inflate FSC. |
-| 2× – 4× map resolution | Tight; OK for well-defined rigid domains. |
-| ~16 Å | CryoSPARC tutorial default — safe starter. |
-| 20–30 Å | Loose; use for flexible regions or initial passes. |
-
-## Quick math
-
-Given:
-- map apix `p` = 1.06 Å
-- GSFSC resolution `r` = 3.4 Å
-- want soft width ≥ `5r` = 17 Å
-
-Then:
-- `--soft 17` in scripts/make_mask_from_model.py
-- equivalently in CryoSPARC Volume Tools: `Soft padding width = round(17/1.06)` = `16 px`
-- pick `Dilation = 3–6 px` empirically
+These checks guide an empirical comparison; tutorial parameters do not certify a mask. The script sidecar establishes execution success, not scientific suitability.

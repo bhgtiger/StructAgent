@@ -1,25 +1,31 @@
 ---
 name: topaz-skill
-description: >-
-  Config-first, VALIDATED, ready-to-use assistant for Topaz (tbepler/topaz), the
-  cryo-EM particle picking and micrograph/tomogram denoising package (CLI `topaz`,
-  PyPI `topaz-em`). Validated end-to-end on GPU (2026-06-06, topaz 0.3.20). Use when
-  the user asks to install, configure, understand, or generate commands for Topaz
-  workflows — training/segmentation/extraction for particle picking, denoise/denoise3d,
-  preprocess/downsample/normalize, or coordinate-format conversion. ALWAYS runs a
-  config/environment session first; on a probe-'valid' machine it emits concrete,
-  validated commands with the user's real paths and, after explicit confirmation, MAY
-  run real Topaz jobs on the user's data with output safeguards — never installs Topaz
-  or runs compute jobs without confirmation.
-version: 1.0.0
+description: Config-first, VALIDATED, ready-to-use assistant for Topaz (tbepler/topaz), the cryo-EM particle
+  picking and micrograph/tomogram denoising package (CLI `topaz`, PyPI `topaz-em`). Validated end-to-end
+  on GPU (2026-06-06, topaz 0.3.20). Use when the user asks to install, configure, understand, or generate
+  commands for Topaz workflows — training/segmentation/extraction for particle picking, denoise/denoise3d,
+  preprocess/downsample/normalize, or coordinate-format conversion. For machine-specific work, runs a
+  config/environment session first; on a probe-'valid' machine it emits concrete, validated commands with
+  the user's real paths and, after explicit confirmation, MAY run real Topaz jobs on the user's data with
+  output safeguards — never installs Topaz or runs compute jobs without confirmation.
 license: Skill text MIT-style for this repo; Topaz itself is GPLv3.
 metadata:
   topaz_pin: v0.3.20 @ 58fe52370f4accb8215525df2ea8f2c7ee6d340a
   grounded_on: 2026-06-05
   validated_on: 2026-06-06 (live help + GPU smoke on a Linux + NVIDIA GPU host, topaz 0.3.20)
+  version: 1.0.0
 ---
 
 # Topaz skill (config-first, validated against 0.3.20)
+
+## Documentation maintenance lane
+
+For a skill/source/tutorial refresh, follow [references/maintenance.md](references/maintenance.md).
+This documentation-only lane skips environment probing and runtime command gates;
+those gates still apply to machine-specific advice, installation, data operations, and jobs.
+Upstream documentation checked **2026-09-07**: Topaz **0.3.20** (stable, 2026-05-11); local validation remains **0.3.20** (2026-06-06).
+This does not establish the software installed on the current host. New documentation-only
+claims must not inherit historical `VALIDATED` labels.
 
 Topaz is a cryo-EM pipeline: **positive-unlabeled CNN particle picking** plus
 **deep denoising** of micrographs (`denoise`) and tomograms (`denoise3d`). CLI is

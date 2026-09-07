@@ -270,3 +270,9 @@ only (not a benchmark), the validation smoke ran `train_vae`/`backproject_voxel`
 `analyze` end-to-end on a Linux + NVIDIA GPU host with an NVIDIA GPU on a tiny 5-particle D=256
 set (`[src: the validation run]`); that confirms the pipeline
 executes but says nothing about epoch timing at scale.
+
+## Current tutorial and dashboard route (documentation checked 2026-09-07)
+
+Use the [EMPIAR-10076 tutorial](https://ez-lab.gitbook.io/cryodrgn/cryodrgn-empiar-10076-tutorial) for pose-conditioned reconstruction and the [cryoDRGN-AI tutorial](https://ez-lab.gitbook.io/cryodrgn/cryodrgn-ai-ab-initio-reconstruction/cryodrgn-ai-ab-initio-empiar-10076-tutorial) for reconstruction without consensus poses. The older tutorial contains historical software commands: preserve its scientific sequence, but reconcile epoch numbering, defaults, and sign handling with the installed CLI. Its data sign and input filenames are dataset-specific; validate a backprojection before training another dataset.
+
+For **4.3.0+**, the dashboard adds full/sketched volume-landscape views and combined or separate multi-region particle selections. For **4.3.1**, its trajectory interface includes in-browser volume slices and VTK 3D viewing, so viewing decoded volumes does not require ChimeraX. Inspect volume support and the mapping of saved selections to original particle rows before downstream filtering. A visual trajectory is exploratory and does not independently establish physical dynamics. The [command builder](https://ml-struct-bio.github.io/cryodrgn/) tracks releases: compare its generated commands with the target version's help before use. These additions are documentation-verified, not covered by the 4.2.1 smoke test. Sources: [4.3.0](https://github.com/ml-struct-bio/cryodrgn/releases/tag/4.3.0), [4.3.1](https://github.com/ml-struct-bio/cryodrgn/releases/tag/4.3.1).

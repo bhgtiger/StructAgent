@@ -25,8 +25,8 @@ The wrapper:
 
 ## Residue-code rules
 
-- 1–3 characters, uppercase letters and digits only — this matches both PDB and mmCIF conventions.
-- The four-character mmCIF-only codes (e.g. `A1ABC`) are deliberately **not** supported in v1: they require explicit mmCIF output and are easy to misuse with downstream tools that still expect three-letter codes. If a user needs a 4-letter code, run `acedrg` directly through `run_ccp4.sh` and own the consequences.
+- 1–3 characters, uppercase letters and digits only — a wrapper/PDB compatibility restriction, not the full mmCIF identifier space.
+- Longer mmCIF-only codes (e.g. `A1ABC`, five characters) are deliberately **not** supported in v1: they require explicit mmCIF output and are easy to misuse with downstream tools that still expect three-letter codes. If a user needs a longer code, run `acedrg` directly through `run_ccp4.sh` and own the consequences.
 - Codes already present in `$CLIBD_MON` (e.g. `ATP`, `NAD`, `HEM`) are a hazard: AceDRG will happily produce a CIF with the same code, and downstream tools may load whichever the search path finds first. The wrapper warns; the user picks a unique code if needed.
 
 ## Charge and protonation
@@ -54,3 +54,9 @@ Phenix's `phenix.elbow` solves the same problem and lives in the `phenix` skill.
 
 - AceDRG task reference: <https://cloud.ccp4.ac.uk/manuals/html-taskref/doc.task.MakeLigand.html>
 - CCP4 monomer library notes: <https://www.ccp4.ac.uk/html/>
+
+## Current tutorial and dictionary checks
+
+For a new ligand, follow the [official Make Ligand task reference](https://cloud.ccp4.ac.uk/manuals/html-taskref/doc.task.MakeLigand.html) to establish chemistry, then translate the selected input into this wrapper's explicit mode. Inspect bond orders, chirality, protonation, atom naming and generated coordinates before refinement; a completed dictionary job does not establish the intended chemistry.
+
+[CCP4 update 016](https://www.ccp4.ac.uk/ccp4-9-0-updates/) adds Gemmi's `drg` subcommand aimed at reproducing `acedrg -c` and enables AceDRG's non-geometry-optimization module. Do not substitute `gemmi drg` for this full AceDRG wrapper or infer new flags from those release descriptions; use installed help for that specific operation. Record the monomer-library version alongside generated CIFs because library updates can change link restraints.

@@ -17,7 +17,7 @@ Paper: Sánchez-García R, Gómez-Blanco J, Cuervo A, Carazo JM, Sorzano COS, Va
 
 ## Scientific limits & cautions to surface
 
-- **Input must be raw/unmasked/unsharpened** (from refinement). Post-processed/masked/sharpened inputs are out-of-distribution for the trained models and can mislead (`references/04`).
+- **Prefer raw/unmasked/unsharpened input** from refinement. Sharpened/enhanced maps remain unsuitable. Masked input has a limited, explicitly documented mode-2 fallback; default normalization is inappropriate for it (see [inputs/models](04_inputs_outputs_models.md)).
 - **Model trained on particular targets.** The README cautions that features absent from training (e.g. some ligands / post-translational modifications) may not be faithfully represented; do not over-interpret novel densities introduced or removed by the network.
 - **`highRes` only for overall FSC < 4 Å**, and it can look noisier. **`tightTarget`/`highRes` can over-mask**; `wideTarget` is the less-aggressive option.
 - **Auto-normalization can rarely fail / be less accurate** — consider `--noiseStats` or a binary mask if results look wrong (`references/04`).

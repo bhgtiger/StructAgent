@@ -1,41 +1,34 @@
 # CryoSPARC Handoff — Import & Volume Tools
 
-## Import 3D Volumes
+Checked 2026-09-07 against [Volume Tools](https://guide.cryosparc.com/processing-data/all-job-types-in-cryosparc/utilities/job-volume-tools) and the [Mask Creation tutorial](https://guide.cryosparc.com/processing-data/tutorials-and-case-studies/mask-selection-and-generation-in-ucsf-chimera). Documentation verification does not establish the installed CryoSPARC version or run schema.
 
-| Field | Value |
-|---|---|
-| `Volume paths` | path to your `mask_base.mrc` (or glob) |
-| `Volume type` | `mask` if Option A (fully finalised in ChimeraX) <br> `map` if Option B (will run Volume Tools next) |
-| `Pixel size (A)` | only fill if header is missing; our scripts preserve it from the target map |
+## Import and finalization
 
-## Volume Tools — Option B finalisation
+Create an unsoftened base explicitly with `--binarize --dilation 0 --soft 0`; omitting `--soft` does not disable Gaussian smoothing. Import that MRC with Import 3D Volumes as a map, then connect it to Volume Tools. A fully finished mask may be imported as a mask. Preserve the target map’s box, voxel size, and coordinate frame.
 
-Run **Volume Tools** on the imported mask base with `Volume type = map`.
-
-| Parameter | Suggested | Notes |
+| Current Volume Tools parameter | Starting choice | Validation |
 |---|---|---|
-| Type of operation | `threshold` | Produces a finalised mask |
-| Threshold for binarizing | `0.5` | Our scripts already output ≈0/1 so 0.5 splits cleanly. For non-binarized molmap output, use ~`0.15` as in the tutorial. |
-| Dilation distance for mask in pixels | `3–6` | Empirical. Larger = wider 1-region. Start at 3. |
-| Soft padding width for mask in pixels | `round(5 × GSFSC_resolution / apix)` | Hard rule. For a 3 Å map at 1.0 apix → 15 px. Start at this value. |
-| Output box size | leave blank | Keep input box |
-| Output pixel size | leave blank | Keep input apix |
+| Type of input volume | `volume` for the connected base | Only the selected input slot is processed |
+| Type of output volume | `mask` | Check the output type before downstream connection |
+| Threshold | `0.5` for a binary base | For nonbinary molmap output, inspect contour/topology; no universal threshold |
+| Dilation radius (pix) | A few pixels; historical trials used 3–6 | Spherical dilation radius in final output pixels |
+| Soft padding width (pix) | At least `ceil(5 × GSFSC_resolution / final_apix)` as the Guide starting recommendation | Cosine-edge width; compare wider settings if FSC/coverage requires it |
+| Output box / sampling | Preserve target grid | Check output dimensions, origin, and voxel size |
 
-**Iteration strategy:** keep the same mask base, fork Volume Tools jobs with different `dilation` / `soft padding` combos. Cheap. Then test the resulting masks in a single Local Refinement and keep the one with Tight ≈ Corrected FSC.
+The previous `Type of operation = threshold` and long dilation/padding labels are historical wording; consult the installed job schema before API automation. Operation order is **resample/filter/crop → threshold/dilate/pad → invert**. Inversion occurs last since v4.4. Starting in **v5**, lowpass filtering defaults to **Butterworth, order 8** (previously rectangular; order default 10). Make filter choice explicit when reproducing an older mask. To choose a contour after lowpass filtering, run a first filter-only Volume Tools job, inspect its output, then threshold in a second job.
 
 ## Where the mask plugs in
 
 | Job | Mask role |
 |---|---|
-| Local Refinement | `Mask` input — defines region to refine |
-| Particle Subtraction | `Mask` input — region to **subtract** (so it's the *complementary* mask) |
-| 3D Variability Analysis | `Mask` input — restricts analysis to region |
-| 3D Classification | optional `Solvent mask` |
-| Homogeneous / Non-uniform Refinement | optional `Static mask` — tight masks here easily inflate FSC, be conservative |
+| Local Refinement | Region to retain and refine |
+| Particle Subtraction | Region to subtract, normally the particle outside the local region |
+| 3D Variability Analysis | Region included in variability analysis |
+| 3D Classification | Optional solvent mask |
+| Homogeneous / Non-uniform Refinement | Optional static mask; compare against the current dynamic-mask route |
 
-## Sanity checks before running expensive jobs
+A box-wide `1 - region` mask also includes solvent; use a particle-bounded complement when following the tutorial’s subtraction workflow. Finish each base with suitable padding, inspect the pair, and do not assume independently softened masks remain an exact algebraic complement.
 
-1. Open mask + map together in ChimeraX, contour mask at 0.5. Mask region should match what you expect.
-2. Check apix in header: `chimerax --nogui --exit --cmd "open mask.mrc; volume #1 settings"`.
-3. Check box size matches the map.
-4. After Local Refinement: Tight FSC curve should track Corrected FSC. If Tight runs well above Corrected → mask too tight, dilate or soften more.
+## Checks before downstream work
+
+Inspect mask and map together at mask contour 0.5. Confirm coverage, dimensions, voxel size/origin, and finite values within [0,1]. Downstream masks need soft edges; a hard base is only an intermediate. The tutorial notes an exception for **3D Flex Mesh generation**, which does not require a soft mask. Where the job reports both Tight and Corrected FSC, a large separation suggests masking artifacts: revisit dilation and padding. A similar pair of curves is useful evidence, not proof that the model or alignment is correct.

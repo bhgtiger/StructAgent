@@ -1,6 +1,7 @@
 ---
 name: coot
-description: Practical Coot 1 workflows for macromolecular model building, local rebuilding, ligand/monomer handling, density-guided cleanup, waters/peaks inspection, validation, dictionaries/restraints, and Coot-specific scripting. Use when the task should be done with Coot rather than ChimeraX/ISOLDE/Phenix, especially for ligand fitting, local residue/fragment cleanup, water finding/pruning, awkward rebuild jobs, weird chemistry, or source-backed Coot automation. Prefer modular lane selection: headless/newer API when clearly supported, classic `coot --no-graphics --script` for the broad documented scripting surface, and GUI/manual Coot only when the task is genuinely interactive or underdocumented for automation.
+description: >-
+  Practical Coot 1 workflows for macromolecular model building, local rebuilding, ligand/monomer handling, density-guided cleanup, waters/peaks inspection, validation, dictionaries/restraints, and Coot-specific scripting. Use when the task should be done with Coot rather than ChimeraX/ISOLDE/Phenix, especially for ligand fitting, local residue/fragment cleanup, water finding/pruning, awkward rebuild jobs, weird chemistry, or source-backed Coot automation. Prefer modular lane selection: headless/newer API when clearly supported, classic `coot --no-graphics --script` for the broad documented scripting surface, and GUI/manual Coot only when the task is genuinely interactive or underdocumented for automation.
 ---
 
 # Coot
@@ -400,3 +401,7 @@ Read these before planning or extending major coverage:
 
 - **Standalone CCP4 CLI binaries** (`refmac5`, `acedrg`, `freerflag`, `mtzdump`, `phaser`, `cbuccaneer`, …) → `ccp4` skill. "Run Refmac from inside Coot" recipes stay here; bare-CLI Refmac runs go to `ccp4`.
 - **Phenix CLI** (`phenix.refine`, `phenix.real_space_refine`, `phenix.elbow`, …) → `phenix` skill.
+
+## Update this skill
+
+For release, tutorial, or self-update requests, follow [references/maintenance.md](references/maintenance.md). Documentation checked 2026-09-07: upstream Coot 1.3.3 (2026-08-13); packaged builds may lag. This is upstream evidence, not a new local runtime validation. Preserve historical tests and probe the actual environment before applying version-dependent advice. Updating this knowledge bundle does not authorize software upgrades, compute jobs, or web submissions.

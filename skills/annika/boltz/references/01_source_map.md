@@ -2,7 +2,10 @@
 
 Where every claim in this skill can be checked. Pinned baseline: **v2.2.1**,
 commit `cb04aeccdd480fd4db707f0bbafde538397fa2ac`. Main HEAD observed
-2026-06-22: `b1ebfc46...` (repo is active; pin for reproducibility).
+2026-09-07: `b1ebfc46ecf57f5414e0d1a6f9027bbb122c53bc` (2026-05-29).
+The [release index](https://github.com/jwohlwend/boltz/releases) still lists
+v2.2.1 (2025-09-08) as latest. This is a source review, not a new GPU test.
+See [maintenance](maintenance.md) for the next refresh.
 
 ## Upstream
 

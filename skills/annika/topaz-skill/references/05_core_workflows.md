@@ -150,3 +150,11 @@ topaz.<cmd>.help.txt]`) plus the GPU smoke run
 (cited as `[smoke]`). Conceptual/usage context: README usage blocks,
 `docs/source/tutorial.md`, `docs/source/commands/*`, and
 `tutorial/01_quick_start_guide.ipynb` / `02_walkthrough.ipynb`.
+
+## Tutorial application and release caveats (checked 2026-09-07)
+
+Use the pinned [quick start/walkthrough](https://github.com/tbepler/topaz/tree/v0.3.20/tutorial) for basic picking, [cross-validation notebook](https://github.com/tbepler/topaz/blob/v0.3.20/tutorial/03_cross_validation.ipynb) for expected-particle-count/epoch and threshold selection, and [denoising notebook](https://github.com/tbepler/topaz/blob/v0.3.20/tutorial/04_denoising.ipynb) for pretrained or paired-data denoising. The ReadTheDocs tutorial is an older placeholder. Even pinned notebooks contain legacy cells: check their commands against the installed help and replace the cross-validation cell's `PATH` variable with a task-specific log-path variable. Its prose says 25 models, but six candidate counts times five folds means **30** fits; calculate actual cost before authorizing that sweep.
+
+For selecting picking parameters, hold out entire micrographs and compare held-out precision/recall rather than training scores. Tune a score threshold on inspected picks and downstream particle quality; it is not a probability cutoff. Denoising training needs paired views of the same aligned signal with independent noise, such as odd/even movie-frame sums; duplicated images are not an independent pair. Check registration and patch seams against the original images before using outputs.
+
+Version **0.3.19** added training-data preloading and fixed worker usage; `auto` may preload a dataset smaller than 80% of free memory. For memory-limited jobs inspect `--preload` in target help and available host/cgroup memory before selecting a mode. Python integrations must also account for `denoise_stream` returning output paths by default, rather than in-memory images. Version **0.3.20** fixes a reporting call. Sources: [0.3.19](https://github.com/tbepler/topaz/releases/tag/v0.3.19), [0.3.20](https://github.com/tbepler/topaz/releases/tag/v0.3.20), [tagged training parser](https://github.com/tbepler/topaz/blob/v0.3.20/topaz/commands/train.py). No new GPU validation was performed.

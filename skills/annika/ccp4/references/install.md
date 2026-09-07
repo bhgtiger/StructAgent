@@ -21,7 +21,7 @@ The CCP4 docs also document `/path/to/ccp4-<version>/start` as a Bash entry poin
 `scripts/check_env.sh` and `scripts/run_ccp4.sh` resolve the setup script in this order:
 
 1. `$CCP4_SETUP` if exported.
-2. `/Applications/ccp4-*/bin/ccp4.setup-sh` (newest version glob).
+2. `/Applications/ccp4-*/bin/ccp4.setup-sh` (shell glob order, not semantic-version selection).
 3. `/opt/xtal/ccp4-*/bin/ccp4.setup-sh`.
 4. `$HOME/ccp4-*/bin/ccp4.setup-sh`.
 
@@ -66,3 +66,9 @@ When the setup script is not found, `check_env.sh` prints:
    ```
 
 3. If only `/path/to/ccp4-<version>/start` exists, source that for an interactive shell and ask the maintainer to provide `bin/ccp4.setup-sh`.
+
+## Release coverage (documentation checked 2026-09-07)
+
+The [official update table](https://www.ccp4.ac.uk/ccp4-9-0-updates/) ends at **9.0.017 (2026-08-05)**. This is the suite update level, not the version of every binary. Update 016 lists Servalcat 0.4.142, Gemmi 0.7.5, AceDRG 331, and Coot/WinCoot 1.2; update 017 fixes Gemmi mmCIF output. If a model conversion changes atom identifiers or fails to round-trip, record the suite update level and Gemmi build before changing the model. Re-read exported coordinates and compare atom/residue identifiers and cell/symmetry with the input.
+
+The wrappers' existing probes and examples have not been rerun against this release. Run `scripts/check_env.sh` on the target host before claiming availability; a successful presence probe is not a refinement validation. Keep an explicit `CCP4_SETUP` when multiple installations exist. Updating docs is separate from running CCP4 Update Manager.

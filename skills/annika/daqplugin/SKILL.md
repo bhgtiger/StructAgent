@@ -9,6 +9,8 @@ Drive DAQplugin, a ChimeraX bundle for residue-wise local quality scoring of pro
 
 Use this skill together with `chimerax` for batch invocation. Use `isolde` as well when the user wants live DAQ feedback during interactive ISOLDE refinement.
 
+Upstream checked **2026-09-07**: Toolshed **1.0.7 (2026-07-17)**, GitHub release **1.0.1**, and source metadata **1.0.8** differ. Read [version/backend caveats](references/commands.md#versions-backend-diagnosis-and-inspection-tutorial) before choosing artifacts. Historical command provenance is retained; the installed bundle and inference backends have not been probed by this refresh.
+
 ## Choose The Workflow
 
 1. **Compute new DAQ scores from a map**: run `daqscore compute_grid` when the user has a cryo-EM map and wants a reusable `.npy` score grid.
@@ -92,7 +94,7 @@ DAQplugin auto-selects inference backends by platform:
 | macOS Apple Silicon | MLX-Metal -> MLX-CPU -> ORT-CPU |
 | macOS Intel | ORT-CPU |
 
-The active backend is printed in the ChimeraX log. If a forced GPU backend silently falls back or fails, rerun with `backend cpu` to separate DAQ/plugin correctness from GPU setup.
+The active backend is printed in the ChimeraX log. `auto` may fall back to CPU. Current Toolshed notes describe explicit errors for forced-backend failures (1.0.4+) and improved NVIDIA detection (1.0.7). Inspect the installed bundle and active-backend log; a CPU diagnostic run separates model/plugin correctness from GPU initialization but does not validate GPU performance.
 
 ## ISOLDE / Live Monitoring
 
@@ -141,3 +143,7 @@ Only use `apply_isolde_restraints true` when the user explicitly wants ISOLDE re
 ## Citation
 
 When reporting DAQ results, cite Terashi et al., Nature Methods 2022, "Residue-wise local quality estimation for protein models from cryo-EM maps", and note that DAQplugin came from `https://github.com/kiharalab/DAQplugin`.
+
+## Update this skill
+
+For release, tutorial, or instruction refreshes, follow [references/maintenance.md](references/maintenance.md): verify the tool-specific sources, correct owning references, preserve historical/local evidence, validate, and synchronize authorized copies. Software upgrades and live jobs are separate tasks.

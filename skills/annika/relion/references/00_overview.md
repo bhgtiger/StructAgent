@@ -1,5 +1,9 @@
 # 00 — RELION 5 overview, project layout, version map
 
+## Release status checked 2026-09-07
+
+[5.0.1](https://github.com/3dem/relion/releases/tag/5.0.1) (2025-09-22) is the latest stable release listed by upstream. [5.1.0](https://github.com/3dem/relion/releases/tag/5.1.0) (2026-03-13) is explicitly **prerelease**. The [release-5.0 manual](https://relion.readthedocs.io/en/release-5.0/) remains the stable tutorial lane. The historical 5.0.0 CLI capture below is not a current-host probe. Installation compatibility changes belong to [troubleshooting](20_troubleshooting.md); 5.1 additions belong to [helical](13_helical_amyloid.md) and [tomo](14_tomo_sta.md) references. See [maintenance](maintenance.md) to refresh sources.
+
 ## Scope
 Orientation file for the RELION 5.0 skill: what RELION 5 is, the three ways to drive it (GUI, raw `relion_*` CLI, Schemes/on-the-fly), the canonical single-particle (SPA) stage order, the on-disk project layout (per-job-type folders, `default_pipeline.star`, hidden `.gui_*job.star`, per-job `job.star`/`note.txt`, exit sentinels, `Trash/`), a version map (3.1→5.1), the source-precedence rule that governs every factual claim in this skill, and how to begin a diagnosis with the read-only `scripts/inspect_project.py`. Verified against the installed binary `RELION version: 5.0.0-commit-3d6c20` and the read-only 4.0-beta fixture `<RELION_PROJECT_FIXTURE>`.
 
@@ -168,7 +172,7 @@ do_ctf_correction  Yes
 | **3.1** | **Optics groups**: `data_optics` block + `rlnOpticsGroup`; higher-order aberration correction (trefoil/tetrafoil, Cs deviation), anisotropic magnification; auto-upgrade of older STARs (one-way — 3.1 STARs can't be read by older RELION); `External` job type; first `Schedules` framework | `Whats-new.rst:57-94` |
 | **4.0** | **VDAM** gradient refinement (replaces SAGD for initial model; faster 2D/3D class); **Schemes** (renamed from Schedules) for on-the-fly; **class-ranker** (`relion_class_ranker`, automated 2D class selection); **tomo rewrite** (pseudo-subtomograms, CTF-refine + polish for tomo); CCP-EM pipeliner integration | `Whats-new.rst:31-54` |
 | **5.0** | **Blush** regularisation (denoising CNN inside Class3D/Refine3D/MultiBody; GUI `do_blush` → `--blush`); **DynaMight** (continuous heterogeneity, VAE deformations); **ModelAngelo** (automated atomic model building); **AMD/Intel GPU** (HIP/ROCm, SYCL); **full STA** pipeline (`relion --tomo`, mdoc→model); filament dendrogram selection | `Whats-new.rst:7-29` |
-| **5.1** | Amyloid-focused additions (e.g. enhanced helical/amyloid utilities) | (unverified: not in this docs snapshot, which is release-5.0; confirm against a 5.1 source/docs before quoting specifics) — `13_helical_amyloid.md` |
+| **5.1.0 prerelease** | Amyloid picker/Schemes/Blush network; AreTomo2 reconstruction and real 3D subtomogram options | Documentation verified 2026-09-07; not locally executed — `13_helical_amyloid.md`, `14_tomo_sta.md` |
 
 Practical consequence: **older projects are normal.** This skill runs a 5.0 binary on a 4.0-beta fixture; 5.0 will read 3.1/4.0 STARs and `default_pipeline.star` fine. Going *backwards* (5.0 STAR → older RELION) is the unsupported direction. When a feature flag (`--blush`, VDAM behaviour) is absent from an old job's `note.txt`, that's the project's era, not a bug.
 

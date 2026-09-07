@@ -1,11 +1,19 @@
 ---
 name: "cryoatom-advisor"
-description: "Read-only advisor for CryoAtom/CryoAtom2 readiness, static CLI, NOT-RUN plans, and safety limits; use for explicit CryoAtom questions."
+description: "Read-only advisor for CryoAtom/CryoAtom2 readiness, static CLI, NOT-RUN plans, and safety limits; use for explicit CryoAtom questions or to refresh this advisor's release/tutorial knowledge."
 ---
 
 # CryoAtom Advisor
 
 Give a source-bounded readiness assessment or NOT-RUN plan for CryoAtom/CryoAtom2. This is an advisor, not an installer, runner, or biological validator.
+
+## Update this skill
+
+Sources checked **2026-09-07**; latest release remains **v2.1.0**.
+For an authorized knowledge refresh, follow
+[references/maintenance.md](references/maintenance.md). That lane allows source
+inspection, documentation edits and offline package validation. It does not
+invoke CryoAtom or change the read-only boundary for runtime work below.
 
 ## Hard boundary
 

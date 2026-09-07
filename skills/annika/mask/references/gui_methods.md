@@ -1,6 +1,6 @@
 # GUI-only Methods — Reference
 
-Documented for completeness. **The mask_skill scripts do not automate these** — they require human interaction with the ChimeraX UI. Use the model-reference (molmap) path instead whenever a model is available.
+Documented for completeness. **The mask_skill scripts do not automate these** — they require human interaction with the ChimeraX UI. Use the model-reference (molmap) path when a trustworthy model covers the region needed.
 
 ## Method 1: Segger / Volume Segmentation
 
@@ -34,4 +34,8 @@ Strengths: fast for big simple blobs. Weaknesses: imprecise, leaves dust, no und
 
 ## Why we don't automate these
 
-Both rely on per-region picking in the 3D view. molmap + threshold/dilation/soft achieves the same end result deterministically when a model is available — which is the case for nearly all our targets.
+Both rely on per-region picking in the 3D view. molmap provides a scripted alternative when the model covers the required density. Map segmentation remains useful for unbuilt or mismodelled regions.
+
+## Current tutorial checkpoints
+
+The official [Mask Creation tutorial](https://guide.cryosparc.com/processing-data/tutorials-and-case-studies/mask-selection-and-generation-in-ucsf-chimera), checked 2026-09-07, still covers segmentation, volume erasing, and molmap. For segmentation, **hide unwanted regions while choosing the mask**, preserving them for the subtraction complement; Segger edits have no undo. Export selected regions as MRC and resample onto the original target map because Segger exports a cropped box. For Volume Eraser, keep a copy before erasing. These GUI workflows produce bases that still need threshold/dilation/padding in [Volume Tools](cryosparc_volume_tools.md). A molmap base can be created directly with `molmap #model/chain 16 onGrid #target`; confirm model/volume IDs from the current session.

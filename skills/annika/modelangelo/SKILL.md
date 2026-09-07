@@ -19,6 +19,15 @@ description: >-
 
 # ModelAngelo — installation & environment setup
 
+## Update this skill
+
+Latest upstream release and source reviewed **2026-09-07**: **v1.0.18**.
+For release/tutorial refreshes, follow
+[references/maintenance.md](references/maintenance.md) without running a target
+probe or installer. The pinned setup remains unchanged; source review is not
+new host validation. For current tutorial selection and sequence-scope checks,
+read [integration](references/07_codex_and_integration.md).
+
 ModelAngelo (Jamali et al., *Nature* 2024; repo `3dem/model-angelo`, MIT; pinned
 **v1.0.18**, commit `994945b`) is an automated atomic model builder for cryo-EM
 maps. **This skill installs and sets it up — it does not run production builds

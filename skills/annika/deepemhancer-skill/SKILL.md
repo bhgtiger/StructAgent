@@ -1,17 +1,42 @@
 ---
 name: deepemhancer
-description: Use this skill to run, install, configure, troubleshoot, or explain DeepEMhancer (rsanchezgarc/deepEMhancer) — the deep-learning post-processing tool for cryo-EM maps (combined masking-like + sharpening-like enhancement). Covers the CLI (-i/-i2/-o, -p tightTarget/wideTarget/highRes, --deepLearningModelPath, --noiseStats, -m/--binaryMask, -g/--gpuIds, -b/--batch_size, --cleaningStrengh, --download), model .hd5 files, input/half-map suitability, the TensorFlow/CUDA/GPU environment, CryoSPARC/HPC integration, and whether a given machine can run it. It is config-first: it reads or generates a target-environment config report before giving machine-specific commands, and it confirms before installing, downloading models, or running on a map. MANDATORY TRIGGERS: DeepEMhancer, deepemhancer, map post-processing, map sharpening + denoising in one step, deepEMhancer_tightTarget.hd5, --deepLearningModelPath, "run deepemhancer", "install deepemhancer", "deepemhancer GPU/CUDA error".
-version: 1.0.0
-author: StructAgent Maintainers + Hermes/Claude
+description: Run, install, configure, troubleshoot, or explain DeepEMhancer cryo-EM map post-processing,
+  its models, normalization, TensorFlow/CUDA environment, and CryoSPARC/HPC integration. Also use to refresh
+  this skill from upstream releases and usage guidance. Machine-specific work requires a current target-environment
+  report; installs, model downloads, and map runs require confirmation.
 license: local
-platforms: [linux]
 metadata:
   hermes:
-    tags: [cryo-em, post-processing, sharpening, denoising, deepemhancer, tensorflow, gpu]
-    related_skills: [cryosparc, relion, chimerax, phenix, structural-strategy]
+    tags:
+    - cryo-em
+    - post-processing
+    - sharpening
+    - denoising
+    - deepemhancer
+    - tensorflow
+    - gpu
+    related_skills:
+    - cryosparc
+    - relion
+    - chimerax
+    - phenix
+    - structural-strategy
+  version: 1.0.0
+  author: StructAgent Maintainers + Hermes/Claude
+  platforms:
+  - linux
 ---
 
 # DeepEMhancer
+
+## Documentation maintenance lane
+
+For a skill/source/tutorial refresh, follow [references/maintenance.md](references/maintenance.md).
+This documentation-only lane skips environment probing and runtime command gates;
+those gates still apply to machine-specific advice, installation, data operations, and jobs.
+Upstream documentation checked **2026-09-07**: DeepEMhancer **0.17** (stable GitHub release, 2025-06-26); the source HEAD still matches the historical `961f028c` pin. Historical installation/runtime evidence retains its original version and date.
+This does not establish the software installed on the current host. New documentation-only
+claims must not inherit historical `VALIDATED` labels.
 
 DeepEMhancer (Sánchez-García et al., *Communications Biology* 2021; repo `rsanchezgarc/deepEMhancer`, Apache 2.0) is a deep-learning post-processing tool for cryo-EM maps. A 3D U-net applies **masking-like and sharpening-like operations in one step** using pretrained `.hd5` models. Input is a **raw, unmasked, unsharpened** map straight from refinement (half maps preferred); output is a post-processed map for visualization and model building.
 

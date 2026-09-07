@@ -1,5 +1,19 @@
 # 07 — Codex portability & pipeline integration
 
+## Tutorial routing — checked 2026-09-07
+
+Use the [v1.0.18 README](https://github.com/3dem/model-angelo/blob/v1.0.18/README.md)
+for standalone setup, sequence-guided builds and no-sequence/HMM identification.
+Use the [RELION 5.0 ModelBuilding tutorial](https://relion.readthedocs.io/en/release-5.0/SPA_tutorial/ModelBuilding.html)
+for a RELION-owned job and its Hmmer tab. Its example timings and GPU IDs are
+dataset/site settings. Verify the configured Python environment and sequence
+alphabet before applying its recipe. Installation verification still stops at
+help/import/cache checks; a tutorial build requires a separate authorized run.
+
+For mixed protein/nucleic-acid targets, check the sequence-completeness note in
+[the CLI reference](05_cli_and_verification.md) before copying protein-only
+examples or comparing ModelAngelo with another model builder.
+
 ## Using this skill under Codex
 
 The skill is **optimized for Claude** but built to be **Codex-compatible**:
@@ -23,9 +37,10 @@ To install for Codex: copy the folder into `~/.codex/skills/` (or
 records a specific machine and must not travel with the skill (regenerate it per
 target with the probe). The Codex `skill-creator` lives at
 `~/.codex/skills/.system/skill-creator`; its `quick_validate.py` can validate the
-copy. The Claude copy lives at `~/.claude/skills/modelangelo` (auto-discovered)
-and is the canonical one to edit; mirror changes into the Codex copy if you keep
-both (as the user does for `topaz`).
+copy. Resolve the active installation from the loaded skill path and compare
+it with the repository source. Neither a Claude nor Codex installation is
+automatically canonical. Synchronize reviewed changes only into authorized
+copies, preserving their private config and populated lessons.
 
 Differences to keep in mind if running under Codex:
 - Codex skill guidance discourages extra docs (README/CHANGELOG) inside a skill —

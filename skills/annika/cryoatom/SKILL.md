@@ -1,9 +1,17 @@
 ---
 name: "cryoatom"
-description: "Portable, config-first assistant for CryoAtom2 — automatic atomic model building for proteins, RNA, DNA and protein-nucleic-acid complexes from cryo-EM density maps. Carries no host facts: it probes the machine it is running on, writes a site config, and only then makes machine-specific claims. Use whenever the user wants to install, configure, port, understand, plan, or run CryoAtom/CryoAtom2 on any system: standing up a new install (container or native conda), staging and pinning the six model weights, writing a build command, choosing sequence vs no-sequence mode, picking -pf/-nf databases, reading the output mmCIF and its confidence field, comparing against ModelAngelo, or troubleshooting weights/CUDA/OOM/getp errors. It never installs, downloads, or runs anything without explicit per-action confirmation. Triggers: cryoatom, CryoAtom2, cryoatom build, install cryoatom on a new cluster, atomic model building from cryo-EM map, protein-nucleic acid model building, RUNet/CryoNet checkpoints, CryoAtom weight cache."
+description: "Portable, config-first assistant for CryoAtom/CryoAtom2 model building from cryo-EM maps. Use for installation, containers, host configuration, six-weight caching, build planning/execution, sequence or database inputs, mmCIF confidence interpretation, CUDA/OOM/getp troubleshooting, or refreshing this skill's versions and tutorials. Probe before host-specific claims; preserve per-action authorization for installs, downloads and runs."
 ---
 
 # CryoAtom2 — portable skill
+
+## Update this skill
+
+Release/source review **2026-09-07**: latest tagged release **v2.1.0**;
+this package retains its untagged **2.1.1 / `856e250`** runtime pin.
+Follow [references/maintenance.md](references/maintenance.md) for a software
+knowledge refresh. This lane edits documentation without a runtime probe,
+weight download or image rebuild. Historical runtime observations stay dated.
 
 CryoAtom2 builds atomic models for proteins, nucleic acids, and their complexes
 directly from a cryo-EM density map, with or without sequence input. Its

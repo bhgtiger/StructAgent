@@ -85,6 +85,10 @@ Copy selected folders under `skills/annika/` or `skills/maria/` into your agent'
 
 See [`docs/skills_only_usage.md`](docs/skills_only_usage.md). For a worked Claude/Codex-style implementation example, see [`docs/cryosparc_skill_example/`](docs/cryosparc_skill_example/).
 
+Software skills include on-demand instructions for refreshing releases and
+tutorials. See the [Annika software refresh report](docs/annika_software_refresh_2026-09-07.md)
+for current coverage, validation and known limits.
+
 ### Option B — implement the full StructAgent system
 
 Create two agents:

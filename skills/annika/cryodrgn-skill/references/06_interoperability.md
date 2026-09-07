@@ -1,5 +1,11 @@
 # 06 — Interoperability (RELION / cryoSPARC)
 
+## Parser version gate (documentation checked 2026-09-07)
+
+The tables and commands below retain the **4.2.1** validation baseline. In **4.3.0+**, `parse_pose_csparc` can infer the image resolution from `.cs` metadata; the `-D` requirement below is specific to 4.2.1. Verify the inferred original box size before omitting the override. Version 4.3.0 also fixes unit/missing-column errors in `parse_relion`.
+
+For **4.3.1+** WarpTools/RELION5 subtomogram STAR input, consider the new `cryodrgn_utils parse_warptools` route, then unified `parse_star`. This is a tomography conversion, not a replacement for ordinary SPA STAR parsing. Check `rlnCtfDataAreCtfPremultiplied` before applying CTF correction, and verify particle/tilt counts, pixel size, poses, and a backprojection. The utility did not exist in the captured 4.2.1 command inventory; obtain target-version help before emitting runnable flags. Sources: [4.3.0 release](https://github.com/ml-struct-bio/cryodrgn/releases/tag/4.3.0), [4.3.1 release](https://github.com/ml-struct-bio/cryodrgn/releases/tag/4.3.1), [tagged parser](https://github.com/ml-struct-bio/cryodrgn/blob/4.3.1/cryodrgn/commands_utils/parse_warptools.py).
+
 cryoDRGN consumes upstream refinements from RELION (`.star`) and cryoSPARC (`.cs`)
 and can write selections back out. The import, inspect, and export/write-back
 flags below are **`[VALIDATED: cryoDRGN 4.2.1]`** against captured live `-h`
@@ -58,8 +64,8 @@ Common gotchas (see also `09_troubleshooting.md`):
 - Broken relative paths to `.mrcs` inside a `.star`/`.cs` → pass `--datadir <dir>`
   (supported on the write/inspect utilities; `parse_*` read the embedded paths).
 - `-D`/`--Apix` overrides must be the **original** image parameters
-  (pre-downsample), or shifts/CTF scale wrong. For `parse_pose_csparc`, `-D` is
-  required and is the consensus refinement box size.
+  (pre-downsample), or shifts/CTF scale wrong. For `parse_pose_csparc` in the validated **4.2.1**, `-D` is
+  required and is the consensus refinement box size (4.3.0+ can infer it; see above).
 - `parse_ctf_star` expects standard `_rln*` CTF fields (`04_data_model_and_formats.md`).
 
 ## Inspect headers/metadata (`cryodrgn_utils`)

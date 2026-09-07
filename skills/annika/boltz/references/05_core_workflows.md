@@ -3,6 +3,22 @@
 Each recipe = a YAML + a command. Only flags from `03_cli_reference.md` are used.
 Default model is Boltz-2. Confirm the host is VALIDATED (probe) before running.
 
+## Tutorial review — 2026-09-07
+
+The official [prediction guide](https://github.com/jwohlwend/boltz/blob/b1ebfc46ecf57f5414e0d1a6f9027bbb122c53bc/docs/prediction.md)
+retains the YAML, conditioning, affinity and MSA-authentication walkthroughs.
+Its change from v2.2.1 clarifies `step_scale`: 1.638 for Boltz-1, 1.5 for
+Boltz-2. The skill's CLI table already reflects this; copying a historical
+tutorial's 1.638 into every Boltz-2 command changes the sampling setup.
+Leave the default implicit unless there is a justified sampling experiment,
+and record model, seed and sampling settings when comparing outputs.
+
+For a ligand screen, the guide's one-input example is a starting point:
+reuse the approved target MSA, retain one result identity per ligand, and check
+the expected affinity JSON and ligand entity before ranking. MSA authentication
+examples change credentials/endpoint handling, not whether sequences leave the
+host. Keep credentials outside YAML and the skill bundle.
+
 ## 1. Single protein (auto MSA)
 
 ```yaml

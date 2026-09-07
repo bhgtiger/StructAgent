@@ -2,7 +2,7 @@
 
 ## Overview
 
-Run ISOLDE flexible fitting with live convergence monitoring, automatic early stop on plateau, emergency revert on CC regression, and hard timeout safety net.
+Historical template for ISOLDE flexible fitting with monitoring, early stop, checkpoint recovery, and timeout. Read [current-version caveats](#current-version-caveats) before copying or launching it; its cleanup and popup behavior require adaptation for 1.12.
 
 **Template:** `scripts/isolde_monitored_template.py`
 **Launcher:** `scripts/launch_monitored.sh`
@@ -60,7 +60,7 @@ Track molmap volumes by Python `id()` to avoid dangerous `close #N-M` range comm
 | Condition | When | Action |
 |-----------|------|--------|
 | CC plateau | ΔCC < 0.002 for 2 consecutive 60s windows (after 2 min soak) | `isolde sim stop` → save |
-| CC regression | CC drops > 0.005 from peak CC seen so far | `isolde sim revert` → save checkpoint state |
+| CC regression | CC drops > 0.005 from peak CC seen so far | `isolde sim stop discardTo checkpoint` → save checkpoint state (adapt the legacy script first) |
 | Hard timeout | Elapsed > HARD_TIMEOUT | `isolde sim stop` → save |
 | Sim crash | `ih.simulation_running == False` unexpectedly | Save whatever we have |
 
@@ -125,3 +125,9 @@ Without `models #id`, ChimeraX may save extra objects (cc_ref_vol, molmap leftov
 | High-resolution map (<2.5 Å) | Tighten CC_PLATEAU_THRESH to 0.001 |
 | Low-resolution map (>4 Å) | Relax CC_PLATEAU_THRESH to 0.003-0.005 |
 | Quick test run | Set HARD_TIMEOUT=120, MIN_SOAK=60 |
+
+## Current-version caveats
+
+The bundled scripts preserve the historical Mac workflow and were **not rerun on ISOLDE 1.12**. Before using a copied template, replace unconditional OP3/OXT cleanup with the [current preflight route](commands.md#current-release-preflight-and-tutorials), disable indiscriminate popup clicking, and inspect private API assumptions against the installed bundle. Preserve map-association checks, timers, new output paths, and launcher safeguards.
+
+The [current simulation command](https://tristanic.github.io/isolde/static/isolde/doc/commands/isolde.html#isolde-sim) restores checkpoints via `isolde sim stop discardTo checkpoint`; do not rely on the template's historical `isolde sim revert` spelling. Confirm a checkpoint exists before making revert a recovery action. CC thresholds here are runtime stopping heuristics, not validation that the model is scientifically complete. Unexpected simulation cessation is a failed run even if salvage coordinates are written.

@@ -5,7 +5,7 @@ description: "Automate UCSF ChimeraX on macOS for structural biology: fitting, s
 
 # ChimeraX Skill
 
-Automate ChimeraX (≥1.8) on macOS. Analysis + model editing only — no rendering in v1.
+Automate ChimeraX (≥1.8) on macOS. Analysis + model editing only — no rendering in v1. Upstream production **1.12 (2026-06-11)** verified **2026-09-07**; this does not revalidate the historical macOS workflow or identify the installed version. Read [current command caveats](references/commands.md#current-release-and-workflow-caveats) before adapting newer builds.
 
 For residue-wise DAQ quality scoring, DAQ coloring, `.npy` DAQ grids, DAQ B-factor export, sequence-shift arrows, or live DAQ monitoring, load and use the `daqplugin` skill with this ChimeraX batch pattern.
 
@@ -69,7 +69,7 @@ Each command entry: **string** (abort on failure) or **object** with `cmd`, opti
 
 ## Fitting: The Position Trap (Critical)
 
-**`fitmap` changes `model.position` (scene transform), NOT `atom.coord`.**
+**By default, `fitmap` changes the model transform, not atom-local coordinates.** Local fitting with `moveWholeMolecules false` instead moves the specified atoms; global search ignores that option. Ordinary coordinate saves include the transform already; do not apply it to coordinates again before saving. The following delta pattern is for transferring a fit to a separate, identically framed model; nested/transformed parents require scene-frame conversion.
 
 After `fitmap`, atom coordinates in the model are unchanged. You must capture the position delta:
 
@@ -117,7 +117,7 @@ For per-domain rigid-body fitting:
 
 ## Extraction / Saving Caveats
 
-- `save path #N/A:901` selects chain A residue 901 but may still write source-model context such as headers/full chain context. For extracting only specific HETATM records, write the records directly via Python instead of relying on `save` selection semantics.
+- To extract a residue, use `select #N/A:901` then `save /path/subset.cif models #N selectedOnly true`. A model selector alone does not restrict saved atoms. mmCIF may retain sequence/header context; inspect the saved atom records. See [saving and coordinate frames](references/commands.md#current-release-and-workflow-caveats).
 
 - `fitmap #lig inMap #vol metric correlation` requires `resolution R` for atomic-model fitting.
 - For local ligand refinement, prefer `fitmap ... metric correlation resolution R maxSteps 120` **without** `search`; reject fits whose centroid drifts >10 Å from the expected site midpoint.
@@ -140,3 +140,7 @@ Load [references/commands.md](references/commands.md) for:
 ## What's NOT in v1
 
 Rendering (images/movies), REST mode (use isolde skill), missing loop building, ligand docking (use `emerald` for cryo-EM density-guided docking), solvation.
+
+## Update this skill
+
+For release, tutorial, or instruction refreshes, follow [references/maintenance.md](references/maintenance.md): verify the tool-specific sources, correct owning references, preserve historical/local evidence, validate, and synchronize authorized copies. Software upgrades and live jobs are separate tasks.

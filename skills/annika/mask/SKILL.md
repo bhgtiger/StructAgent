@@ -7,7 +7,7 @@ description: "Generate cryo-EM mask bases (.mrc) from atomic models or maps usin
 
 Headless ChimeraX (≥1.8, macOS) pipeline for generating mask bases. Focus: **model-reference (molmap) workflow**, fully scriptable without a GUI. Volume-segmentation (Segger) and Volume Eraser methods require a GUI and are documented in `references/gui_methods.md` for completeness only.
 
-Designed to plug into the `chimerax` skill later — uses the same `--nogui --exit --script` invocation pattern.
+Uses the `chimerax` skill’s `--nogui --exit --script` invocation pattern. Upstream checked **2026-09-07**: ChimeraX production **1.12** and current CryoSPARC mask/Volume Tools tutorials. This is documentation coverage; the historical ≥1.8 scripts have not been rerun. Before choosing soft-edge values, read [mask theory](references/mask_theory.md): the scripts’ Gaussian sigma is not CryoSPARC cosine-padding width.
 
 ## When to use which method
 
@@ -17,7 +17,7 @@ Designed to plug into the `chimerax` skill later — uses the same `--nogui --ex
 | volume eraser | Yes | Map only | Quick large-region masks, no model available |
 | Segger segmentation | Yes | Map only | Complex topologies, no model available |
 
-If the user has an atomic model, **always prefer molmap**.
+Prefer molmap for scripted masks of a trustworthy model selection. If the model omits density the mask must include, use the map-based methods; the upstream tutorial recommends segmentation for general manual use.
 
 ## Binary discovery
 
@@ -42,8 +42,8 @@ Common selection specs (ChimeraX atomspec):
 - `/A` — chain A
 - `/A:120-340` — residues 120–340 of chain A
 - `/A,B` — chains A and B
-- `/A:120-340,#1/B:50-200` — multi-region
-- `#1` — entire model #1
+- `#2/A:120-340 | #2/B:50-200` — union of regions in the opened model (#2 in this script)
+- `#2` — entire atomic model (#2 after the target map opens)
 - empty / omit → whole opened model
 
 ## Quick start — map → mask base (GUI-free fallback when no model)
@@ -67,33 +67,33 @@ Given target map (box B, apix p) and model:
 2. `open <target_map>` → `#1`  *(used only for grid)*
 3. `open <model>` → `#2`
 4. `molmap <selection> <resolution> gridSpacing <p>` → simulated map `#3`
-   - **Resolution rule of thumb: 8–20 Å.** Lower = tighter mask. 16 Å is the cryoSPARC tutorial default and a safe start. Never use ≤ 2× map resolution (too tight ⇒ FSC inflation, see `references/mask_theory.md`).
+   - **Current tutorial: use 12 Å or coarser; 16 Å is its example.** Lower values retain finer model detail. The former 2× map-resolution rule was a local heuristic, not the current Guide recommendation; inspect mask coverage and FSC (see `references/mask_theory.md`).
 5. *(optional, default on)* binarize at threshold `t` via **two** `volume threshold` calls (each produces a new volume):
    - `volume threshold #3 minimum <t> set 0` → values < t become 0
    - `volume threshold #4 maximum 0 setMaximum 1` → values > 0 become 1
 
    Default threshold `0.5 * max(#3)`. Note: `setMinimum` / `setMinimumFrom` are **not** real ChimeraX keywords — use `set`.
-6. *(optional)* dilation by ~`dilation_A` Å — ChimeraX has **no native morphology op**, so use a blur + re-threshold trick:
+6. *(optional)* approximate expansion using a blur + re-threshold trick (not a calibrated spherical dilation radius):
    - `volume gaussian #N sDev <dilation_A>` (smears the 1-region outward; σ is in Å)
    - `volume threshold #N+1 minimum 0.25 set 0` then `volume threshold #N+2 maximum 0 setMaximum 1` (re-binarize)
 
    Lower the 0.25 cutoff for wider dilation, raise it for narrower.
 7. *(optional)* soft edge: `volume gaussian #N sDev <soft_A>` — σ is in **Å**, not voxels.
-   - Recommended **minimum soft padding width** (CryoSPARC guide): `5 × resolution_Å` (≈ `5 × resolution_Å / apix_Å` voxels)
+   - CryoSPARC’s recommended cosine-padding width is `5 × resolution_Å / final_apix_Å` pixels. This is a different parameter from Gaussian sigma; do not copy it into `--soft` as an equivalent.
 8. `volume resample #N onGrid #1` → snap to target map's exact box/origin
 9. `save <out.mrc> #<final>`
 
-Result: a soft-edged, model-shaped mask in the original map's coordinate frame.
+Result: a model-shaped base in the target coordinate frame, optionally Gaussian-smoothed. Validate it before direct use as a final mask.
 
 ## Parameters cheat sheet
 
 | Flag | Default | Notes |
 |---|---|---|
-| `--resolution` | 16 | molmap resolution (Å). Try 12 for tight, 20 for loose. |
+| `--resolution` | 16 | molmap resolution (Å). Current Guide recommends 12 Å or coarser. |
 | `--binarize/--no-binarize` | on | Threshold molmap output to 0/1 |
 | `--threshold` | auto = 0.5·max | Only relevant with `--binarize` |
-| `--dilation` | 0 | Extra dilation in Å before soft edge |
-| `--soft` | `5 * apix`, or `5 * gsfsc-resolution` if `--gsfsc-resolution` is given | Soft padding width in Å. **0 ⇒ no soft edge — almost always wrong.** |
+| `--dilation` | 0 | Gaussian sigma (Å) used by approximate blur/threshold expansion; not an exact dilation radius |
+| `--soft` | `5 * apix`, or `5 * gsfsc-resolution` if `--gsfsc-resolution` is given | Gaussian sigma in Å. Legacy defaults are not validated equivalents of cosine padding. Use `--soft 0` for a base that Volume Tools will finish. |
 | `--target-map` | required | Defines output box, origin, apix |
 | `--selection` | whole model | ChimeraX atomspec |
 
@@ -101,7 +101,7 @@ Result: a soft-edged, model-shaped mask in the original map's coordinate frame.
 
 1. **Always start with `close all`** — model numbering is reset.
 2. **Always finish with `volume resample ... onGrid <map>`** before saving. CryoSPARC rejects mismatched box sizes.
-3. **Never set `--resolution` below ~2× the map's nominal resolution** — produces over-tight masks that inflate FSC.
+3. **Use molmap resolution 12 Å or coarser for the current tutorial route**; 16 Å is a starting example. Check topology and coverage instead of treating resolution alone as an FSC guarantee.
 4. **Soft edge is non-optional in production**. Hard masks cause ringing artifacts. CryoSPARC's Volume Tools can also add the soft edge — if you plan to use Volume Tools, you can output a hard binarized mask base from here and let Volume Tools handle dilation + padding (often simpler — see Suggested handoff below).
 5. **Selection sanity check**: print residue count from `select` before molmap. If it returns 0 atoms, the script aborts.
 6. **Result file is the only success signal.** Exit code 0 is not reliable for ChimeraX. Scripts here write `<out>.json` sidecar with `{"ok": true, ...}`.
@@ -117,14 +117,14 @@ You have two options. **Option B is usually simpler** because it offloads soft-e
 - Use directly in Local Refinement / Particle Subtraction.
 
 ### Option B — produce a "mask base" and let Volume Tools finish it
-- Run **without** dilation/soft (or with binarize only).
+- Explicitly set `--binarize --dilation 0 --soft 0`; omitting `--soft` invokes the historical Gaussian default.
 - Import via `Import 3D Volumes` as a regular volume.
 - Run **Volume Tools** job with:
-  - `Type of operation`: `threshold`
-  - `Threshold for binarizing`: `0.5` (since our output is already 0/1) — or whatever splits your bell
-  - `Dilation distance for mask in pixels`: typically `3–6 px`
-  - `Soft padding width for mask in pixels`: typically `round(5 × GSFSC_resolution / apix)` — start with `6–10 px`
-  - Leave `Output box size` blank to keep input box.
+  - `Type of input volume`: choose the connected `volume` slot; `Type of output volume`: `mask`.
+  - `Threshold`: `0.5` for an already binarized base; inspect a nonbinary base to choose its threshold.
+  - `Dilation radius (pix)`: a few pixels as an initial trial.
+  - `Soft padding width (pix)`: start at `ceil(5 × GSFSC_resolution / final_apix)` and compare nearby/wider settings.
+  - Preserve output box and sampling unless a deliberate resampling is needed. These widths use the final output pixels; see [Volume Tools](references/cryosparc_volume_tools.md).
 - Iterate dilation/padding combinations cheaply without re-running ChimeraX.
 
 ### Importing to CryoSPARC
@@ -149,7 +149,7 @@ For a Local Refinement on region R, the particle-subtraction mask = everything *
   --out /path/mask_subtraction.mrc
 ```
 
-This gives you the matched complementary pair the CryoSPARC tutorial recommends.
+This generates a particle-bounded complementary base. Verify containment, range, and both masks on the same grid before final padding; separately softening two masks does not guarantee their sum equals the original full mask. For bases destined for Volume Tools, use `--soft 0` on the complement script too.
 
 ## Files in this skill
 
@@ -170,3 +170,7 @@ mask/
 ## Lineage
 
 Built on the CryoSPARC mask-creation guide and the "Three Techniques for Mask Creation" ChimeraX tutorial. Aligns with the existing `chimerax` skill so it can be merged later as a sub-module.
+
+## Update this skill
+
+For release, tutorial, or instruction refreshes, follow [references/maintenance.md](references/maintenance.md): verify the tool-specific sources, correct owning references, preserve historical/local evidence, validate, and synchronize authorized copies. Software upgrades and live jobs are separate tasks.

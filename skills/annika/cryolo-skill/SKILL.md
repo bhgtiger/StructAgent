@@ -1,25 +1,31 @@
 ---
 name: cryolo-skill
-description: >-
-  Config-first, VALIDATED, ready-to-use assistant for SPHIRE-crYOLO, the cryo-EM
-  particle picker. Validated against crYOLO 1.9.9 on Linux + NVIDIA (GPU, 2026-06-06).
-  Use when the user asks whether/how to install, configure, or run crYOLO (cryolo_gui.py,
-  cryolo_predict.py, training, general-model picking, config JSON, BOX/STAR/CBOX
-  outputs), whether their machine (macOS/Apple Silicon, Linux, NVIDIA/CUDA) can run
-  crYOLO, how to plan crYOLO commands, crYOLO licensing/commercial-use questions, or
-  troubleshooting (GPU not used, slow picking). Before any concrete command,
-  device/support claim, or workflow recommendation it reads or runs a local
-  environment/config probe; on a supported/partial verdict it emits concrete commands
-  with the user's real paths and may run real jobs after explicit user confirmation;
-  it still performs no blind installs or model downloads.
-version: 1.0.0
-license_note: >-
-  This skill describes SPHIRE-crYOLO, which is distributed under a Complimentary
-  Science Software License (non-commercial academic/research use only). This skill
-  ships no crYOLO code or model weights. See references/07_safety_license_privacy.md.
+description: Config-first, VALIDATED, ready-to-use assistant for SPHIRE-crYOLO, the cryo-EM particle picker.
+  Validated against crYOLO 1.9.9 on Linux + NVIDIA (GPU, 2026-06-06). Use when the user asks whether/how
+  to install, configure, or run crYOLO (cryolo_gui.py, cryolo_predict.py, training, general-model picking,
+  config JSON, BOX/STAR/CBOX outputs), whether their machine (macOS/Apple Silicon, Linux, NVIDIA/CUDA)
+  can run crYOLO, how to plan crYOLO commands, crYOLO licensing/commercial-use questions, or troubleshooting
+  (GPU not used, slow picking). Before any concrete command, device/support claim, or workflow recommendation
+  it reads or runs a local environment/config probe; on a supported/partial verdict it emits concrete
+  commands with the user's real paths and may run real jobs after explicit user confirmation; it still
+  performs no blind installs or model downloads.
+metadata:
+  version: 1.0.0
+  license_note: This skill describes SPHIRE-crYOLO, which is distributed under a Complimentary Science
+    Software License (non-commercial academic/research use only). This skill ships no crYOLO code or model
+    weights. See references/07_safety_license_privacy.md.
 ---
 
 # crYOLO skill (config-first, per-machine gated)
+
+## Documentation maintenance lane
+
+For a skill/source/tutorial refresh, follow [references/maintenance.md](references/maintenance.md).
+This documentation-only lane skips environment probing and runtime command gates;
+those gates still apply to machine-specific advice, installation, data operations, and jobs.
+Upstream documentation checked **2026-09-07**: crYOLO **1.9.9** is the highest version in the stable changelog (no release date supplied there); local validation remains **1.9.9** (2026-06-06).
+This does not establish the software installed on the current host. New documentation-only
+claims must not inherit historical `VALIDATED` labels.
 
 This skill helps reason about, configure, and run **SPHIRE-crYOLO** — a fast cryo-EM
 particle picker. It is **config-first**: the local environment must be probed/read before

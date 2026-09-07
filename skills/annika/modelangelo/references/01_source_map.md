@@ -1,5 +1,14 @@
 # 01 — Source map (which source backs which claim)
 
+## Refresh — 2026-09-07
+
+The [release index](https://github.com/3dem/model-angelo/releases) and main HEAD
+both resolve to **v1.0.18 / `994945bdfa6e5368e0d62349a47792f4864eebc3`**.
+The June version pin below remains current. README, installer, sequence-aware
+parser/inference and the RELION 5.0 ModelBuilding tutorial were rechecked.
+No new installation or map build was run; managed-distribution versions below
+remain dated June observations. Use [maintenance](maintenance.md) to refresh.
+
 Pinned baseline: **`3dem/model-angelo` tag `v1.0.18`, commit
 `994945bdfa6e5368e0d62349a47792f4864eebc3`**, released **2026-06-15**. Verified
 current latest as of **2026-06-22** (GitHub releases/tags API: v1.0.18 is the top

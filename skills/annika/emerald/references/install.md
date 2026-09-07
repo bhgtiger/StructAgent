@@ -1,7 +1,8 @@
 # Installing Rosetta for EMERALD
 
-EMERALD ships inside the main Rosetta distribution. Minimum version: **2023.06**
-(released 2023-02-05).
+EMERALD ships inside Rosetta; it has no independent release number. The latest numbered Rosetta release verified on 2026-09-07 is **3.15 (2025-09-09)** from the [official downloads](https://downloads.rosettacommons.org/downloads/academic/). Development snapshots are a separate channel and were not exhaustively inventoried.
+
+The paper cites 2023.06, but a [Rosetta maintainer investigation](https://forum.rosettacommons.org/node/11748) found that this build lacks demo options such as `in:file:override_database_params`; it identifies code after 2023-03-15 and points to 2023.26 as containing the updates. Do not promise compatibility from the old minimum alone. Match the installed executable, database and XML; no current release was run in this maintenance session.
 
 ## 1. License
 
@@ -50,8 +51,9 @@ bash skills/annika/emerald/scripts/check_env.sh
 ```
 
 Must print `[OK]` for ROSETTA3, the rosetta_scripts binary, and the GenFF
-params file. If it complains about GenFF missing, your release is too old —
-grab a newer weekly release.
+params file. Missing GenFF can mean an incomplete or mismatched database. This
+script checks presence and optionally displays release metadata; it does not
+enforce a minimum version, parse the XML, or prove EMERALD compatibility.
 
 ## 5. (Optional) AmberTools for AM1-BCC charges
 

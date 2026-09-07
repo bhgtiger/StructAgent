@@ -1,5 +1,32 @@
 # Inputs, planning, execution, and outputs
 
+## Release and tutorial guidance — checked 2026-09-07
+
+[ColabFold 1.6.2](https://github.com/sokrypton/ColabFold/releases/tag/v1.6.2)
+adds optional `--use-pallas` Evoformer kernels for NVIDIA compute capability
+8.0+ and `--compile-mode` (`fast`, default `tuned`, `full`).
+For repeated or long predictions, establish the actual GPU/JAX combination and
+inspect live help before choosing them. Compare startup/compile time separately
+from prediction time on a representative approved fixture; published speedups
+are not host guarantees. This release also fixes paired/unpaired local-search
+crashes on complexes, so record the search version before diagnosing that error.
+
+The [stable README](https://github.com/sokrypton/ColabFold/blob/v1.6.2/README.md)
+now explains `JAX_COMPILATION_CACHE_DIR` and shape grouping. For repeated jobs,
+use a writable persistent cache and record GPU, driver, JAX and input shapes;
+changed shapes or software can require recompilation. Choose the local-search,
+GPU-search or remote-MSA tutorial according to database availability and the
+approved data destination. A local A3M still needs a separate template-network
+check.
+
+The [current README](https://github.com/sokrypton/ColabFold/blob/c35de0221f4d297a39edf4cf292ba2832e321edc/README.md)
+also links an
+[AlphaFold3/OpenFold3 notebook](https://github.com/sokrypton/ColabFold/blob/c35de0221f4d297a39edf4cf292ba2832e321edc/AlphaFold3_of3.ipynb).
+For that request, inspect the notebook's backend, dependencies, inputs and
+network actions in a separate workflow; do not translate its settings into
+AF2 `colabfold_batch` flags or claim AF3 inference is validated here.
+Existing AF3 JSON/MSA export examples also do not establish AF3 inference.
+
 ## Inputs
 
 ColabFold v1.6.2 accepts FASTA/FA/FAA, A3M, CSV/TSV with required `id` and `sequence` plus optional alignment/template paths, and directories of supported inputs. PDB/mmCIF-derived chain sequences may be accepted by source workflows. Confirm exact behavior from captured live help/source before relying on less common forms.

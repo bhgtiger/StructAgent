@@ -71,3 +71,7 @@ The upload JS rejects filenames containing spaces or characters such as `(`,
 - Privacy: web uploads are stored 14 days server-side (ref 09); local is not.
 - Field name `water_molecules` vs. label "Implicit Solvent (GBIS)" — treat as
   historical naming; do not assert behavior without a live check.
+
+## Freshness boundary for web plans
+
+The table above remains a **2026-06-30 UI snapshot**. A 2026-09-07 recheck could not verify the web form/manual/terms; see [01_source_map.md](01_source_map.md). Explain these values as historical when planning, and obtain the current visible fields and terms before a user relies on them. The unchanged local repository does not prove the hosted service uses identical code or defaults.

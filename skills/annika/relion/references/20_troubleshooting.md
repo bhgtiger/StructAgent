@@ -182,3 +182,9 @@ Where another **installed skill** owns execution or deeper diagnosis: `cryosparc
 - `references/source/relion_ver5.0/src/jaz/single_particle/motion/motion_refiner_mpi.cpp` (MPI param-estimation guard, lines 40-44 and 52-54).
 - Real fixture `run.err` + `note.txt` (READ-ONLY) under `<RELION_PROJECT_FIXTURE>`: `Polish/job040`, `Polish/job041`, `MultiBody/job087`, `MultiBody/job089`.
 - `skill/relion/scripts/inspect_project.py` (noise-filter `NOISE` set; `SENTINELS` map; real-error extraction).
+
+## Release-specific build/runtime failures (checked 2026-09-07)
+
+For a **5.0.1** build failure, first compare compiler/CUDA/CMake with [its release notes](https://github.com/3dem/relion/releases/tag/5.0.1): it moves from C++14 to **C++17**, adds CUDA 12.9+ support, and records a CMake **earlier-than-3.27** requirement for that release. CUDA 13 drops Pascal GPUs (e.g. GTX 1080 Ti/P100), for which the notes direct users to CUDA 11/12. Do not apply that CMake limit blindly to an unverified later source checkout.
+
+For Blackwell GPUs with Topaz/Blush/DynaMight, upstream supplies `environment_blackwell.yml` instead of the ordinary environment file. Check the target GPU and environment first; the release page's removal/recreate example is not authorization to delete a user's environment. Plan a separate compatible environment and validate the relevant tool before changing production workflows. Local 5.0.0 CLI capture proves none of these 5.0.1 runtime combinations. Release 5.1.0 is prerelease, so a request for stable behavior stays on the 5.0.x tutorial lane.

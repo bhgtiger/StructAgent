@@ -6,7 +6,7 @@ Grounded in pinned source help text + README + the paper (rationale only). The t
 
 - **File type:** `.mrc` / `.map` 3D cryo-EM volume.
 - **State of the map:** the input should be a **raw map directly from refinement — unmasked and not sharpened.** Per the `-i` help: *"This map should be unmasked and not sharpened (Do not use post-processed maps, only maps directly obtained from refinement)."*
-  - **Inappropriate inputs:** already post-processed, masked, B-factor-sharpened, or otherwise enhanced maps. Feeding these defeats the method and can produce misleading output.
+  - **Inappropriate for default normalization:** masked maps; sharpened or previously enhanced maps remain unsuitable. The README documents a special mask-normalization mode for masked input when raw maps cannot be recovered; see the limited fallback below.
 - **Half maps (preferred when available):** provide half map 1 as `-i` and half map 2 as `-i2`. If you pass a half map to `-i`, **do not forget `-i2`** (the help calls this out explicitly).
 - **Sampling rate:** read from the MRC header by default; override with `-s/--samplingRate` (Å/voxel) only if the header is wrong/missing.
 
@@ -57,7 +57,8 @@ DeepEMhancer normalizes the input before the network; the help calls normalizati
 
 ```text
 Input/model/normalization decision
-1. Is the input a raw, unmasked, unsharpened map from refinement?  No -> stop; wrong input.
+1. Prefer raw, unmasked, unsharpened refinement maps. Sharpened/enhanced -> stop.
+   Only masked input available -> assess the documented mode-2 fallback below.
 2. Do you have both half maps?  Yes -> -i half1 -i2 half2.   No -> -i fullmap.
 3. Resolution?  < 4 A and want detail -> consider -p highRes (may be noisier).
                 Over-masking with tight/highRes -> try -p wideTarget.  Else default tightTarget.
@@ -65,3 +66,9 @@ Input/model/normalization decision
                    Have a good binary mask -> -m mask.mrc (forces tightTarget).
 5. Models present for the chosen mode?  No -> blocked (see references/02/06).
 ```
+
+## Normalization tutorial caveat (checked 2026-09-07)
+
+The [upstream usage guide](https://github.com/rsanchezgarc/deepEMhancer/blob/961f028ca609017990de4473ab368cf1787e8282/README.md#about-the-normaliztion) warns that automatic solvent-shell estimation can fail for hollow or fibrous specimens. Prefer raw half maps; if shell statistics are unreliable, measure a genuinely solvent-only region and supply its mean/SD. Do not copy the README's example statistics to another map.
+
+A **masked but unsharpened** input has a documented fallback through mode 2 (`-m`) and `deepEMhancer_masked.hd5`, when the preferred raw input is unavailable. Upstream discourages it when mode 1 is possible. This exception does not endorse feeding sharpened/enhanced maps into the network. Confirm the binary mask's grid and protein/solvent labels, omit a non-default `-p`, and do not combine with `--noiseStats`. Compare recovered and missing density against the input; ligands and post-translational modifications were absent from training and require particular scrutiny. This is source-backed guidance, not new local validation.

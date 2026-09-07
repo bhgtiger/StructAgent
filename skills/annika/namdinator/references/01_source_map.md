@@ -55,3 +55,9 @@ comes from.
 - Current web form/limits/privacy → `namdinator.au.dk` snapshots.
 - Community evidence is thin; do not rely on GitHub issues for troubleshooting
   coverage (0 issues observed in both repos).
+
+## Refresh evidence (2026-09-07)
+
+The [organization repository master commit](https://api.github.com/repos/namdinator/Namdinator_bash/commits/master) remains `5814c9474a41f7cbcca785ce83027227073d656f` (2019-10-16); the [release list](https://github.com/namdinator/Namdinator_bash/releases) is empty. README and generic script were retrieved again. This confirms the source baseline, not a current tested dependency stack or a maintained web backend.
+
+Live HTTPS retrieval of the web home/manual/terms failed certificate validation in this refresh; browser retrieval did not establish form or terms contents. The June 2026 snapshots remain historical evidence. Do not restamp the field limits or retention claims as current, bypass TLS validation, or infer a web API from form markup. Recheck the exact linked manual/terms from a reachable home page before relying on web-service details. See [maintenance](maintenance.md).

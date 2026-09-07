@@ -1,5 +1,14 @@
 # Version pin and hardware requirements
 
+## Current source review — 2026-09-07
+
+The [release index](https://github.com/YangLab-SDU/CryoAtom/releases) still lists
+**v2.1.0 (2026-03-17)** as the latest published release; master remains the
+`856e250` snapshot below. The release notes add multi-GPU support, HMM-search
+fixes and increased RU-Net iterations. These are upstream statements, not new
+host tests. Preserve the tagged/static advisor pin separately from this
+package's untagged runtime pin. See [maintenance](maintenance.md).
+
 ## The pin — read this before quoting any version fact
 
 This package installs and describes **CryoAtom2 2.1.1, commit
@@ -22,7 +31,7 @@ bypasses entirely — weights are staged out-of-band into an external cache. The
 
 If you install a different revision, change `version.expected`,
 `version.source_commit`, and `version.source_tree` in the site config *and* in
-`install/cryoatom.def`, and re-verify the flag surface against
+`install/cryoatom.def` and `install/Dockerfile`, and re-verify the flag surface against
 `references/03_cli_and_outputs.md`.
 
 ## Scientific version distinction

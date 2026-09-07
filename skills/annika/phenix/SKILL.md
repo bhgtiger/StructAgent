@@ -46,13 +46,15 @@ phenix.real_space_refine model.pdb map.mrc resolution=3.3 \
 
 Outputs: `.pdb/.log/.geo/.eff`. Key metrics: Ramachandran, rotamer outliers, bond/angle RMSD, CC_mask.
 
-## Critical Lessons (from experience)
+## Critical Lessons (historical local Phenix 2.0 experience)
+
+These observations are not blanket restrictions on current Phenix. See the [CLI reference](references/phenix_cli_reference.md) for current release caveats and tutorial routes.
 
 ### SS Restraints: helix_type Bug
 
-`phenix.secondary_structure_restraints` outputs `helix_type = *unknown` → generates **ZERO** H-bond restraints for helices.
+A historical local run produced `helix_type = *unknown` and zero helix H-bond restraints. Inspect the generated annotations and restraint count before applying this workaround; preserve genuine pi and 3_10 helices.
 
-**Must fix:**
+**Conditional workaround for confirmed alpha helices with this failure:**
 ```bash
 phenix.secondary_structure_restraints model.pdb format=phenix | \
   sed 's/helix_type = alpha pi 3_10 \*unknown/helix_type = *alpha pi 3_10 unknown/g' > ss.eff
@@ -88,13 +90,11 @@ refinement.geometry_restraints.edits {
 | Zn–OE (GLU) | 1.95 |
 | Mg–O | 2.05–2.10 |
 
-### Crystal Reference Models — Don't Use at Low Resolution
+### Reference Models — Check Conformational Agreement
 
-Using crystal structures as `reference_model` restraints for ≥3 Å EM maps makes things WORSE. Crystal conformations too different from EM complex. CC dropped from 0.604 to 0.593.
+A historical case with a mismatched crystal conformation lost CC (0.604 to 0.593). This is a warning about that reference, not a resolution cutoff. The current manual supports selected reference-model restraints. Restrain only corresponding regions that agree with the density and compare fit and geometry before retaining them.
 
-**Rule:** Only use reference_model for same complex at better resolution, or resolution < 2.5 Å.
-
-### Q/N/H Flips — Always Run
+### Q/N/H Flips — Inspect Before Applying
 
 ```bash
 phenix.reduce -BUILD -FLIP model.pdb > flipped.pdb 2> flips.log
@@ -102,7 +102,7 @@ phenix.reduce -BUILD -FLIP model.pdb > flipped.pdb 2> flips.log
 phenix.pdbtools flipped.pdb remove="element H" output.file_name=noH.pdb
 ```
 
-Flips are almost always correct. Apply after first refinement round.
+Check the installed refinement defaults and existing flip results before a separate Reduce pass; inspect density, hydrogen bonds and metal coordination for proposed changes. Do not assume every flip improves the model.
 
 ### DNA SS Restraints
 
@@ -133,12 +133,12 @@ Supply CIFs to refinement as positional arguments: `phenix.real_space_refine mod
 
 ### Cryo-EM ligand fitting caveat
 
-`phenix.ligandfit` is primarily an X-ray tool and expects MTZ reflection data, not CCP4/MRC maps. Converting large cryo-EM maps with `phenix.map_to_structure_factors` can create huge MTZs and stall; boxed MTZ workflows can still place ligands in the wrong density and require origin-shift correction. For cryo-EM ligand refitting, prefer reference transfer by structural superposition followed by Phenix RSR when a homologous ligand structure exists.
+Current LigandFit supports cryo-EM maps via `map_in=` plus `resolution=`; see the [verified recipe](references/phenix_cli_reference.md). Historical Phenix 2.0 attempts encountered conversion costs and shifted-box coordinates. Those failures do not establish that LigandFit is X-ray-only. Check map/model frames and the fitted site; homologous ligand transfer followed by RSR remains a useful alternative when justified.
 
 ### Ligand refinement / validation details
 
 - `phenix.real_space_refine run=all` is invalid in this build. Omit `run=` for defaults, or specify valid components explicitly.
-- For ligand B-factors, include ADP explicitly: `refinement.run=minimization_global+local_grid_search+adp`.
+- ADP is enabled in documented defaults; when overriding `run=`, preserve ADP explicitly if needed: `refinement.run=minimization_global+local_grid_search+adp`.
 - For ring planarity cleanup, pass `.eff` planarity edits (`geometry_restraints.edits.planarity`) instead of modifying the ligand CIF.
 - `phenix.pdb_interpretation model.pdb restraints.cif write_geo=True` writes a `.geo` file; grep ligand names to inspect ligand-specific bond/angle deviations.
 - `phenix.map_correlations model.pdb map.map resolution=X` reports per-residue CC including ligands. `phenix.map_model_cc` is deprecated and requires `--force`.
@@ -157,7 +157,7 @@ Notes:
 - `phenix.real_space_diff_map model.pdb map.mrc resolution=X` works for cryo-EM omit-style difference maps and is a useful gate before speculative local restraint tests.
 - `phenix.real_space_correlation` is broken for real-map jobs in this Phenix 2.0 build (`miller_fn` error); use `phenix.map_correlations` for overall/per-residue CC and a custom ChimeraX sampler for ligand/per-atom density.
 
-**Target metrics:**
+**Historical triage targets (not universal pass/fail or deposition criteria):**
 | Metric | Target |
 |--------|--------|
 | Rama outliers | < 0.5% |
@@ -174,9 +174,9 @@ Notes:
 
 ## Additional Cryo-EM / Ligand CLI Lessons
 
-- `phenix.ligandfit` is fundamentally an X-ray/MTZ workflow. Feeding CCP4/MRC maps directly can crash; converting large cryo-EM cells with `phenix.map_to_structure_factors` may create enormous MTZs and stall. Boxed MTZ ligandfit can place ligands in wrong density and uses shifted-box coordinates that need origin correction. Prefer reference-transfer + RSR when a homologous ligand structure exists.
+- Current cryo-EM LigandFit uses `map_in=` with `resolution=`. Keep the historical conversion/origin warnings above; do not repeat the old X-ray-only restriction.
 - `phenix.real_space_refine run=all` is invalid in this Phenix 2.0 build. Omit `run=` for defaults, or specify explicit terms such as `refinement.run=minimization_global+local_grid_search+adp`.
-- For ligand-containing EM models, make ADP refinement explicit (`...+adp`) before interpreting ligand B-factors; otherwise ligand B values can remain frozen from ISOLDE defaults.
+- When a custom `run=` strategy omits ADP, include `...+adp` before interpreting refined ligand B-factors. Documented default strategies already include ADP; check the actual `.eff` file.
 - `phenix.map_correlations model.pdb map.map resolution=X` gives per-residue CC including ligands and replaces deprecated `phenix.map_model_cc` (old name requires `--force`).
 - `phenix.pdb_interpretation model.pdb restraints.cif write_geo=True` writes a `.geo` file useful for ligand-specific bond/angle deviations.
 - `phenix.real_space_diff_map model.pdb map.mrc resolution=X` works for cryo-EM omit-style difference maps and is a good gate before speculative local restraint tests.
@@ -190,8 +190,8 @@ Notes:
 | MTZ label errors | Specify `--labels` + `--rfree-label` |
 | EM resolution missing | Always pass `--resolution` |
 | Ligand not recognized | Generate CIF via `phenix.elbow` |
-| Zero helix H-bonds | Fix `helix_type = *unknown` → `*alpha` |
-| CC drops with reference_model | Remove reference model at >3Å EM |
+| Zero helix H-bonds | Inspect annotations/counts; correct unknown type only for confirmed alpha helices |
+| CC drops with reference_model | Inspect mismatched regions; revise/remove inappropriate restraints |
 
 ## CLI Reference
 
@@ -201,3 +201,7 @@ Load [references/phenix_cli_reference.md](references/phenix_cli_reference.md) fo
 
 - **CCP4 binaries** (`refmac5`, `acedrg`, `phaser`, `freerflag`, `mtzdump`, `servalcat`, `refmacat`, …) → use the `ccp4` skill, not Phenix wrappers, even when a Phenix workflow could solve the same problem.
 - **Strategic choice** between Phenix vs Refmac/Servalcat → `structural-strategy/references/refinement.md`.
+
+## Update this skill
+
+For release, tutorial, or self-update requests, follow [references/maintenance.md](references/maintenance.md). Documentation checked 2026-09-07: Phenix 2.2.1-6174 (official release 2026-09-03). This is upstream evidence, not a new local runtime validation. Preserve historical tests and probe the actual environment before applying version-dependent advice. Updating this knowledge bundle does not authorize software upgrades, compute jobs, or web submissions.

@@ -7,6 +7,14 @@ description: "Orchestrator for macromolecular structure building pipelines. Rout
 
 Routes multi-step structure determination workflows to the right sub-skill.
 
+## Update this skill
+
+Software integration reviewed **2026-09-07**. Follow
+[references/maintenance.md](references/maintenance.md) to refresh tool releases,
+tutorials and handoffs. Keep exact runtime versions in the owning tool skills;
+this orchestrator has no single software version. Maintenance edits do not run
+the pipeline.
+
 ## Sub-skills
 
 | Skill | Mode | Use for |
@@ -21,7 +29,7 @@ Routes multi-step structure determination workflows to the right sub-skill.
 
 | Tool | Location | Notes |
 |------|----------|-------|
-| **Merizo** | `<MERIZO_INSTALL>/` | Domain segmentation (any structure, no PAE needed) |
+| **Merizo** | `<MERIZO_INSTALL>/` | Protein domain segmentation; verify chain, revision and numbering using [integration notes](references/merizo.md). No PAE input required. |
 | **AlphaFold DB** | via ChimeraX `alphafold match` | Template retrieval |
 
 ## Task → Skill Routing
@@ -42,11 +50,18 @@ Routes multi-step structure determination workflows to the right sub-skill.
 | Ligand restraint generation (eLBOW) | **phenix** |
 | Ligand restraint generation (AceDRG) | **ccp4** |
 | Metal coordination restraints | **phenix** (.edits file) |
-| SS restraints | **phenix** (with helix_type fix) |
+| SS restraints | **phenix** (inspect annotations and generated restraint counts) |
 | Q/N/H flip correction | **phenix** (reduce) |
 | Validation (MolProbity) | **phenix** |
 
 ## Cryo-EM Pipeline (AlphaFold → Map)
+
+This is a historical example workflow. Choose durations, density thresholds,
+trimming and stopping criteria from the current map/model evidence; the numbers
+below are not universal quality gates. Before each tool step, use its current
+skill for version-specific commands, preflight and validation. In particular,
+ISOLDE's current preflight/export guidance supersedes old unconditional
+atom-deletion or platform workarounds.
 
 ```
 1. Global rigid-body fitting          (ChimeraX --nogui)
@@ -54,7 +69,7 @@ Routes multi-step structure determination workflows to the right sub-skill.
    Quality gate: ≥60% atoms in density
 
 2. Domain segmentation                (Merizo)
-   --iterate → domain boundaries + NDR regions
+   Check chain/revision → standard or iterative segmentation → boundaries + NDRs
 
 3. Conservative trim                  (ChimeraX --nogui)
    Remove residues: unassigned by Merizo AND no density (0.5σ)
@@ -65,7 +80,8 @@ Routes multi-step structure determination workflows to the right sub-skill.
    Never extract+reassemble — fit copies, apply transforms to complete model
 
 5. ISOLDE flexible fitting (10 min)   (ChimeraX GUI + REST)
-   Pre-flight: OP3/OXT delete, addh, map association, MDFF verify
+   Run current ISOLDE preflight; repair only identified chemistry problems
+   Associate map, verify MDFF and the selected OpenMM platform
    Internal Python timer (REST hangs during sim)
    Monitor ih.simulation_running every 30s
 
@@ -77,16 +93,16 @@ Routes multi-step structure determination workflows to the right sub-skill.
 7. Ligand building (if applicable)
    7a. Place ligands from reference structures (superpose + extract)
    7b. ISOLDE with ligands (5 min) — full pre-flight checklist
-       Fix ADP H-naming, delete OXT, check post-PRO HIS, set OpenCL
+       Check ligand parameters/hydrogens; apply historical naming fixes only if needed
    7c. For cryo-EM small-molecule docking into density, run Rosetta EMERALD
        when no trustworthy transferred pose exists or multiple orientations remain plausible
    7d. Prepare restraint files: metal .edits, ligand .cif, SS .eff
 
 8. Phenix real-space refinement       (Phenix CLI)
    Iterative: R1 conservative → check → tighten → R2
-   Fix helix_type *unknown → *alpha
-   Apply Q/N/H flips (reduce) between rounds
-   Don't use crystal reference_model at >3Å
+   Inspect SS annotations/counts; correct only confirmed misassigned helices
+   Inspect proposed Q/N/H flips before applying
+   Assess reference-model conformation against density, without a blanket resolution cutoff
 
 9. Validation                         (Phenix MolProbity)
    Targets: Rama <0.5%, favored >96%, rotamer <2%, clashscore <10
@@ -96,6 +112,7 @@ Routes multi-step structure determination workflows to the right sub-skill.
 
 11. Iterate or deposit
     Max 3 ISOLDE↔Phenix cycles before flagging
+```
 
 ## Rotamer Fix Protocol
 
@@ -117,7 +134,7 @@ When rotamer outliers exceed ~2% after Phenix refinement, use this three-phase a
 ### Phase 2: Targeted ISOLDE (5 min, selection only)
 
 1. Load rotamer-fixed model + map in ChimeraX GUI
-2. Run full ISOLDE pre-flight (OP3, OXT, addh, map association, MDFF verify)
+2. Run the current ISOLDE preflight; repair reported chemistry issues, associate the map and verify MDFF
 3. **Find Volume by type, not index** (see isolde skill rule 2b)
 4. Select all outlier residues: `select #1 & (/<chain>:<res> ...)`
 5. Expand selection: `select zone sel 5.5 #1 & protein`
@@ -137,7 +154,6 @@ When rotamer outliers exceed ~2% after Phenix refinement, use this three-phase a
 - Clashscore: improved
 - Rama favored: maintained or improved
 - MolProbity: significant improvement
-```
 
 ## X-ray Pipeline
 
@@ -171,7 +187,7 @@ Intermediate (sequential numbering, NEVER overwrite):
   → model_10_isolde.cif    → model_N_phenix.pdb
 
 Restraint files:
-  ss.eff                   — SS restraints (helix_type fixed)
+  ss.eff                   — SS restraints (annotations and counts checked)
   metal_restraints.edits   — metal coordination
   ligand.cif               — from eLBOW
 

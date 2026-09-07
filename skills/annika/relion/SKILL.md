@@ -1,17 +1,25 @@
 ---
 name: relion
-version: 0.1.0
-description: >
-  Diagnose, run, and interoperate with RELION cryo-EM workflows. Use when RELION context
-  is explicit: project/job trees, default_pipeline.star, job.star, run.out/run.err,
-  RELION_JOB_EXIT_* sentinels, data_optics/STAR metadata, failed Refine3D/Class2D/CtfRefine/
-  Polish jobs, GUI-job to relion_* command mapping, guarded relion_*/sbatch generation or
-  execution, and conversions with cryoSPARC/pyem, cryoDRGN, maps/half-maps/masks, or picker
-  formats. Do not trigger on generic refine/classify/mask/particle requests without RELION
-  context, or for native cryoSPARC processing.
+description: 'Diagnose, run, and interoperate with RELION cryo-EM workflows. Use when RELION context is
+  explicit: project/job trees, default_pipeline.star, job.star, run.out/run.err, RELION_JOB_EXIT_* sentinels,
+  data_optics/STAR metadata, failed Refine3D/Class2D/CtfRefine/ Polish jobs, GUI-job to relion_* command
+  mapping, guarded relion_*/sbatch generation or execution, and conversions with cryoSPARC/pyem, cryoDRGN,
+  maps/half-maps/masks, or picker formats. Do not trigger on generic refine/classify/mask/particle requests
+  without RELION context, or for native cryoSPARC processing.'
+metadata:
+  version: 0.1.0
 ---
 
 # RELION
+
+## Documentation maintenance lane
+
+For a skill/source/tutorial refresh, follow [references/maintenance.md](references/maintenance.md).
+This documentation-only lane skips environment probing and runtime command gates;
+those gates still apply to machine-specific advice, installation, data operations, and jobs.
+Upstream documentation checked **2026-09-07**: RELION **5.0.1** (stable, 2025-09-22); **5.1.0** (2026-03-13) is marked prerelease. Local CLI capture remains **5.0.0** (2026-06-04).
+This does not establish the software installed on the current host. New documentation-only
+claims must not inherit historical `VALIDATED` labels.
 
 Execution, diagnosis, and file-conversion assistant for RELION **5.0** single-particle, helical, and tomography workflows. Built against a RELION 5.0.0 command-help capture and real project-tree fixture; configure each live host before execution.
 

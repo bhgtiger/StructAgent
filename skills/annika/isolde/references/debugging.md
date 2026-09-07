@@ -12,7 +12,7 @@
 
 When `isolde sim start` appears to succeed but `ih.simulation_running` is immediately `False` with "Sim termination reason: None":
 
-### The Monkey-Patch (essential diagnostic tool)
+### The Monkey-Patch (legacy fallback only)
 
 ```python
 from isolde.openmm.sim_handler import SimHandler
@@ -44,7 +44,7 @@ def _patched_create(self, *args, **kwargs):
 SimHandler._create_openmm_system = _patched_create
 ```
 
-Run this BEFORE `isolde sim start`. The output tells you exactly which residues failed.
+On current 1.12 builds, use `isolde preflight parameters #N` first; see [current commands](commands.md#current-release-preflight-and-tutorials). This old patch assumes private attributes and dictionary-shaped ambiguous/unassigned results that are not stable. Inspect the installed API and result types before adapting it; do not paste it as a current diagnostic. If used, install it before simulation and restore the original method after diagnosis.
 
 ---
 
@@ -52,7 +52,7 @@ Run this BEFORE `isolde sim start`. The output tells you exactly which residues 
 
 ### HIS after PRO — Missing Backbone H
 
-`addh` skips backbone H on residues following PRO. For HIS, missing H means no amber14 template (HID/HIE/HIP) matches.
+A historical run found missing backbone H near HIS/PRO. Current upstream preparation guidance also describes missing peptide H near imperfect metal sites. Inspect the flagged residue; prefer the Unparameterised Residues widget or a justified `addh template true` retry before manually constructing an H.
 
 **Detection:** In `unassigned` output, look for HIS residues.
 
@@ -94,16 +94,16 @@ CYS near metals may show as ambiguous (CYM/CYX/MC_CYF). ISOLDE's `cys_type()` ch
 
 ### C-terminal OXT
 
-Residues with OXT have no amber14 template. Delete OXT:
+Historical local template matching failed for some OXT-bearing termini. Current 1.12 notes include an OXT-building fix; first run parameter preflight and inspect completeness/bonds. If deletion is justified, resolve `affected_residue` to the specific residue identified by that inspection, on a saved working copy. Do not iterate over the whole model:
 ```python
-for a in model.atoms:
+for a in list(affected_residue.atoms):
     if a.name == "OXT":
         a.delete()
 ```
 
 ### DNA Terminal OP3
 
-5' terminal nucleotides with OP3 have no forcefield template.
+Historical OP3-bearing 5' termini failed template matching. Confirm the affected residue and intended terminal chemistry with current preflight before using this local workaround.
 ```
 delete #model/F:1@OP3
 delete #model/G:1@OP3
@@ -182,10 +182,10 @@ def verify_ligand(residue, expected_atoms, expected_bonds):
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| "Sim termination reason: None" | Unparameterised residue | Use monkey-patch to find which residue |
+| "Sim termination reason: None" | Cause not established; template failure was observed historically | Capture error/status; run parameter preflight before a version-specific private patch |
 | Sim starts, model drifts away | Map not associated (no MDFF forces) | Associate map via `nxmapset.add_nxmap_handler_from_volume()` |
 | REST hangs indefinitely | Sent command during active sim | Use internal Python timer instead |
-| Sim stops after a few seconds | Popup appeared, froze event loop | Run osascript popup handler |
+| Sim stops after a few seconds | Check for modal warning or actual simulation failure | Inspect warning; use current disulfide/altloc preflights and targeted fixes |
 | curl: connection refused | ChimeraX not running or REST not started | Bootstrap sequence |
 | "No map fitting forces" warning | Map not associated with ISOLDE | Associate map (see above) |
 | Port already in use | Previous ChimeraX didn't clean up | Use different port (9877) |

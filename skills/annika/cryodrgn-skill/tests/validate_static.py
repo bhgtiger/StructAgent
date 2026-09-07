@@ -107,7 +107,13 @@ if os.path.isfile(SKILL_MD):
         end = sk.find("\n---", 3)
         front = sk[3:end] if end != -1 else ""
         m = re.search(r"^name:\s*(\S+)\s*$", front, re.MULTILINE)
-        vm = re.search(r"^version:\s*([0-9][^\s]*)\s*$", front, re.MULTILINE)
+        # Portable skills store package-specific fields under metadata.
+        # Retain the historical top-level form for old snapshot validation.
+        metadata = re.search(r"^metadata:[ \t]*\n((?:[ \t]+[^\n]*\n?)*)", front, re.MULTILINE)
+        vm = re.search(r"^  version:[ \t]*([0-9][^\s]*)[ \t]*$",
+                       metadata.group(1), re.MULTILINE) if metadata else None
+        if vm is None:
+            vm = re.search(r"^version:\s*([0-9][^\s]*)\s*$", front, re.MULTILINE)
         name_ok = bool(m) and m.group(1) == "cryodrgn-skill"
         ver = vm.group(1) if vm else None
         # First execution-capable, live-verified release pins 1.0.0; accept 1.x.

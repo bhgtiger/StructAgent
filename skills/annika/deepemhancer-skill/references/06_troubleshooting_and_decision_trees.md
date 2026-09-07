@@ -49,7 +49,8 @@ Grounded in pinned-source behavior + README/Biowulf known issues + errors observ
 ## Decision tree B — "Which model / normalization?"
 
 ```text
-Input must be raw, unmasked, unsharpened (else stop — wrong input).
+Prefer raw, unmasked, unsharpened input. Stop for sharpened/enhanced input;
+for masked-only input assess the limited mode-2 fallback in references/04_inputs_outputs_models.md.
 Resolution < 4 Å and want detail? -> -p highRes (may be noisier).
 Over-masking with tight/highRes?  -> -p wideTarget.
 Otherwise                         -> default tightTarget.

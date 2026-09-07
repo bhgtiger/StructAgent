@@ -103,3 +103,7 @@ It prefers `gemmi` (structured parser) and falls back to `mtzdump` text parsing.
 
 ## Lessons
 See `lessons.md`.
+
+## Update this skill
+
+For release, tutorial, or self-update requests, follow [references/maintenance.md](references/maintenance.md). Documentation checked 2026-09-07: CCP4 9.0.017 (2026-08-05); component versions differ. This is upstream evidence, not a new local runtime validation. Preserve historical tests and probe the actual environment before applying version-dependent advice. Updating this knowledge bundle does not authorize software upgrades, compute jobs, or web submissions.
