@@ -1,0 +1,18 @@
+{
+  "queries": {
+    "hiv1_protease_aba_3hvp": {
+      "chains": [
+        {
+          "molecule_type": "protein",
+          "chain_ids": ["A", "B"],
+          "description": "HIV-1 protease with Cys67/Cys95 as L-2-aminobutyric acid (ABA), PDB 3HVP",
+          "sequence": "PQITLWQRPLVTIRIGGQLKEALLDTGADDTVLEEMNLPGKWKPKMIGGIGGFIKVRQYDQIPVEIAGHKAIGTVLVGPTPVNIIGRNLLTQIGATLNF",
+          "non_canonical_residues": {
+            "67": "ABA",
+            "95": "ABA"
+          }
+        }
+      ]
+    }
+  }
+}

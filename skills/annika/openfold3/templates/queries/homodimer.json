@@ -1,0 +1,14 @@
+{
+  "queries": {
+    "hiv1_protease_dimer": {
+      "chains": [
+        {
+          "molecule_type": "protein",
+          "chain_ids": ["A", "B"],
+          "description": "HIV-1 protease, PDB 1HHP sequence; one entry, two copies = homodimer",
+          "sequence": "PQITLWQRPLVTIKIGGQLKEALLDTGADDTVLEEMSLPGRWKPKMIGGIGGFIKVRQYDQILIEICGHKAIGTVLVGPTPVNIIGRNLLTQIGCTLNF"
+        }
+      ]
+    }
+  }
+}

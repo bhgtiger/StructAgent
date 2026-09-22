@@ -1,0 +1,37 @@
+{
+  "queries": {
+    "t4l_l99a_benzene_pocket": {
+      "chains": [
+        {
+          "molecule_type": "protein",
+          "chain_ids": ["A"],
+          "description": "T4 lysozyme L99A cavity mutant, PDB 181L sequence",
+          "sequence": "MNIFEMLRIDEGLRLKIYKDTEGYYTIGIGHLLTKSPSLNAAKSELDKAIGRNTNGVITKDEAEKLFNQDVDAAVRGILRNAKLKPVYDSLDAVRRAAAINMVFQMGETGVAGFTNSLRMLQQKRWDEAAVNLAKSRWYNQTPNRAKRVITTFRTGTWDAYKNL"
+        },
+        {
+          "molecule_type": "ligand",
+          "chain_ids": ["B"],
+          "description": "benzene as SMILES",
+          "smiles": "c1ccccc1"
+        }
+      ],
+      "pocket_constraint": {
+        "ligand_chain_id": "B",
+        "pocket_residues": [
+          ["A", 78],
+          ["A", 84],
+          ["A", 87],
+          ["A", 91],
+          ["A", 99],
+          ["A", 102],
+          ["A", 103],
+          ["A", 111],
+          ["A", 118],
+          ["A", 121],
+          ["A", 153]
+        ],
+        "max_distance": 4.0
+      }
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "queries": {
+    "engrailed_hd_dna_1hdd": {
+      "chains": [
+        {
+          "molecule_type": "dna",
+          "chain_ids": ["A"],
+          "description": "DNA strand 1, PDB 1HDD chain A",
+          "sequence": "TTTTGCCATGTAATTACCTAA"
+        },
+        {
+          "molecule_type": "dna",
+          "chain_ids": ["B"],
+          "description": "DNA strand 2, PDB 1HDD chain B",
+          "sequence": "ATTAGGTAATTACATGGCAAA"
+        },
+        {
+          "molecule_type": "protein",
+          "chain_ids": ["C", "D"],
+          "description": "Engrailed homeodomain, two copies, PDB 1HDD chains C and D",
+          "sequence": "MDEKRPRTAFSSEQLARLKREFNENRYLTERRRQQLSSELGLNEAQIKIWFQNKRAKIKKS"
+        }
+      ]
+    }
+  }
+}

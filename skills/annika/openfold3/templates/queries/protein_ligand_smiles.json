@@ -1,0 +1,20 @@
+{
+  "queries": {
+    "t4l_l99a_benzene": {
+      "chains": [
+        {
+          "molecule_type": "protein",
+          "chain_ids": ["A"],
+          "description": "T4 lysozyme L99A cavity mutant, PDB 181L sequence",
+          "sequence": "MNIFEMLRIDEGLRLKIYKDTEGYYTIGIGHLLTKSPSLNAAKSELDKAIGRNTNGVITKDEAEKLFNQDVDAAVRGILRNAKLKPVYDSLDAVRRAAAINMVFQMGETGVAGFTNSLRMLQQKRWDEAAVNLAKSRWYNQTPNRAKRVITTFRTGTWDAYKNL"
+        },
+        {
+          "molecule_type": "ligand",
+          "chain_ids": ["B"],
+          "description": "benzene (PDB 181L ligand BNZ) given as SMILES",
+          "smiles": "c1ccccc1"
+        }
+      ]
+    }
+  }
+}

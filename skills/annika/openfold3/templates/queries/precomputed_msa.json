@@ -1,0 +1,22 @@
+{
+  "queries": {
+    "barnase_barstar_msa": {
+      "chains": [
+        {
+          "molecule_type": "protein",
+          "chain_ids": ["A"],
+          "description": "barnase; directory holds e.g. uniref90_hits.a3m, mgnify_hits.a3m (query sequence first)",
+          "sequence": "AQVINTFDGVADYLQTYHKLPDNYITKSEAQALGWVASKGNLADVAPGKSIGGDIFSNREGKLPGKSGRTWREADINYTSGFRNSDRILYSSDWLIYKTTDHYQTFTKIR",
+          "main_msa_file_paths": "<ABSOLUTE_MSA_ROOT>/barnase"
+        },
+        {
+          "molecule_type": "protein",
+          "chain_ids": ["D"],
+          "description": "barstar; separate directory per unique sequence (the directory name is the MSA id)",
+          "sequence": "KKAVINGEQIRSISDLHQTLKKELALPEYYGENLDALWDALTGWVEYPLVLEWRQFEQSKQLTENGAESVLQVFREAKAEGADITIILS",
+          "main_msa_file_paths": "<ABSOLUTE_MSA_ROOT>/barstar"
+        }
+      ]
+    }
+  }
+}

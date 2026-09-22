@@ -59,6 +59,7 @@ skills/annika/                Execution-side structural-biology skills/protocols
   ├── mask/                   Headless ChimeraX model/map-derived cryo-EM mask generation
   ├── modelangelo/            ModelAngelo installation, configuration, and environment validation
   ├── namdinator/             Read-only Namdinator MDFF planning and troubleshooting
+  ├── openfold3/              Config-first OpenFold3 (OpenBind-0) cofolding and the Anthropic optimization kit, validated on A100/H100
   ├── phenix/                 Phenix real-space and reciprocal-space refinement
   ├── relion/                 RELION 5 SPA/tomo guidance and CLI-grounded automation templates
   ├── structural-strategy/    Decision-making for fitting, refinement, validation
@@ -101,6 +102,9 @@ Connect them with an A2A JSON-RPC gateway or equivalent message bus. Use the tem
 See [`docs/full_system_implementation.md`](docs/full_system_implementation.md). Optional public PDB/PDBe lookup tools can be exposed via [`docs/pdbe_mcp_setup.md`](docs/pdbe_mcp_setup.md).
 
 ## Changelog
+
+### v14 (2026-09-22)
+- **Added** `skills/annika/openfold3/` — config-first OpenFold3 skill (AlphaFold3-class cofolding of protein, RNA, DNA, ligands and ions; `run_openfold predict`, `setup_openfold`, OpenBind-0 weights) with first-class support for the Anthropic optimization kits (`uplifting-biomolecular-modeling@f4f62fa`, modes `off`/`exact`/`fast`/`big`, `--det`, `--n_gpu`). Grounded in the pinned upstream v0.5.0 source and live receipts; historical GPU validation of v0.5.0 + OpenBind-0 + kit on A100 40 GB and H100 (2026-09-22). Ships a read-only host probe, a query-JSON builder/validator, a read-only output summarizer, public example queries and a guarded Slurm template; local/private site configs are intentionally not bundled.
 
 ### v13 (2026-07-05)
 - **Updated** the sanitized A2A sender template with gateway readiness checks, retry/backoff controls, configurable timeouts, and explicit message-level `agentId` routing.

@@ -1,0 +1,180 @@
+#!/bin/bash
+# OpenFold3 prediction job: generic Slurm template (openfold3 skill). template — not run as shipped.
+# Copy, fill every <PLACEHOLDER>, `bash -n <copy>`, `sbatch <copy>`. Pins: openfold-3 v0.5.0 + OpenBind-0; optional kit
+# anthropics/uplifting-biomolecular-modeling@f4f62fa openfold3_ob0/. See references/05_core_workflows.md (workflows 10-12).
+# Guards: unfilled/relative settings, an existing output dir, a bad MODE/DET/N_GPU -> exit 2 before GPU work; job-local
+# caches; --use-msa-server false; rc echoed with its meaning; short structure count with rc 0 -> exit 1.
+# No `set -e` / `set -u`: kit rc 3 and 5 are RESULTS, and site activation scripts often read unset variables.
+# Keep comments OFF #SBATCH lines. GPUs: 1, or 2/4/8 only for kit MODE=big on one node (or --gres=gpu:<N>).
+# Time: ~45 s start-up per call + compute for queries x seeds x samples + first-call JIT. `big` streams from host RAM.
+#SBATCH --account=<ACCOUNT>
+#SBATCH --partition=<GPU_PARTITION>
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --gpus=<N_GPUS>
+#SBATCH --cpus-per-task=<CPUS>
+#SBATCH --mem=<MEM>
+#SBATCH --time=<HH:MM:SS>
+#SBATCH --job-name=of3_predict
+#SBATCH --output=of3_predict_%j.out
+#SBATCH --export=NONE
+
+# ---------------------------------------------------------------- settings --
+ROUTE="<kit|stock>"            # kit = run.sh modes; stock = plain `run_openfold predict`
+KIT_CLI="<KIT_CLI>"            # split on spaces, e.g. "bash <KIT_DIR>/openfold3_ob0/run.sh" or "apptainer run --nv <IMAGE>.sif"
+STOCK_CLI="<STOCK_CLI>"        # e.g. "run_openfold" or "apptainer exec --nv <IMAGE>.sif run_openfold", or a site wrapper
+CARD="<CARD>"                  # kit --config: a100 | h100 | h200 | b200 | b300
+MODE="exact"                   # kit: exact (conservative default) | fast | big | off
+DET="0"                        # kit --det 0|1; exact --det 1 is byte-identical to off --det 1
+N_GPU="1"                      # kit --n_gpu 1|2|4|8; above 1 only with MODE=big
+QUERY_JSON="<ABS_QUERY_JSON>"  # absolute paths the prediction process can see (bind them into any container)
+OUT_PARENT="<ABS_OUTPUT_PARENT_DIR>"   # a NEW of3_<jobid>/ is created under it
+CKPT="<ABS_CHECKPOINT_PATH>"   # of3-ob-2025-06-30-174k.pt as the prediction process sees it
+OF3_CACHE=""                   # $OPENFOLD_CACHE; empty = the checkpoint's dir. A runner.yml there is merged into EVERY run
+NUM_SEEDS=""                   # empty = seed 42 (or the runner-YAML list); N = N seeds drawn from random.seed(42)
+NUM_SAMPLES=""                 # empty = 5
+SEEDS_FOR_COUNT=""             # count only: N when NUM_SEEDS is empty and RUNNER_YAML lists N seeds
+RUNNER_YAML=""                 # optional absolute path (low_mem preset, output format, seeds, ...)
+USE_TEMPLATES=""               # empty = true; "false" ONLY for queries without template keys (else UnpicklingError)
+ALLOW_TEMPLATE_DROP="0"        # 1 = deliberately accept kit rc 5 (TEMPLATES DROPPED); record why
+STRUCT_EXT="cif"               # = output_writer_settings.structure_format: cif | pdb | cif.gz
+NODE_TMP="/tmp"                # node-local scratch root; never a network filesystem or home
+RESUME_DIR=""                  # resume only: an EXISTING output dir + experiment_settings.skip_existing: true in RUNNER_YAML
+APPTAINER_FORWARD="0"          # 1 = copy cache/kit variables to APPTAINERENV_* for a raw `apptainer --cleanenv` CLI
+HASH_CKPT="0"                  # 1 = sha256 the checkpoint into the ledger (reads ~2.3 GB; stock prints no WEIGHTS line)
+HOME_CACHE_AUDIT="0"           # 1 = list files created under ~/.triton and ~/.cache (first runs on a new setup)
+SUMMARIZER=""                  # optional <SKILL_DIR>/scripts/summarize_openfold3_output.py
+
+# ---- site environment, e.g. module load <APPTAINER_MODULE> or source <VENV>/bin/activate (no set -e / -u) --
+
+# --------------------------------------------------------------- refusals --
+refuse() { echo "REFUSED: $*" >&2; exit 2; }
+case "$ROUTE" in kit) need="KIT_CLI CARD" ;; stock) need="STOCK_CLI" ;; *) refuse "ROUTE must be kit or stock" ;; esac
+for name in $need QUERY_JSON OUT_PARENT CKPT; do
+    case "${!name}" in ''|*'<'*'>'*) refuse "unfilled setting $name='${!name}'" ;; esac
+done
+for p in "$QUERY_JSON" "$OUT_PARENT" "$CKPT" "$NODE_TMP" ${RUNNER_YAML:+"$RUNNER_YAML"} ${RESUME_DIR:+"$RESUME_DIR"}; do
+    case "$p" in /*) ;; *) refuse "not an absolute path: $p" ;; esac
+done
+[ -r "$QUERY_JSON" ] || refuse "query JSON not readable: $QUERY_JSON"
+[ -z "$RUNNER_YAML" ] || [ -r "$RUNNER_YAML" ] || refuse "runner YAML not readable: $RUNNER_YAML"
+if [ "$ROUTE" = kit ]; then
+    case "$MODE" in exact|fast|big|off) ;; *) refuse "MODE must be exact|fast|big|off (got '$MODE')" ;; esac
+    case "$DET" in 0|1) ;; *) refuse "DET must be 0 or 1 (got '$DET')" ;; esac
+    case "$N_GPU:$MODE" in 1:*|[248]:big) ;; *) refuse "N_GPU=$N_GPU: use 1, or 2/4/8 with MODE=big (got MODE=$MODE)" ;; esac
+fi
+[ -r "$CKPT" ] || echo "WARNING: checkpoint not readable on the host: $CKPT (fine only inside a container)" >&2
+JOB_TAG="${SLURM_JOB_ID:-manual$$}"
+mkdir -p "$OUT_PARENT" || exit 1
+if [ -n "$RESUME_DIR" ]; then
+    OUT_DIR="$RESUME_DIR"
+    [ -d "$OUT_DIR" ] || refuse "RESUME_DIR does not exist: $OUT_DIR"
+    grep -qs 'skip_existing: *true' "$RUNNER_YAML" || echo "WARNING: resuming without skip_existing: true in RUNNER_YAML" >&2
+else
+    OUT_DIR="$OUT_PARENT/of3_$JOB_TAG"
+    [ -e "$OUT_DIR" ] && refuse "$OUT_DIR already exists; write every run to a fresh directory"
+fi
+LOG="$OUT_PARENT/of3_$JOB_TAG.log"; LEDGER="$OUT_PARENT/of3_$JOB_TAG.ledger.txt"
+unset OPENFOLD3_OB0_OPT OPENFOLD3_OPT   # a value that disagrees with --mode is rc 2; any value arms plain run_openfold
+
+# ------------------------------------ job-local work dir (mktemp: mode 0700) and caches --
+WORK=$(mktemp -d "$NODE_TMP/of3_${JOB_TAG}_XXXXXX") || { echo "cannot create a work dir under $NODE_TMP" >&2; exit 1; }
+case "$WORK" in "${HOME:-/nonexistent}"/*) rm -rf -- "$WORK"; refuse "work dir under home: $WORK" ;; esac
+trap 'rm -rf -- "$WORK"' EXIT
+trap 'echo "signal received: cleaning up $WORK" >&2; exit 143' TERM INT HUP
+export TMPDIR="$WORK/tmp" MODEL_OPT_JIT_ROOT="$WORK/jit" XDG_CACHE_HOME="$WORK/xdg" \
+       OPT_CORE_VERDICT_DIR="$WORK/jit/verdicts" CUDA_CACHE_PATH="$WORK/jit/cuda" NUMBA_CACHE_DIR="$WORK/jit/numba" \
+       APPTAINER_TMPDIR="$WORK/apptainer_tmp" APPTAINER_CACHEDIR="$WORK/apptainer_cache"
+if [ "$ROUTE" = stock ]; then   # stock Triton would otherwise write ~/.triton
+    export TRITON_CACHE_DIR="$WORK/jit/stock/triton" TORCH_EXTENSIONS_DIR="$WORK/jit/stock/torch_extensions"
+else                            # the kit keys both under $MODEL_OPT_JIT_ROOT/<stack key>/ itself
+    unset TRITON_CACHE_DIR TORCH_EXTENSIONS_DIR
+fi
+mkdir -p "$TMPDIR" "$MODEL_OPT_JIT_ROOT" "$XDG_CACHE_HOME" "$OPT_CORE_VERDICT_DIR" "$CUDA_CACHE_PATH" "$NUMBA_CACHE_DIR" \
+    "$APPTAINER_TMPDIR" "$APPTAINER_CACHEDIR" ${TRITON_CACHE_DIR:+"$TRITON_CACHE_DIR" "$TORCH_EXTENSIONS_DIR"} || exit 1
+touch "$WORK/start.marker"
+export OPENFOLD3_OB0_CKPT="$CKPT" OPENFOLD_CACHE="${OF3_CACHE:-$(dirname "$CKPT")}"
+if [ "$APPTAINER_FORWARD" = 1 ]; then   # the container must also see $WORK, $OUT_PARENT and the inputs: bind them
+    fwd='^(OPENFOLD3_OB0_OPT.*|OF3TP_.*|OF3O_.*|MODEL_OPT_.*|OPENFOLD3_OB0_CKPT|OPENFOLD_CACHE|TMPDIR|XDG_CACHE_HOME'
+    fwd+='|OPT_CORE_VERDICT_DIR|CUDA_CACHE_PATH|NUMBA_CACHE_DIR|TRITON_CACHE_DIR|TORCH_EXTENSIONS_DIR|CUDA_VISIBLE_DEVICES)$'
+    for n in $(compgen -e); do case "$n" in APPTAINERENV_*|SINGULARITYENV_*) unset "$n" ;; esac; done
+    for n in $(compgen -e); do [[ $n =~ $fwd ]] && export "APPTAINERENV_$n=${!n}"; done
+fi
+
+# ---------------------------------------------------------------- command --
+# MSA server OFF: the default (true) sends every protein sequence to the public ColabFold server. Use precomputed MSAs
+# (references/07_msa_templates_weights.md) or single-sequence; true ONLY with the user's explicit approval for these sequences, recorded.
+YAML_OPT=(); [ -n "$RUNNER_YAML" ] && YAML_OPT=(--runner-yaml "$RUNNER_YAML")
+ARGS=(--query-json "$QUERY_JSON" --output-dir "$OUT_DIR" --use-msa-server false "${YAML_OPT[@]}")
+[ -n "$NUM_SEEDS" ]     && ARGS+=(--num-model-seeds "$NUM_SEEDS")
+[ -n "$NUM_SAMPLES" ]   && ARGS+=(--num-diffusion-samples "$NUM_SAMPLES")
+[ -n "$USE_TEMPLATES" ] && ARGS+=(--use-templates "$USE_TEMPLATES")
+if [ "$ROUTE" = kit ]; then
+    read -r -a KIT <<< "$KIT_CLI"
+    KIT_OPTS=(--config "$CARD" --mode "$MODE" --det "$DET")
+    [ "$N_GPU" != 1 ] && KIT_OPTS+=(--n_gpu "$N_GPU")
+    [ "$ALLOW_TEMPLATE_DROP" = 1 ] && ARGS+=(--allow-template-drop)
+    CMD=("${KIT[@]}" pred "${KIT_OPTS[@]}" "${ARGS[@]}")
+    RUN_DESC="route=kit mode=$MODE det=$DET card=$CARD n_gpu=$N_GPU"
+else
+    read -r -a STOCK <<< "$STOCK_CLI"
+    CMD=("${STOCK[@]}" predict --inference-ckpt-path "$CKPT" "${ARGS[@]}")
+    RUN_DESC="route=stock (plain run_openfold predict; no kit mode)"
+fi
+GPU_INFO=$(nvidia-smi --query-gpu=name,driver_version,memory.total --format=csv,noheader 2>/dev/null) \
+    && GPU_INFO=$(printf '%s\n' "$GPU_INFO" | sort | uniq -c | sed 's/^ *//' | paste -sd ';' -) || GPU_INFO=""
+printf '== %s job=%s %s\ngpu: %s\noutput: %s   log: %s\ncommand: %s\n' "$(date -u +%FT%TZ)" "$JOB_TAG" "$RUN_DESC" \
+       "${GPU_INFO:-none visible}" "$OUT_DIR" "$LOG" "${CMD[*]}"
+if [ "$ROUTE" = kit ]; then   # dry-run gate on THIS node (re-hashes the checkpoint); non-zero stops before any prediction
+    "${KIT[@]}" check "${KIT_OPTS[@]}" "${YAML_OPT[@]}"; check_rc=$?
+    [ "$check_rc" = 0 ] || { echo "== kit check rc=$check_rc (2 usage, 3 NOT ACTIVE, 127 not found); no prediction started" >&2; exit "$check_rc"; }
+fi
+
+# -------------------------------------------------------------------- run --
+"${CMD[@]}" 2>&1 | tee "$LOG"
+rc=${PIPESTATUS[0]}
+case "$ROUTE:$rc" in
+    *:0)     meaning="finished" ;;
+    kit:1)   meaning="prediction failed, or incomplete (fewer structures than queries x seeds x samples)" ;;
+    kit:2)   meaning="usage error (flag or spelling, checkpoint missing, --mode vs mode variable)" ;;
+    kit:3)   meaning="NOT ACTIVE: mode/pin/GPU requirement not met (reason on stderr); a result, not a crash" ;;
+    kit:5)   meaning="TEMPLATES DROPPED: declared templates never reached the model (05 workflow 8)" ;;
+    stock:1) meaning="Python exception (default checkpoint missing, invalid query JSON, ...)" ;;
+    stock:2) meaning="click usage error (unknown option, BOOLEAN without a value, path does not exist)" ;;
+    *:127)   meaning="command not found (CLI, wrapper or image missing)" ;;
+    *)       meaning="unexpected exit code"; [ "$rc" -gt 128 ] && meaning="killed by signal $((rc - 128)) (time limit or host memory?)" ;;
+esac
+echo "== rc=$rc ($meaning)"
+grep -E 'WEIGHTS |TEMPLATES (DECLARED|DROPPED|DISABLED)|ACTIVE mode=|NOT ACTIVE|stock subprocess|exit rule ->' "$LOG" | cut -c1-400
+
+# ----------------------------------------------------------- completeness --
+# Upstream logs per-query failures (OOM included) to <out>/logs/predict_err_rank<r>.log and can still exit 0.
+n_queries=$(python3 -c 'import json,sys; print(len(json.load(open(sys.argv[1]))["queries"]))' "$QUERY_JSON" 2>/dev/null)
+seeds="${NUM_SEEDS:-${SEEDS_FOR_COUNT:-1}}"; samples="${NUM_SAMPLES:-5}"
+n_models=$(( $(find "$OUT_DIR" -type f -path '*/seed_*' -name "*_model.$STRUCT_EXT" 2>/dev/null | wc -l) + 0 ))
+expected=""; complete="unknown"
+if [ -n "$n_queries" ]; then expected=$((n_queries * seeds * samples)); [ "$n_models" -eq "$expected" ] && complete=yes || complete=no; fi
+echo "== structures: $n_models / ${expected:-unknown} expected (queries ${n_queries:-?} x seeds $seeds x samples $samples)"
+[ -f "$OUT_DIR/summary.txt" ] && grep -E 'Failed Queries' "$OUT_DIR/summary.txt"
+ls "$OUT_DIR"/logs/predict_err_rank*.log >/dev/null 2>&1 \
+    && echo "WARNING: per-query errors logged in $OUT_DIR/logs/ (read before trusting the run)" >&2
+final=$rc
+[ "$rc" = 0 ] && [ "$complete" = no ] && { final=1; echo "== INCOMPLETE: rc 0 but $n_models / $expected structures; exit 1" >&2; }
+
+# ------------------------------------------------------------- run ledger --
+msa_route="single-sequence (--use-msa-server false, no MSA paths)"
+grep -q 'main_msa_file_paths' "$QUERY_JSON" && msa_route="precomputed MSAs listed in the query (--use-msa-server false)"
+ckpt_sha="not computed"; [ "$HASH_CKPT" = 1 ] && ckpt_sha=$(sha256sum "$CKPT" 2>/dev/null | cut -d' ' -f1)
+{
+    printf 'date_utc=%s job=%s %s\ncommand=%s\nquery_json=%s output_dir=%s\nmsa_route=%s\n' "$(date -u +%FT%TZ)" \
+        "$JOB_TAG" "$RUN_DESC" "${CMD[*]}" "$QUERY_JSON" "$OUT_DIR" "$msa_route"
+    echo "runner_yaml=${RUNNER_YAML:-none} use_templates=${USE_TEMPLATES:-default(true)} allow_template_drop=$ALLOW_TEMPLATE_DROP"
+    echo "checkpoint=$CKPT sha256=$ckpt_sha (pin bd43301c011d5f87580d3e8b548658869433e4488399feb03035ba248f8e29e4)"
+    echo "gpu=${GPU_INFO:-none visible} rc=$rc final=$final meaning=$meaning structures=$n_models expected=${expected:-unknown}"
+    grep -E 'WEIGHTS |exit rule ->' "$LOG" | cut -c1-400
+} > "$LEDGER"
+echo "== ledger: $LEDGER"
+[ -n "$SUMMARIZER" ] && [ -r "$SUMMARIZER" ] && [ -d "$OUT_DIR" ] && python3 "$SUMMARIZER" "$OUT_DIR" --query-json "$QUERY_JSON"
+[ "$HOME_CACHE_AUDIT" = 1 ] && [ -n "$HOME" ] && { echo "== new files under ~/.triton ~/.cache (expect none from OpenFold3):"
+    find "$HOME/.triton" "$HOME/.cache" -newer "$WORK/start.marker" -type f 2>/dev/null | head -50; }
+exit "$final"

@@ -1,0 +1,14 @@
+{
+  "queries": {
+    "ubiquitin_monomer": {
+      "chains": [
+        {
+          "molecule_type": "protein",
+          "chain_ids": ["A"],
+          "description": "human ubiquitin, 76 aa (UniProt P0CG48 mature unit)",
+          "sequence": "MQIFVKTLTGKTITLEVEPSDTIENVKAKIQDKEGIPPDQQRLIFAGKQLEDGRTLSDYNIQKESTLHLVLRLRGG"
+        }
+      ]
+    }
+  }
+}

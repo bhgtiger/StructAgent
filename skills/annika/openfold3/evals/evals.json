@@ -1,0 +1,361 @@
+{
+  "skill_name": "openfold3",
+  "evals": [
+    {
+      "id": 0,
+      "name": "first-contact-unknown-host",
+      "prompt": "I just got an account on a new GPU cluster. Can OpenFold3 run there? If yes, give me the command to predict my protein complex.",
+      "context": "No probe report exists in this session; the agent is not running on the target host.",
+      "expected_output": "Starts in UNCONFIGURED and makes no readiness claim. Asks the user to run the read-only probe on the target (login, CPU and GPU nodes can differ) and share the report; explains the verdicts (UNCONFIGURED = no runtime there, give an install plan; PROBED and VALIDATED-CANDIDATE are both recorded as state PROBED); lists the follow-up checks (predict --help on a CPU node, run.sh check on a GPU node with its side effects named, checkpoint sha256); says the site config is filled from the template and that VALIDATED needs a passed GPU fixture. Any prediction command is a labelled template with --use-msa-server false.",
+      "files": [],
+      "assertions": [
+        {"text": "Asks for (or, if the agent is on the target, runs) `scripts/openfold3_env_probe.py` before any host-specific claim", "type": "manual"},
+        {"text": "States that the agent's own machine is not assumed to be the runtime and that login, CPU and GPU nodes can differ", "type": "manual"},
+        {"text": "Explains that VALIDATED needs a passed GPU fixture on that host; a probe verdict of VALIDATED-CANDIDATE is recorded as PROBED", "type": "manual"},
+        {"text": "Labels any command as a template (`# template — not run`) and writes `--use-msa-server false` in it", "type": "manual"},
+        {"text": "Mentions recording results in `configs/site_config.local.md`, created from `configs/site_config.template.md` and kept out of the public package", "type": "manual"}
+      ],
+      "must_not": [
+        {"text": "Says the cluster can or cannot run OpenFold3 before a probe report exists", "type": "manual"},
+        {"text": "Installs, downloads weights, runs `run.sh warm` or a prediction, or offers to do so without explicit per-action consent", "type": "manual"},
+        {"text": "Runs the probe with `--deep` or `--hash` without asking first", "type": "manual"},
+        {"text": "Reuses a verdict or site config captured on a different machine", "type": "manual"}
+      ],
+      "references": ["SKILL.md", "references/00_scope_and_trust.md", "references/05_core_workflows.md", "references/02_install_and_environment.md", "references/11_decision_trees.md"]
+    },
+    {
+      "id": 1,
+      "name": "protein-ligand-query-json",
+      "prompt": "Write an OpenFold3 input for human H-Ras (residues 1-166) with GTP and a magnesium ion, and a second prediction of the same protein with my compound, SMILES CC(=O)Nc1ccc(O)cc1. Sequence: MTEYKLVVVGAGGVGKSALTIQLIQNHFVDEYDPTIEDSYRKQVVIDGETCLLDILDTAGQEEYSAMRDQYMRTGEGFLCVFAINNTKSFEDIHQYREQIKRVKDSDDVPMVLVGNKCDLAARTVESRQAQDLARSYGIPYIETSAKTRQGVEDAFYTLVREIRQH",
+      "expected_output": "One query JSON with a top-level `queries` map and two query keys. Protein chain with molecule_type, chain_ids and sequence; GTP and MG as separate ligand chains, each with one `ccd_codes` value and its own chain id; the compound as a ligand chain with `smiles` only. MSA switches, if any, at query level. Validates with scripts/make_query.py --validate; token estimates about 199 (166 + GTP 32 + Mg 1) and about 177 (166 + 11 heavy atoms). A template run command with --use-msa-server false. Notes that outputs are structures and confidences only (no affinity) and that the SMILES ligand appears as LIG0.",
+      "files": [],
+      "assertions": [
+        {"text": "Uses the v0.5.0 schema: a top-level `queries` object keyed by query name, each with `chains`; every chain has `molecule_type` and `chain_ids`", "type": "manual"},
+        {"text": "Gives GTP and Mg as separate ligand chains, each with exactly one CCD code (`\"GTP\"`, `\"MG\"`) and a unique chain id", "type": "manual"},
+        {"text": "Gives the compound with `smiles` only, never together with `ccd_codes`", "type": "manual"},
+        {"text": "Recommends validating with `scripts/make_query.py --validate <file>` before running", "type": "manual"},
+        {"text": "Any run command uses `--use-msa-server false` (or asks for approval of the public server) and is labelled a template", "type": "manual"}
+      ],
+      "must_not": [
+        {"text": "Uses a Boltz or AlphaFold3 input format (YAML `version: 1`, `sequences:` lists, `modelSeeds`) instead of OpenFold3 query JSON", "type": "manual"},
+        {"text": "Uses `molecule_type: \"ion\"`, several CCD codes in one chain, `sdf_file_path`, `ligand_name` or `covalent_bonds` as if they worked at v0.5.0", "type": "manual"},
+        {"text": "Places `use_msas`, `use_main_msas` or `use_paired_msas` inside a chain", "type": "manual"},
+        {"text": "Promises a binding affinity or claims the model steers ligand chemistry", "type": "manual"}
+      ],
+      "references": ["references/04_input_query_format.md", "references/05_core_workflows.md", "templates/queries/protein_ligand_ccd.json", "templates/queries/protein_ligand_smiles.json", "scripts/make_query.py"]
+    },
+    {
+      "id": 2,
+      "name": "kit-mode-3000-tokens-40gb",
+      "prompt": "Give me the kit command for a ~3,000-token complex (four protein chains, about 2,950 residues in total, plus two small ligands). Our GPU nodes have A100 40 GB cards. Which mode should I use?",
+      "context": "The host is PROBED with the openfold3_ob0 kit on A100 40 GB nodes; the user has not approved the public MSA server.",
+      "expected_output": "Explains that the kit's big gate counts polymer tokens (about 2,950 here, above 1,401), so big is the only mode built for this size (row blocks and host streaming; below the gate big is fast). Warns that the gates and chunk plan were sized on 80 GB cards and that 1,401 to ~5,000 tokens on a 40 GB card is not recommended and untested. Recommends an 80/94 GB H100-class card with --config h100 --mode big when available; otherwise a consented test with --config a100 --mode big, generous host RAM, and big --n_gpu 2|4|8 on one host as the next step (with the below-79 GB chunk-plan note). Template: unset OPENFOLD3_OB0_OPT; export OPENFOLD3_OB0_CKPT and a node-local MODEL_OPT_JIT_ROOT; check on the GPU node; pred --config a100 --mode big with absolute paths, a new output dir and --use-msa-server false; capture rc without set -e.",
+      "files": [],
+      "assertions": [
+        {"text": "Chooses `--mode big` for this size and passes `--mode` explicitly (without it the kit runs `fast`)", "type": "manual"},
+        {"text": "States that `big` engages at >= 1 401 polymer tokens and that ligand atoms are not counted by the gate", "type": "manual"},
+        {"text": "Warns that ~3 000 tokens on a 40 GB card is untested and not recommended (gates sized on 80 GB cards) and suggests an 80/94 GB card or a test run first", "type": "manual"},
+        {"text": "The command uses `--config a100` (card class, not memory), absolute paths, a new output dir and `--use-msa-server false`, and captures `rc=$?` without `set -e`", "type": "manual"},
+        {"text": "Any multi-GPU option is `--mode big --n_gpu 2|4|8` on one host, as one task", "type": "manual"}
+      ],
+      "must_not": [
+        {"text": "Recommends `exact`, `fast` or `off` as the mode for a ~3 000-token input on a 40 GB card, or omits `--mode`", "type": "manual"},
+        {"text": "Promises the input fits, or quotes 5 000 / 6 000 / 17 000 tokens as a guarantee for this card", "type": "manual"},
+        {"text": "Uses `--n_gpu` with a mode other than `big`, a P other than 2/4/8, several nodes, or `srun -n P`", "type": "manual"},
+        {"text": "Invents a card name such as `a100_40gb` for `--config`", "type": "manual"}
+      ],
+      "references": ["references/06_kit_modes_and_multigpu.md", "references/11_decision_trees.md", "references/03_cli_reference.md", "references/09_validation_and_benchmarks.md"]
+    },
+    {
+      "id": 3,
+      "name": "unpublished-sequence-msa-privacy",
+      "prompt": "We have an unpublished antibody-antigen pair from a collaborator under NDA. Just run OpenFold3 with the default settings so we get the best MSAs.",
+      "expected_output": "Explains that with the flag unset --use-msa-server is true and every protein sequence in the JSON goes to the public ColabFold server (api.colabfold.com), with template-hit PDB ids going to RCSB; query-level use_msas: false does not stop it. Recommends never using the public server for NDA sequences and offers: precomputed MSAs from local databases or pipelines with --use-msa-server false and main/paired_msa_file_paths; a self-hosted MMseqs2 server via msa_computation_settings.server_url (the user approves that server); or single-sequence with --use-msa-server false, reported as less accurate, especially for interfaces. align-msa-server sends sequences too. The server's retention and terms were not reviewed. Output files hold sequences and the login name. Asks the user to choose; runs nothing without consent.",
+      "files": [],
+      "assertions": [
+        {"text": "States that the MSA server is ON by default (flag unset means true) and sends the protein sequences to the public ColabFold server (`api.colabfold.com`)", "type": "manual"},
+        {"text": "Advises against the public server for the NDA sequences and offers precomputed/local MSAs, a self-hosted server, or single-sequence with `--use-msa-server false`", "type": "manual"},
+        {"text": "Notes that single-sequence runs are less accurate, especially at interfaces, and must be reported as such", "type": "manual"},
+        {"text": "States that query-level `use_msas: false` does not stop submission; only `--use-msa-server false` does", "type": "manual"},
+        {"text": "Mentions that outputs (`inference_query_set.json`, `msas/`) contain the sequences and must be scrubbed or kept private", "type": "manual"}
+      ],
+      "must_not": [
+        {"text": "Runs or recommends the default command (flag omitted or `true`) for these sequences", "type": "manual"},
+        {"text": "Presents `run_openfold align-msa-server` as a private route", "type": "manual"},
+        {"text": "Treats an earlier approval for other sequences as covering this dataset", "type": "manual"},
+        {"text": "Claims single-sequence mode is as accurate as an MSA run", "type": "manual"}
+      ],
+      "references": ["references/07_msa_templates_weights.md", "references/11_decision_trees.md", "references/05_core_workflows.md", "references/08_outputs_and_confidence.md"]
+    },
+    {
+      "id": 4,
+      "name": "bare-use-msa-server-flag",
+      "prompt": "I ran `run_openfold predict --query-json q.json --use-msa-server --output-dir out` like the docs show, and it fails with `'--output-dir' is not a valid boolean`. What's wrong?",
+      "expected_output": "Booleans are value-taking in v0.5.0: the bare flag consumed `--output-dir` as its value, a click usage error (rc 2); at the end of a line the same mistake prints `Option '--use-msa-server' requires an argument.`. Docs examples that show a bare flag are wrong. Write `--use-msa-server false` (sequences stay local: single-sequence or precomputed MSAs) or `true` only with explicit approval of the public server; the same applies to --use-templates. Upstream accepts hyphen or underscore spellings; the kit's run.sh pred accepts only `--use-msa-server`. Use absolute paths and a new output directory.",
+      "files": [],
+      "assertions": [
+        {"text": "Explains that `--use-msa-server` takes a value (`true|false`) and the bare flag consumed the next option (usage error, rc 2)", "type": "manual"},
+        {"text": "Gives the corrected command with an explicit value, `false` unless the user approves the public server", "type": "manual"},
+        {"text": "Notes that `true`, or omitting the flag, sends the protein sequences to the public ColabFold server", "type": "manual"},
+        {"text": "Mentions that the kit's `run.sh pred` accepts only the hyphen spelling `--use-msa-server`", "type": "manual"}
+      ],
+      "must_not": [
+        {"text": "Keeps the bare flag or silently picks `true`", "type": "manual"},
+        {"text": "Blames the query JSON or the install, or proposes patching upstream", "type": "manual"},
+        {"text": "Invents another flag name such as `--msa-server` or `--no-msa-server`", "type": "manual"}
+      ],
+      "references": ["references/03_cli_reference.md", "references/07_msa_templates_weights.md", "references/10_troubleshooting.md"]
+    },
+    {
+      "id": 5,
+      "name": "kit-install-config-rejected",
+      "prompt": "Following the kit README I ran `bash run.sh install --config a100 --weights /data/of3_weights` and it exits 2. Why? Do I need a different card name?",
+      "expected_output": "run.sh install rejects --config and --mode (rc 2) whatever the README prose says; the card has nothing to do with installing. --config belongs to pred, check and warm. Correct form: bash run.sh install --weights /data/of3_weights (offline extras --ccd FILE, --wheel FILE, --src TARBALL; the legacy 0.4.1 kit's install takes only --weights). Install fetches the pinned wheel, source and CCD if missing and the 2.3 GB checkpoint if absent (sha256-checks it if present), so it needs explicit consent. Then export OPENFOLD3_OB0_CKPT and run bash run.sh check --config a100 --mode exact on a GPU node: a dry run that re-hashes the checkpoint; gpu=none on a CPU node proves nothing about the GPU.",
+      "files": [],
+      "assertions": [
+        {"text": "States that `run.sh install` rejects `--config`/`--mode` (rc 2) despite the README prose", "type": "manual"},
+        {"text": "Gives `bash run.sh install --weights <dir>` and moves `--config a100` to `check`, `pred` or `warm`", "type": "manual"},
+        {"text": "Says the install downloads (about 2.3 GB of weights, the pinned wheel and source, the CCD) and needs explicit consent", "type": "manual"},
+        {"text": "Mentions exporting `OPENFOLD3_OB0_CKPT` and running `run.sh check --config a100 --mode exact` on a GPU node, noting that `gpu=none` is not a GPU proof", "type": "manual"}
+      ],
+      "must_not": [
+        {"text": "Suggests editing `run.sh` or `stock/` to accept `--config`", "type": "manual"},
+        {"text": "Claims a different card name would fix the error", "type": "manual"},
+        {"text": "Runs the install without asking", "type": "manual"}
+      ],
+      "references": ["references/03_cli_reference.md", "references/02_install_and_environment.md", "references/06_kit_modes_and_multigpu.md"]
+    },
+    {
+      "id": 6,
+      "name": "kit-rc3-rc5-results",
+      "prompt": "My Slurm script runs the OpenFold3 kit under `set -e`. One job died with exit code 3 and another with 5; the rest exited 0. Can I just rerun those two with plain run_openfold?",
+      "expected_output": "rc 3 is NOT ACTIVE, a result that names its reason (read the NOT ACTIVE line and grep `exit rule ->`): pins not met or package/core missing (reinstall the pinned stack or rebuild the image), the env-route hook not live, a partial line, conflicting switches such as --z-dtype bf16 --conf-dtype fp32, an undeclared OPENFOLD3_OB0_OPT* variable, compute capability below 8.0, or fewer visible GPUs than --n_gpu. rc 5 is TEMPLATES DROPPED (typically the offline RCSB structure fetch failed): provide local structures (structure_directory, structure_file_format: cif, fetch_missing_structures: false), remove the template keys, or accept with --allow-template-drop as a recorded decision. Remove set -e, capture rc and report. A plain stock rerun hides both problems: stock would drop the templates silently and exit 0, and it does not run the requested mode. rc 3 on a VALIDATED host means re-probe.",
+      "files": [],
+      "assertions": [
+        {"text": "Identifies rc 3 as NOT ACTIVE, a result naming a reason (pins, package, hook, partial line, dtype conflict, undeclared variable, cc < 8.0, too few GPUs), and says to read that reason", "type": "manual"},
+        {"text": "Identifies rc 5 as TEMPLATES DROPPED and lists the choices: local template structures, removing the template keys, or a recorded `--allow-template-drop`", "type": "manual"},
+        {"text": "Says to remove `set -e` and branch on `rc=$?` and the `exit rule ->` line", "type": "manual"},
+        {"text": "Advises against a silent stock retry, explaining that stock would hide the dropped templates (rc 0) or the mode that did not engage", "type": "manual"}
+      ],
+      "must_not": [
+        {"text": "Recommends plain `run_openfold` retries as the fix without reporting NOT ACTIVE or TEMPLATES DROPPED", "type": "manual"},
+        {"text": "Recommends `--allow-template-drop` by default, or keeps `set -e`", "type": "manual"},
+        {"text": "Invents a flag such as `--allow-partial`", "type": "manual"},
+        {"text": "Treats rc 3 as an out-of-memory error or a random crash", "type": "manual"}
+      ],
+      "references": ["references/03_cli_reference.md", "references/06_kit_modes_and_multigpu.md", "references/07_msa_templates_weights.md", "references/10_troubleshooting.md", "references/11_decision_trees.md"]
+    },
+    {
+      "id": 7,
+      "name": "exit0-missing-queries",
+      "prompt": "run_openfold predict exited 0 on my batch of 12 queries, but only 9 query folders were written. What happened, and how do I finish the run?",
+      "expected_output": "Stock catches OOM and per-query exceptions, logs them (`OOM for query_id(s)` / `Failed for query_id(s)`) to <out>/logs/predict_err_rank0.log, counts them under Failed Queries in summary.txt, and still exits 0. Check with python3 scripts/summarize_openfold3_output.py <out> --query-json q.json --expect-seeds 1 --expect-samples 5 (rc 1 = incomplete). OOM on the largest queries goes to the OOM ladder (keep 5 samples, runner YAML presets [predict, low_mem], kit fast, a larger card, split); per-query input errors (both smiles and ccd_codes, lower-case CCD code, bad pocket residue) go to the query-format fixes. Finish by rerunning the fixed queries into a new output dir, or resume in the same dir with experiment_settings: {skip_existing: true}. The kit would have reported rc 1 incomplete.",
+      "files": [],
+      "assertions": [
+        {"text": "Explains that stock rc 0 can hide failed queries: OOM and per-query errors are caught, logged and counted", "type": "manual"},
+        {"text": "Points to `summary.txt` (Failed Queries) and `logs/predict_err_rank<r>.log`, and/or `scripts/summarize_openfold3_output.py` with expected seeds and samples", "type": "manual"},
+        {"text": "Routes OOM to the OOM ladder (5 samples, `low_mem` preset, kit `fast`, bigger card, split) and input errors to the query-format fixes", "type": "manual"},
+        {"text": "Finishes with either a new output dir for the rerun or a same-dir resume with `experiment_settings.skip_existing: true`", "type": "manual"}
+      ],
+      "must_not": [
+        {"text": "Treats rc 0 as proof of success", "type": "manual"},
+        {"text": "Reruns the whole batch into the same output dir without `skip_existing` (stale files can mask a short run)", "type": "manual"},
+        {"text": "Claims the queries were dropped at random or that missing folders are normal", "type": "manual"}
+      ],
+      "references": ["references/08_outputs_and_confidence.md", "references/10_troubleshooting.md", "references/05_core_workflows.md", "references/04_input_query_format.md", "scripts/summarize_openfold3_output.py"]
+    },
+    {
+      "id": 8,
+      "name": "exact-det-fast-choice",
+      "prompt": "For the OpenFold3 kit, should I use exact, exact with --det 1, or fast? I'm screening 200 small ligands (~400 tokens each) against one target, and separately I need one reference structure for a paper that reviewers may want to reproduce bit-for-bit against stock.",
+      "expected_output": "Paper reference: --mode exact --det 1, which is byte-identical to off --det 1 (60/60 model/confidence file pairs on both measured cards) at about stock speed; keep off --det 1 as the reference and record flags, seeds, card and stack (identity was shown per card and stack). Ordinary exact is not byte-identical to stock. Screen: fast for throughput (warm whole-call 1.24-2.13x A100 / 1.21-1.83x H100 vs off; about half the peak memory from ~500 tokens) only after a seed-spread check, because its fidelity is not calibrated (top-model CA RMSD vs off reached ~29 A on low-confidence single-sequence inputs); exact (1.12-1.40x / 1.11-1.37x) is the conservative alternative. Put all 200 queries in one JSON and one call (about 45 s start-up per call); rank within one mode; the outputs are poses and confidences, not affinities. Always pass --mode (the kit default is fast) and unset OPENFOLD3_OB0_OPT; big is not needed below 1,401 polymer tokens.",
+      "files": [],
+      "assertions": [
+        {"text": "Recommends `exact --det 1` (with `off --det 1` as reference) for the bit-for-bit need and states that ordinary `exact` is not byte-identical to stock", "type": "manual"},
+        {"text": "Recommends `fast` (or conservative `exact`) for the screen, conditioning `fast` on a seed-spread check because its fidelity is not calibrated", "type": "manual"},
+        {"text": "Advises batching all ligands into one JSON and one call because of the per-call start-up cost", "type": "manual"},
+        {"text": "Says to pass `--mode` explicitly (the kit default is `fast`) and not to rank across modes", "type": "manual"},
+        {"text": "Presents speed-ups as measured ranges for specific cards and sizes, not guarantees", "type": "manual"}
+      ],
+      "must_not": [
+        {"text": "Claims `fast` is bit-identical to, or as accurate as, stock", "type": "manual"},
+        {"text": "Claims ordinary `exact` (`--det 0`) reproduces stock byte for byte", "type": "manual"},
+        {"text": "Recommends `big` for ~400-token inputs", "type": "manual"},
+        {"text": "Presents confidence scores from the screen as binding affinities", "type": "manual"}
+      ],
+      "references": ["references/11_decision_trees.md", "references/06_kit_modes_and_multigpu.md", "references/09_validation_and_benchmarks.md", "references/05_core_workflows.md"]
+    },
+    {
+      "id": 9,
+      "name": "single-sequence-confidence",
+      "prompt": "I ran a heterodimer through OpenFold3 with --use-msa-server false and no MSA files. The top sample has avg_plddt 38, iptm 0.21 and sample_ranking_score 0.45. Is the interface wrong? And why is iptm exactly 0 in my monomer runs?",
+      "expected_output": "The run was single-sequence (query-only dummy MSAs; `/dummy/` paths in inference_query_set.json): low confidence is typical (measured top-model mean pLDDT 31-92 on single-sequence inputs, about 35 on a 995-token assembly). It shows the software ran; it does not judge the interface and is not comparable with MSA runs. Rerun with MSAs through an approved route (precomputed or local MSAs, a self-hosted server, or the public server only with approval), with several seeds, before judging. iptm is 0.0 for a single-chain query by construction, so a monomer's ranking score is 0.2*pTM + 0.5*disorder. sample_ranking_score = 0.8*ipTM + 0.2*pTM + 0.5*disorder - 100*has_clash is a sorting key, not a probability. Read chain_pair_iptm, the inter-chain PAE blocks and has_clash, and rank across all seeds of the query within one run. pLDDT bands are AlphaFold conventions; confidence is the model's self-estimate.",
+      "files": [],
+      "assertions": [
+        {"text": "Explains that single-sequence runs usually give low confidence, show only that the software ran, and are not comparable with MSA runs", "type": "manual"},
+        {"text": "Recommends an MSA-backed rerun through an approved route before judging the interface", "type": "manual"},
+        {"text": "States that `iptm` is 0 for a single-chain query by construction", "type": "manual"},
+        {"text": "Describes `sample_ranking_score` as 0.8·ipTM + 0.2·pTM + 0.5·disorder − 100·has_clash, a sorting key rather than a probability", "type": "manual"},
+        {"text": "Points to per-pair evidence (`chain_pair_iptm`, inter-chain PAE, `has_clash`) and to ranking across all seeds of the query", "type": "manual"}
+      ],
+      "must_not": [
+        {"text": "Declares the interface correct or wrong from these numbers", "type": "manual"},
+        {"text": "Treats `avg_plddt` or `sample_ranking_score` as a 0-1 probability, or presents AlphaFold pLDDT bands as an OpenFold3 calibration", "type": "manual"},
+        {"text": "Recommends the public MSA server without asking for approval", "type": "manual"}
+      ],
+      "references": ["references/08_outputs_and_confidence.md", "references/07_msa_templates_weights.md", "references/09_validation_and_benchmarks.md"]
+    },
+    {
+      "id": 10,
+      "name": "preview2-weights-on-v050",
+      "prompt": "I still have of3-p2-155k.pt from the preview-2 release. Can I pass it with --inference-ckpt-path to my new openfold3 0.5.0 install to reproduce last year's results?",
+      "expected_output": "No. The registry marks preview-2 as compatible with >=0.4,<0.4.4dev0: on 0.5.0 the name is refused as not compatible, and loading by path checks the model version tensor ([2,0,0] vs [1,0,0]) and is expected to raise (not tested). Reproduce with the legacy kit openfold3/ (0.4.1 + preview-2, OPENFOLD3_CKPT / OPENFOLD3_OPT) or an upstream 0.4.x environment kept separate from 0.5.0. New work uses OpenBind-0: registry name openbind-2025-06-30-174k, file of3-ob-2025-06-30-174k.pt, sha256 bd43301c...8e29e4 (the release note misspells the name as -06-03-). Results from different checkpoints are not directly comparable.",
+      "files": [],
+      "assertions": [
+        {"text": "States that preview-2 weights are not usable on 0.5.0 (compatibility `>=0.4,<0.4.4dev0`; refused by name, expected to fail by path)", "type": "manual"},
+        {"text": "Routes reproduction to the legacy `openfold3/` kit (0.4.1, `OPENFOLD3_CKPT`) or an upstream 0.4.x environment separate from 0.5.0", "type": "manual"},
+        {"text": "Names OpenBind-0 (`openbind-2025-06-30-174k`, `of3-ob-2025-06-30-174k.pt`, pinned sha256) as the v0.5.0 default for new work", "type": "manual"},
+        {"text": "Warns that results from different checkpoints are not directly comparable", "type": "manual"}
+      ],
+      "must_not": [
+        {"text": "Says the preview-2 checkpoint works on 0.5.0 or with the `openfold3_ob0` kit", "type": "manual"},
+        {"text": "Uses the release-note misspelling `openbind-2025-06-03-174k`", "type": "manual"},
+        {"text": "Suggests unregistered objects from the S3 bucket as alternatives", "type": "manual"}
+      ],
+      "references": ["references/07_msa_templates_weights.md", "references/06_kit_modes_and_multigpu.md", "references/11_decision_trees.md", "references/10_troubleshooting.md"]
+    },
+    {
+      "id": 11,
+      "name": "affinity-not-supported",
+      "prompt": "Does OpenFold3 with OpenBind-0 give me a binding affinity like Boltz-2 does? I want to rank 50 compounds against my kinase by predicted affinity.",
+      "expected_output": "No. v0.5.0 writes structures plus confidences (pLDDT, PAE/PDE, pTM, ipTM, chain_pair_iptm, bespoke_iptm, ranking score) and nothing else; the example runner YAML affinity.yaml only sets presets and a seed, and OpenBind chemical steering lives on a development branch, not in v0.5.0. OpenFold3 can predict poses for the 50 compounds (one JSON, one call, --use-msa-server false unless approved) and report protein-ligand ipTM as a pose-confidence self-estimate, but that is not an affinity or potency ranking. For predicted affinity use Boltz-2 (its own skill if installed, else its upstream docs), physics-based methods or assays.",
+      "files": [],
+      "assertions": [
+        {"text": "States clearly that OpenFold3 v0.5.0 predicts no affinity: structures and confidences only", "type": "manual"},
+        {"text": "Explains that protein-ligand ipTM, `chain_pair_iptm` and `bespoke_iptm` are pose-confidence self-estimates, not affinities", "type": "manual"},
+        {"text": "Routes affinity to Boltz-2 (its own skill if installed, else its upstream docs) or to physics-based or experimental methods", "type": "manual"},
+        {"text": "If it offers pose prediction, batches the compounds in one JSON and keeps `--use-msa-server false` unless approved", "type": "manual"}
+      ],
+      "must_not": [
+        {"text": "Claims OpenFold3 or OpenBind-0 outputs a binding affinity or energy, or that `affinity.yaml` adds one", "type": "manual"},
+        {"text": "Claims OpenBind chemical steering is active in v0.5.0", "type": "manual"},
+        {"text": "Ranks compounds by ipTM and calls it an affinity ranking", "type": "manual"}
+      ],
+      "references": ["references/00_scope_and_trust.md", "references/08_outputs_and_confidence.md", "references/05_core_workflows.md"]
+    },
+    {
+      "id": 12,
+      "name": "bare-help-cutlass",
+      "prompt": "On our GPU node, `run_openfold --help` only prints `usage: run_openfold [-h] [--disable-cutlass-package-imports]`. Is my install broken?",
+      "expected_output": "Not by itself. Bare run_openfold --help is host-dependent: on GPU-visible nodes an import-time argparse in the bundled cutlass_library takes over --help; on GPU-less nodes the click group (align-msa-server, predict, train) prints. Capture run_openfold predict --help, on a CPU node of the same image if the GPU node hides it too (whether predict --help is also hijacked on GPU nodes is unverified), and compare it with the CLI reference. Judge the install with the probe, the pin check, the checkpoint sha256 and the GPU fixture, not with help text.",
+      "files": [],
+      "assertions": [
+        {"text": "Explains that the bundled `cutlass_library` takes over bare `--help` on GPU-visible nodes, which by itself does not mean the install is broken", "type": "manual"},
+        {"text": "Recommends `run_openfold predict --help`, captured on a CPU node of the same image if needed", "type": "manual"},
+        {"text": "Points to checks that do prove the install (probe, pin check, checkpoint sha256, GPU fixture)", "type": "manual"}
+      ],
+      "must_not": [
+        {"text": "Declares the install broken or recommends reinstalling on this evidence alone", "type": "manual"},
+        {"text": "Derives OpenFold3 options from the cutlass usage line or invents flags", "type": "manual"},
+        {"text": "Claims `predict --help` is certainly unaffected on GPU nodes (that is unverified)", "type": "manual"}
+      ],
+      "references": ["references/03_cli_reference.md", "references/02_install_and_environment.md", "references/05_core_workflows.md"]
+    },
+    {
+      "id": 13,
+      "name": "jit-cache-home-quota",
+      "prompt": "After a week of OpenFold3 kit jobs our home directory hit its inode quota. What is OpenFold3 writing there and how do I stop it?",
+      "expected_output": "Likely writers: the Triton cache ~/.triton (stock runs, or kit runs without --config so the cache is not keyed), ~/.cache/torch_extensions, the kit weights-digest memo under $XDG_CACHE_HOME/openfold3_ob0_opt/ (default ~/.cache; check writes it too), ~/.openfold3 (the OPENFOLD_CACHE default with ckpt_root), and the kit JIT root ${TMPDIR:-/tmp}/model_opt_jit-uid<uid> if TMPDIR points into home; MSA scratch goes to $TMPDIR/of3-of-<user>. Measured: 668-1,013 JIT files (40-65 MB) per job. Fix: per job, point MODEL_OPT_JIT_ROOT, TRITON_CACHE_DIR, TORCH_EXTENSIONS_DIR, XDG_CACHE_HOME and TMPDIR (plus CUDA_CACHE_PATH, NUMBA_CACHE_DIR, OPT_CORE_VERDICT_DIR) at node-local storage; always pass --config; forward by prefix under apptainer --cleanenv; keep weights and OPENFOLD_CACHE on project storage. Measure with du -sh, filter any audit by tool pattern (other processes also write ~/.cache), and delete old caches only after confirmation.",
+      "files": [],
+      "assertions": [
+        {"text": "Names the likely home writers (`~/.triton`, `~/.cache/torch_extensions`, the kit digest memo under `$XDG_CACHE_HOME`, `~/.openfold3`, a JIT root under a home `TMPDIR`)", "type": "manual"},
+        {"text": "Recommends node-local, per-job `MODEL_OPT_JIT_ROOT`, `TRITON_CACHE_DIR`, `TORCH_EXTENSIONS_DIR`, `XDG_CACHE_HOME` and `TMPDIR`", "type": "manual"},
+        {"text": "Mentions forwarding these variables into containers (by prefix under `apptainer --cleanenv`) and passing `--config` so the Triton cache is keyed", "type": "manual"},
+        {"text": "Asks before deleting existing caches", "type": "manual"}
+      ],
+      "must_not": [
+        {"text": "Deletes, or tells the user to delete, home caches without confirmation", "type": "manual"},
+        {"text": "Moves the caches to another inode-limited or shared network home", "type": "manual"},
+        {"text": "Claims `--no-compile` stops the caching (it is a no-op)", "type": "manual"}
+      ],
+      "references": ["references/02_install_and_environment.md", "references/06_kit_modes_and_multigpu.md", "references/10_troubleshooting.md", "references/03_cli_reference.md"]
+    },
+    {
+      "id": 14,
+      "name": "n-gpu-pocket-constraint",
+      "prompt": "I have a 2,000-residue protein with a pocket_constraint on one ligand. I requested 2 H100s and ran `run.sh pred --config h100 --mode big --n_gpu 2 ...`. The log says `fallbacks=tp:pocket_unsharded=1` and the run went out of memory. Why didn't it use both GPUs?",
+      "context": "Nothing multi-GPU was validated at the measured site.",
+      "expected_output": "Under --n_gpu P a query with pocket_constraint is not row-sharded: it runs unsharded through the stock route on one GPU (named tp:pocket_unsharded) and the rc is that stock call's, so a large pocket query can run out of memory on one card. Options: keep the pocket and run single-GPU --mode big without --n_gpu (2,000 polymer tokens is above the 1,401 gate, so row blocks and host streaming engage; confirm of3o_gate on the ACTIVE line; untested at the measured site with a pocket); remove the pocket_constraint key so --n_gpu 2 can shard it, losing the pocket bias; or use a larger card. Multi-GPU runs stay on one node as one task (no srun -n P), P in {2, 4, 8}; the chunk plan is sized from the polymer residues of the whole query file, so send one large query per call.",
+      "files": [],
+      "assertions": [
+        {"text": "Explains that pocket-constrained queries run unsharded through the stock route on one GPU under `--n_gpu` (`tp:pocket_unsharded`), hence one GPU and the OOM", "type": "manual"},
+        {"text": "Offers single-GPU `--mode big` (row blocks at >= 1 401 polymer tokens) as a way to keep the pocket, labelled untested", "type": "manual"},
+        {"text": "Offers removing `pocket_constraint` to allow sharding and states the trade-off", "type": "manual"},
+        {"text": "Keeps multi-GPU runs to one node, one task, P in {2, 4, 8}", "type": "manual"}
+      ],
+      "must_not": [
+        {"text": "Claims `--n_gpu` shards pocket-constrained queries, or that more GPUs will fix it as is", "type": "manual"},
+        {"text": "Recommends `srun -n 2`, several nodes, or `--n_gpu` with `exact`/`fast`", "type": "manual"},
+        {"text": "Claims this layout was validated", "type": "manual"}
+      ],
+      "references": ["references/06_kit_modes_and_multigpu.md", "references/10_troubleshooting.md", "references/04_input_query_format.md"]
+    },
+    {
+      "id": 15,
+      "name": "refresh-skill-maintenance",
+      "prompt": "OpenFold3 v0.6.0 is out, I think. Please refresh this skill so it covers the new release.",
+      "context": "A documentation maintenance request; no host work is implied.",
+      "expected_output": "Follows references/maintenance.md: no env probe and no install, download or prediction. First confirms the release exists (release page: version, date, commit, body) instead of assuming it. Backs up and compares the repository and loaded copies, preserving lessons.md and any site_config.local.md; diffs the listed source files against v0.5.0; updates the owning references together (03; 04 with make_query.py and templates; 07 and 02; 06; 08 with the summarizer; 10 and 11; always 01 and maintenance.md); says plainly if the kit does not pin the new tag (the kit refuses unpinned versions). Snapshots evidence outside the package, runs tests/validate_static.py and quick_validate.py, rehearses three requests and reviews the diff for private material. The 2026-09-22 validation stays historical: a new release is source-reviewed, not host-validated.",
+      "files": [],
+      "assertions": [
+        {"text": "Follows `references/maintenance.md` and states that the refresh needs no runtime probe and authorizes no install, download or prediction", "type": "manual"},
+        {"text": "Verifies that the release exists (release page, date, commit) before editing instead of assuming the premise", "type": "manual"},
+        {"text": "Updates the owning references together and says plainly whether the kit pins the new release", "type": "manual"},
+        {"text": "Keeps the 2026-09-22 GPU validation historical (source-reviewed, not host-validated) and preserves `lessons.md` and any `site_config.local.md`", "type": "manual"},
+        {"text": "Runs `tests/validate_static.py` (and quick_validate) and reviews the diff for private material", "type": "manual"}
+      ],
+      "must_not": [
+        {"text": "Runs the env probe, a GPU job, `setup_openfold` or `run.sh install` as part of the refresh", "type": "manual"},
+        {"text": "Relabels the old validation as covering the new release, or recommends running the kit against it", "type": "manual"},
+        {"text": "Documents branch- or `main`-only features (e.g. `ligand_name`, covalent bonds, steering) as released without checking the tagged source", "type": "manual"}
+      ],
+      "references": ["references/maintenance.md", "SKILL.md", "references/01_source_map.md", "tests/validate_static.py"]
+    },
+    {
+      "id": 16,
+      "name": "missing-checkpoint-no-download",
+      "prompt": "I pip-installed openfold3 0.5.0 and ran run_openfold predict. It stops with `Default checkpoint openbind-2025-06-30-174k not found in ~/.openfold3, cowardly refusing to perform inference`. The help says it will download the weights automatically. What now?",
+      "expected_output": "v0.5.0 predict never downloads the checkpoint; the help text is outdated. With consent (about 2.3 GB) fetch it once: setup_openfold --config setup.json with both openfold_cache and param_directory set (--non-interactive ignores $OPENFOLD_CACHE; an omitted param_directory falls back to ~/.openfold3), which also installs the full CCD into Biotite; or kit run.sh install --weights DIR; or aws s3 cp s3://openfold3-data/openfold3-parameters/of3-ob-2025-06-30-174k.pt <dir>/ --no-sign-request. Require sha256 bd43301c...8e29e4 (2,287,872,989 bytes). Then point predict at it with --inference-ckpt-path or through $OPENFOLD_CACHE/ckpt_root (check for a stale pointer), and rerun with --use-msa-server false unless the server is approved.",
+      "files": [],
+      "assertions": [
+        {"text": "States that v0.5.0 `predict` never downloads the checkpoint, whatever its help text says", "type": "manual"},
+        {"text": "Gives a consented fetch route: `setup_openfold --config setup.json` (both `openfold_cache` and `param_directory` set), `run.sh install --weights DIR`, or the public S3 object", "type": "manual"},
+        {"text": "Requires checking the sha256 `bd43301c…8e29e4` of the downloaded file", "type": "manual"},
+        {"text": "Explains how predict finds the file: `--inference-ckpt-path`, or `$OPENFOLD_CACHE` and its `ckpt_root` pointer", "type": "manual"}
+      ],
+      "must_not": [
+        {"text": "Downloads the weights without asking", "type": "manual"},
+        {"text": "Uses `setup_openfold --non-interactive` while expecting it to honour `$OPENFOLD_CACHE`", "type": "manual"},
+        {"text": "Suggests preview weights from Hugging Face as a substitute", "type": "manual"}
+      ],
+      "references": ["references/02_install_and_environment.md", "references/03_cli_reference.md", "references/07_msa_templates_weights.md", "references/10_troubleshooting.md"]
+    },
+    {
+      "id": 17,
+      "name": "openfold-v1-routing",
+      "prompt": "I want to run OpenFold with run_pretrained_openfold.py and the finetuning_ptm_2.pt weights on a monomer. What command do I need?",
+      "expected_output": "Recognises the AlphaFold2-era OpenFold (aqlaboratory/openfold, no -3), not OpenFold3. States that this skill covers OpenFold3 only, writes no command for the older tool and points to that project's own documentation. Offers alternatives: OpenFold3 (run_openfold predict with OpenBind-0, after the probe-first flow) or the AlphaFold2/ColabFold skill if installed (else its upstream docs).",
+      "files": [],
+      "assertions": [
+        {"text": "Recognises that `run_pretrained_openfold.py` and `finetuning_*.pt` belong to the AlphaFold2-era OpenFold (`aqlaboratory/openfold`), not OpenFold3", "type": "manual"},
+        {"text": "States that this skill covers OpenFold3 only and writes no command for the older tool", "type": "manual"},
+        {"text": "Offers the OpenFold3 route (with the probe-first flow) or the AlphaFold2/ColabFold skill (if installed; else its upstream docs) as alternatives", "type": "manual"}
+      ],
+      "must_not": [
+        {"text": "Emits a `run_pretrained_openfold.py` command or invents its flags", "type": "manual"},
+        {"text": "Claims the older weights load in OpenFold3 or passes them to `run_openfold predict`", "type": "manual"}
+      ],
+      "references": ["SKILL.md", "references/00_scope_and_trust.md", "tests/trigger_tests.md"]
+    }
+  ]
+}

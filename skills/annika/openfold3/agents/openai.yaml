@@ -1,0 +1,45 @@
+# Codex (OpenAI) UI metadata for the openfold3 skill.
+# Claude reads SKILL.md frontmatter; Codex reads this file for display/triggering.
+# Keep in sync with SKILL.md's name/description.
+name: openfold3
+display_name: OpenFold3 (AlphaFold3-class cofolding + optimization kit)
+description: >-
+  Config-first assistant for OpenFold3 (aqlaboratory/openfold-3 v0.5.0, default
+  weights OpenBind-0), the open AlphaFold3-class cofolding model for protein,
+  RNA, DNA, ligand and ion complexes, and the Anthropic optimization kit
+  (anthropics/uplifting-biomolecular-modeling openfold3_ob0, run.sh modes
+  off/exact/fast/big, --n_gpu). Install/configure/run OpenFold3, write query
+  JSON, generate correct run_openfold predict / setup_openfold /
+  align-msa-server and kit run.sh pred/check/warm/install commands, read
+  outputs and confidence, keep sequences off the public MSA server, and
+  troubleshoot. Probes the environment first; never installs, downloads or
+  predicts without confirmation.
+keywords:
+  - openfold
+  - openfold3
+  - OpenFold 3
+  - run_openfold
+  - setup_openfold
+  - align-msa-server
+  - OpenBind-0
+  - of3
+  - AlphaFold3-class cofolding
+  - openfold3 kit
+  - openfold3_ob0
+  - uplifting-biomolecular-modeling
+entrypoint: SKILL.md
+runtime:
+  type: cli
+  notes: >-
+    Real runs need Linux x86-64 with an NVIDIA GPU (kit modes: compute
+    capability >= 8.0, driver >= 570), OpenFold3 0.5.0 and the OpenBind-0
+    checkpoint. Scripts are stdlib Python >= 3.9; run
+    scripts/openfold3_env_probe.py first. Historical validation: A100 40 GB and
+    H100, 2026-09-22.
+safety:
+  consent_required:
+    - installing OpenFold3 or the kit, or building/pulling images (pip, pixi, docker, apptainer)
+    - downloading weights or the CCD (setup_openfold, run.sh install, aws s3 cp; ~2.3 GB)
+    - running any prediction, run.sh warm, or a GPU job submission
+    - leaving --use-msa-server unset or true (sends protein sequences to api.colabfold.com)
+    - probe --deep (runs the installed CLI or kit check; may create cache files)

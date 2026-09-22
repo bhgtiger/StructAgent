@@ -11,6 +11,7 @@ Names of third-party tools, packages, and services are used only to identify int
 - Rosetta and RosettaCommons tools, including EMERALD/GALigandDock workflows — RosettaCommons and the relevant authors/developers
 - SPHIRE-crYOLO — its developers and upstream license terms; this repository ships no crYOLO code or model weights
 - RELION and other external cryo-EM tools referenced in workflow notes — their respective authors/developers
+- OpenFold3 and OpenBind-0 — the OpenFold Consortium, the AlQuraishi Lab and the OpenBind Consortium; the OpenFold3 optimization kits — Anthropic; AlphaFold — Google DeepMind. The `openfold3` skill ships no OpenFold3 or kit code and no model weights
 - PDBe, Protein Data Bank in Europe, and related PDBe API/Search services — EMBL-EBI / PDBe and relevant upstream service maintainers
 
 The Apache-2.0 license in this repository applies to original StructAgent code, wrappers, and written material contributed here. It does not grant rights to third-party software, documentation, datasets, trademarks, or services. Users are responsible for obtaining and complying with the licenses, terms of use, and citation requirements for all upstream tools they install or call.

@@ -1,0 +1,26 @@
+{
+  "queries": {
+    "hras_gtp_mg": {
+      "chains": [
+        {
+          "molecule_type": "protein",
+          "chain_ids": ["A"],
+          "description": "human H-Ras 1-166, PDB 5P21 sequence",
+          "sequence": "MTEYKLVVVGAGGVGKSALTIQLIQNHFVDEYDPTIEDSYRKQVVIDGETCLLDILDTAGQEEYSAMRDQYMRTGEGFLCVFAINNTKSFEDIHQYREQIKRVKDSDDVPMVLVGNKCDLAARTVESRQAQDLARSYGIPYIETSAKTRQGVEDAFYTLVREIRQH"
+        },
+        {
+          "molecule_type": "ligand",
+          "chain_ids": ["B"],
+          "description": "GTP by CCD code (5P21 holds the analogue GNP)",
+          "ccd_codes": "GTP"
+        },
+        {
+          "molecule_type": "ligand",
+          "chain_ids": ["C"],
+          "description": "Mg2+ ion by CCD code",
+          "ccd_codes": "MG"
+        }
+      ]
+    }
+  }
+}
