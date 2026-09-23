@@ -4,7 +4,7 @@
 Checks structure and hygiene, not model behaviour:
   files       required package files exist; no __pycache__ / *.pyc left in the package
   frontmatter SKILL.md keys, name == folder name (hyphen-case), description length and characters,
-              agents/openai.yaml name; SKILL.md line count
+              agents/openai.yaml Codex spec; SKILL.md line count
   references  every references/*.md is routed from SKILL.md and stays under --max-ref-lines
   links       every relative markdown link in every .md file resolves inside the package
   paths       every package path in code spans and code blocks (references/, scripts/, templates/, configs/,
@@ -256,13 +256,23 @@ def check_frontmatter(root, rep):
         rep.ok("frontmatter", "SKILL.md %d lines (max %d)" % (n_lines, SKILL_MD_MAX_LINES))
     agents = os.path.join(root, "agents", "openai.yaml")
     if os.path.isfile(agents):
-        m = re.search(r"^name:\s*['\"]?([^'\"\s#]+)", read_text(agents), re.M)
-        if not m:
-            rep.fail("frontmatter", "agents/openai.yaml has no top-level name")
-        elif m.group(1) != folder:
-            rep.fail("frontmatter", "agents/openai.yaml name %r != folder name %r" % (m.group(1), folder))
+        # Codex spec (skill-creator references/openai_yaml.md): top-level keys interface / dependencies /
+        # policy only; short_description 25-64 chars; default_prompt names the skill as $<folder>.
+        ytext = read_text(agents)
+        tops = set(re.findall(r"^([A-Za-z_][\w-]*):", ytext, re.M))
+        bad = sorted(tops - {"interface", "dependencies", "policy"})
+        sd = re.search(r"^\s+short_description:\s*\"([^\"]*)\"", ytext, re.M)
+        dp = re.search(r"^\s+default_prompt:\s*\"([^\"]*)\"", ytext, re.M)
+        if bad:
+            rep.fail("frontmatter", "agents/openai.yaml has non-spec top-level keys: %s" % ", ".join(bad))
+        elif not re.search(r"^\s+display_name:\s*\"[^\"]+\"", ytext, re.M):
+            rep.fail("frontmatter", "agents/openai.yaml lacks a quoted interface.display_name")
+        elif not sd or not 25 <= len(sd.group(1)) <= 64:
+            rep.fail("frontmatter", "agents/openai.yaml short_description missing or not 25-64 chars")
+        elif not dp or ("$" + folder) not in dp.group(1):
+            rep.fail("frontmatter", "agents/openai.yaml default_prompt must mention $%s" % folder)
         else:
-            rep.ok("frontmatter", "agents/openai.yaml name matches")
+            rep.ok("frontmatter", "agents/openai.yaml follows the Codex interface/policy spec")
     return text
 
 

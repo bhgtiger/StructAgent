@@ -212,7 +212,7 @@ All scripts are stdlib Python ≥ 3.9 and print `--help`.
 
 ## House notes
 
-- Works under Claude Code and Codex. Claude reads this frontmatter; Codex reads `agents/openai.yaml`. The scripts are
+- Works under Claude Code and Codex. Both read this frontmatter; `agents/openai.yaml` adds Codex UI metadata and invocation policy. The scripts are
   portable and write nothing unless asked (`make_query.py --out`).
 - Record anything learned the hard way in [lessons.md](lessons.md) (date, lesson, evidence pointer). Preserve it and any
   `site_config.local.md` when updating the skill.
