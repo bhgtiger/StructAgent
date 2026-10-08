@@ -1,0 +1,76 @@
+usage: cond_sampling.py [-h] [-i INPUT_PATH] [-i1 INPUT_PATH1]
+                        [-i2 INPUT_PATH2] [-o OUTPUT_DIR]
+                        [--mask-path MASK_PATH]
+                        [--data-starfile-path DATA_STARFILE_PATH] --model-dir
+                        MODEL_DIR [--no-ema] [--bf16]
+                        [--output-tag OUTPUT_TAG] [--patch-size PATCH_SIZE]
+                        [--batch-size BATCH_SIZE]
+                        [--patch-overlap PATCH_OVERLAP] [--odeint ODEINT]
+                        [--num-timesteps NUM_TIMESTEPS]
+                        [--cfg-weight CFG_WEIGHT] [--op OP [OP ...]]
+                        [--lamb-base LAMB_BASE] [--use-lamb-w]
+                        [--lamb-w-max LAMB_W_MAX] [--norm-grad]
+                        [--fmask-threshold FMASK_THRESHOLD]
+                        [--threshold-res THRESHOLD_RES] [--nbands NBANDS]
+                        [--bbox] [--fsc-weighting] [--spectral-mixing]
+                        [--skip-spectral-trailing] [--debug]
+                        [--log-file-path LOG_FILE_PATH] [--seed SEED]
+
+options:
+  -h, --help            show this help message and exit
+
+data options:
+  -i INPUT_PATH, --input-path INPUT_PATH
+                        If this arg is not None, only do posterior sampling on
+                        this map. (default: None)
+  -i1 INPUT_PATH1, --input-path1 INPUT_PATH1
+                        Input half map 1 path (default: None)
+  -i2 INPUT_PATH2, --input-path2 INPUT_PATH2
+                        Input half map 2 path (default: None)
+  -o OUTPUT_DIR, --output-dir OUTPUT_DIR
+                        Output directory (default: None)
+  --mask-path MASK_PATH
+                        Mask to control inference region (default: None)
+  --data-starfile-path DATA_STARFILE_PATH
+                        Particle dataset starfile path, used for compute
+                        Fourier mask (default: None)
+
+model options:
+  --model-dir MODEL_DIR
+                        Model directory (default: None)
+  --no-ema              Disable EMA weights (default: False)
+  --bf16                Use bf16 precision for fast inference (default: False)
+  --output-tag OUTPUT_TAG
+                        Conditional model output tag, to be removed (default:
+                        1)
+  --patch-size PATCH_SIZE
+                        Model input patch size (default: 64)
+  --batch-size BATCH_SIZE
+                        Batch size (default: 4)
+  --patch-overlap PATCH_OVERLAP
+  --odeint ODEINT
+  --num-timesteps NUM_TIMESTEPS
+                        Number of sampling timesteps (default: 200)
+  --cfg-weight CFG_WEIGHT
+                        Classifier-free-guidance weight (default: 2.0)
+  --op OP [OP ...]      Forward operator type, can be set as [denoise, denoise
+                        inpaint, non-uniform] (default: ['denoise'])
+  --lamb-base LAMB_BASE
+                        Likelihood gradient base step size (default: 1000.0)
+  --use-lamb-w          Use decayed lamb scheduler (default: False)
+  --lamb-w-max LAMB_W_MAX
+                        Max weight for decayed lamb scheduler (default: 5.0)
+  --norm-grad           Use normalized gradient (default: False)
+  --fmask-threshold FMASK_THRESHOLD
+                        Threshold for inpaint fourier mask (default: 10.0)
+  --threshold-res THRESHOLD_RES
+  --nbands NBANDS
+  --bbox
+
+extra options:
+  --fsc-weighting
+  --spectral-mixing
+  --skip-spectral-trailing
+  --debug
+  --log-file-path LOG_FILE_PATH
+  --seed SEED

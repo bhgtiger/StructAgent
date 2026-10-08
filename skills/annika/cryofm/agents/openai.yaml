@@ -1,0 +1,8 @@
+interface:
+  display_name: "CryoFM2 (cfm denoise / enhance)"
+  short_description: "Config-first CryoFM2 assistant: correct cfm commands, map geometry checks, outputs, RELION wrapper, troubleshooting"
+  default_prompt: "Use the cryofm skill. Probe the host first (scripts/cryofm_env_probe.py), inspect the maps (scripts/inspect_map.py), then build the command with scripts/build_cfm_command.py. Ask before any GPU job, install or download."
+policy:
+  allow_implicit_invocation: true
+  requires_confirmation_for: ["GPU job submission", "installs", "weight downloads", "writing into an existing output directory"]
+  never: ["run relion_wrapper.py --help", "copy the quick-start 'Add extra control' or 'Anisotropy correction' commands verbatim", "call the two outputs independent half maps"]

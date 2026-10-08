@@ -1,0 +1,85 @@
+#!/bin/bash
+# ==========================================================================
+# CryoFM2 one-GPU Slurm job (cryofm skill): generic TEMPLATE -- not run as shipped. Copy it, fill every <PLACEHOLDER>,
+# `bash -n <copy>`, show the user templates/run_plan.md, then submit with `sbatch --export=NONE <copy>` (the submitting
+# shell's environment stays out of the job, so the site activation below must happen INSIDE the job).
+# scripts/build_cfm_command.py --sbatch writes a filled copy of this file (command, paths, skill dir, known #SBATCH values).
+#
+# Adapting it to a site:
+# - #SBATCH: account, GPU partition, walltime, and the CPU/memory share of ONE GPU on that partition (the validated
+#   example site: 18 CPUs / 120G per A100 40 GB; 16 CPUs / 160G per H100 94 GB). Keep comments off #SBATCH lines.
+# - SITE_ENV_CMD: whatever puts `cfm` on PATH (a site activation script, `module load ...`, `conda activate cryofm`;
+#   empty if cfm is already on the default PATH). It runs before `set -u` because site scripts often read unset variables.
+# - NODE_TMP: node-local scratch (never a network file system, never $HOME). The job's TMPDIR, and any launcher-derived
+#   cache root, lives there and is removed at the end.
+# - OUT: a NEW directory per run on a file system with room and inodes (same stems overwrite silently).
+# - No `set -e`: a failing cfm must still leave the rc, the peak-memory line and the output check in the log.
+# - Walltime: ~1 min per batch-of-4 patches per half map + 2 min startup (scripts/inspect_map.py prints patches and
+#   batches); raise --mem for --op non-uniform (~64 MiB host RAM per patch per process).
+# ==========================================================================
+#SBATCH --account=<ACCOUNT>
+#SBATCH --partition=<GPU_PARTITION>
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --gpus=1
+#SBATCH --cpus-per-task=<CPUS>
+#SBATCH --mem=<MEM>
+#SBATCH --time=<TIME>
+#SBATCH --job-name=cfm_<JOB_NAME>
+#SBATCH --output=%x-%j.out
+#SBATCH --export=NONE
+
+# ---- settings (fill; absolute paths) ------------------------------------------------------------------------------
+IN1="<ABS_INPUT_1>"                        # half map 1 (-i1), or the single map for `cfm enhance -i`; .mrc/.map, even box
+IN2="<ABS_INPUT_2>"                        # half map 2 (-i2), same grid as IN1 (scripts/inspect_map.py); "" for single-map enhance
+MODEL="<MODELS>/cryofm2-pretrain"          # variant folder holding config.yaml + model.safetensors (a launcher shorthand only where the site resolves one)
+OUT="<OUTPUT_ROOT>/cfm_<JOB_NAME>_${SLURM_JOB_ID:-manual$$}"   # NEW directory per run; never under an inode-limited $HOME
+NODE_TMP="<NODE_LOCAL_TMP>"                # node-local scratch root, e.g. /tmp or the site's per-job local disk
+SKILL_DIR="<SKILL_DIR>"                    # folder holding this skill's scripts/ (inspect_map.py, check_cfm_output.py)
+SITE_ENV_CMD=""                            # e.g. "source /abs/path/activate.sh" | "module load apptainer" | "conda activate cryofm"
+# -------------------------------------------------------------------------------------------------------------------
+
+refuse() { echo "REFUSED: $*" >&2; exit 2; }
+for name in IN1 MODEL OUT NODE_TMP SKILL_DIR; do
+    case "${!name}" in ''|*'<'*'>'*) refuse "unfilled setting $name='${!name}'" ;; esac
+done
+case "$IN2" in *'<'*'>'*) refuse "unfilled setting IN2='$IN2' (use \"\" for single-map enhance)" ;; esac
+for p in "$IN1" "$OUT" "$NODE_TMP" "$SKILL_DIR" ${IN2:+"$IN2"}; do
+    case "$p" in /*) ;; *) refuse "not an absolute path: $p" ;; esac
+done
+[ -e "$OUT" ] && [ -n "$(ls -A "$OUT" 2>/dev/null)" ] && refuse "$OUT exists and is not empty: use a NEW directory"
+
+# site environment first (no set -e / set -u around it), then strict mode
+[ -n "$SITE_ENV_CMD" ] && eval "$SITE_ENV_CMD"
+command -v cfm >/dev/null 2>&1 || refuse "cfm is not on PATH after SITE_ENV_CMD='$SITE_ENV_CMD'"
+set -uo pipefail
+export TMPDIR="$NODE_TMP/cfm-${SLURM_JOB_ID:-manual$$}"      # node-local; site launchers may derive their cache root from it
+mkdir -p "$TMPDIR" "$OUT" || exit 1
+trap 'rm -rf -- "$TMPDIR"' EXIT
+exec > >(tee -a "$OUT/console.log") 2>&1
+echo "host=$(hostname) job=${SLURM_JOB_ID:-none} $(date -Iseconds)"
+nvidia-smi --query-gpu=name,driver_version,memory.total --format=csv,noheader 2>/dev/null || echo "nvidia-smi: no GPU visible"
+
+# header gates before spending GPU time (rc 1 = a gate failed; stop)
+python3 "$SKILL_DIR/scripts/inspect_map.py" "$IN1" ${IN2:+"$IN2"} || { echo "input gates failed"; exit 3; }
+
+# peak GPU memory sampler (device level; compare only with other nvidia-smi numbers)
+nvidia-smi --query-gpu=memory.used --format=csv,noheader,nounits -lms 500 > "$OUT/gpumem.log" 2>/dev/null &
+SMI=$!
+
+t0=$(date +%s)
+# ---- the command (one of; keep --norm-grad --use-lamb-w on every likelihood run; --bf16 on A100/H100-class cards) ----
+cfm denoise -i1 "$IN1" -i2 "$IN2" -o "$OUT" --model-dir "$MODEL" \
+    --op denoise --norm-grad --use-lamb-w --bf16 --seed 0 --log-file-path "$OUT/run.log"
+# cfm denoise -i1 "$IN1" -i2 "$IN2" -o "$OUT" --model-dir "$MODEL" --op denoise inpaint --data-starfile-path /abs/run_data.star --norm-grad --use-lamb-w --bf16 --log-file-path "$OUT/run.log"
+# cfm denoise -i1 "$IN1" -i2 "$IN2" -o "$OUT" --model-dir "$MODEL" --op non-uniform --norm-grad --use-lamb-w --bf16 --log-file-path "$OUT/run.log"
+# cfm enhance -i "$IN1" -o "$OUT" --model-dir "$MODEL" --output-tag 1 --bf16 --log-file-path "$OUT/run.log"                   # MODEL = .../cryofm2-emhancer
+# cfm enhance -i "$IN1" -o "$OUT" --model-dir "$MODEL" --output-tag 0 --cfg-weight 0.5 --bf16 --log-file-path "$OUT/run.log"  # MODEL = .../cryofm2-emready
+rc=$?
+echo "cfm rc=$rc wall=$(( $(date +%s) - t0 ))s"      # 0 = finished; 1 = Python exception (read run.log); 2 = argparse; 127 = cfm/image not found
+
+kill $SMI 2>/dev/null
+echo "peak GPU memory used: $(sort -n "$OUT/gpumem.log" 2>/dev/null | tail -1) MiB"
+python3 "$SKILL_DIR/scripts/check_cfm_output.py" "$OUT" --input "$IN1" --log "$OUT/run.log"
+echo "if the input NSTART/ORIGIN was non-zero: python3 $SKILL_DIR/scripts/restore_origin.py $IN1 $OUT/<stem>_external_reconstruct.mrc $OUT/<stem>_registered.mrc"
+exit $rc

@@ -1,0 +1,25 @@
+usage: cfm [-h] {denoise,enhance} ...
+
+CryoFM Command Line Interface
+
+positional arguments:
+  {denoise,enhance}  Available commands
+    denoise          Apply denoising to cryo-EM density maps
+    enhance          Apply style enhancement to cryo-EM density maps
+
+options:
+  -h, --help         show this help message and exit
+
+Examples:
+  # Denoise with single GPU
+  cfm denoise -i1 half1.mrc -i2 half2.mrc -o ./output --model-dir ./model
+
+  # Denoise with multiple GPUs
+  cfm denoise --num_processes 4 -i1 half1.mrc -i2 half2.mrc -o ./output --model-dir ./model
+
+  # Enhance with single GPU
+  cfm enhance -i input.mrc -o ./output --model-dir ./model --output-tag 1
+
+  # Enhance with multiple GPUs
+  cfm enhance --num_processes 2 -i input.mrc -o ./output --model-dir ./model --output-tag 1
+        

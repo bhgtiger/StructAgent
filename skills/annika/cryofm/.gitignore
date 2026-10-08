@@ -1,0 +1,28 @@
+# Host-specific config: holds real paths, accounts and partitions. Never commit.
+configs/site_config.local.md
+
+# Eval/run scratch
+*-workspace/
+evals/runs/
+feedback.json
+
+# Python / OS noise
+__pycache__/
+*.pyc
+.DS_Store
+
+# Accidental maps, outputs, images and weights
+*.mrc
+*.map
+*.map.gz
+*_external_reconstruct.mrc
+*.sif
+*.safetensors
+*.star
+run.log
+gpumem.log
+
+# Probe and help captures made on a host (hold host names, Slurm variables and absolute paths)
+probe*.json
+probe*.txt
+*.sbatch

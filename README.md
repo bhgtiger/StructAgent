@@ -49,6 +49,7 @@ skills/annika/                Execution-side structural-biology skills/protocols
   ├── coot/                   Coot model building and local refinement
   ├── cryoatom/               Portable CryoAtom2 setup, configuration, planning, and gated execution
   ├── cryoatom-advisor/       Read-only CryoAtom/CryoAtom2 readiness and static CLI guidance
+  ├── cryofm/                 Config-first CryoFM2 map denoising/anisotropy/non-uniform posterior sampling and EMhancer/EMReady-style enhancement (cfm), RELION wrapper, validated on A100
   ├── cryodrgn-skill/         cryoDRGN heterogeneity reconstruction, validated against cryoDRGN 4.2.1
   ├── cryolo-skill/           crYOLO particle picking, validated against crYOLO 1.9.9
   ├── cryosparc/              cryoSPARC workflows, masks, external-tool bridges, and cautious automation
@@ -102,6 +103,9 @@ Connect them with an A2A JSON-RPC gateway or equivalent message bus. Use the tem
 See [`docs/full_system_implementation.md`](docs/full_system_implementation.md). Optional public PDB/PDBe lookup tools can be exposed via [`docs/pdbe_mcp_setup.md`](docs/pdbe_mcp_setup.md).
 
 ## Changelog
+
+### v15 (2026-10-08)
+- **Added** `skills/annika/cryofm/` — config-first CryoFM2 skill (ByteDance-Seed/cryofm, CLI `cfm`): flow posterior sampling of half maps with `cfm denoise` (`--op denoise`, `denoise inpaint` with particle poses, `non-uniform`), EMhancer-/EMReady-style restyling with `cfm enhance`, and the RELION `--external_reconstruct` wrapper, with the upstream documented-command errata, map-header gates and output caveats (3 Å band limit, origin reset, outputs are not gold-standard half maps). Grounded in the pinned upstream commit `6448681` and HF weights revision `4e308f7f`; historical GPU validation of `cfm denoise` and both `cfm enhance` styles on an A100 40 GB (2026-10-08). Ships a read-only host probe, an MRC header/geometry inspector, a trap-refusing command builder, an output checker, an origin restorer, a guarded Slurm template, a RELION template and a static validator; ships no CryoFM code or weights; local/private site configs are intentionally not bundled.
 
 ### v14 (2026-09-22)
 - **Added** `skills/annika/openfold3/` — config-first OpenFold3 skill (AlphaFold3-class cofolding of protein, RNA, DNA, ligands and ions; `run_openfold predict`, `setup_openfold`, OpenBind-0 weights) with first-class support for the Anthropic optimization kits (`uplifting-biomolecular-modeling@f4f62fa`, modes `off`/`exact`/`fast`/`big`, `--det`, `--n_gpu`). Grounded in the pinned upstream v0.5.0 source and live receipts; historical GPU validation of v0.5.0 + OpenBind-0 + kit on A100 40 GB and H100 (2026-09-22). Ships a read-only host probe, a query-JSON builder/validator, a read-only output summarizer, public example queries and a guarded Slurm template; local/private site configs are intentionally not bundled.
