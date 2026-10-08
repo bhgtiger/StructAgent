@@ -30,15 +30,14 @@ folder; neither is bundled.
 ## 3. Evidence folder behind this skill (not bundled)
 
 The gathering project's `sources/` folder (2026-10-08, adversarially verified, pinned to commit `6448681` and HF
-`4e308f7f`) is **not bundled** with this skill. The maintainer keeps it as `cryofm_skill/evidence_2026-10-08/` (plain
-copy, grep-able) and `cryofm_skill/evidence_2026-10-08.tar.gz`, next to the skill's build tree
-(`~/projects/cryofm_skill/` on the maintainer's machine). It holds static inventories of code (`source/cli_reference.md`,
+`4e308f7f`) is **not bundled** with this skill and is not kept at a fixed path: ask the maintainer. It held static
+inventories of code (`source/cli_reference.md`,
 `io_formats.md`, `configs_reference.md`, `model_loading_and_weights_code.md`, `fixtures_headers.md`,
 `mrc_header_semantics.md`), algorithms (`algorithms/*.md`), RELION/cryoSPARC interop (`interop/*.md`), docs/web/weights
 (`web/*.md`), papers (`papers/*.md` + PDFs), community (`community/*.md`), environment (`environment/*.md`), usage rules
 (`usage/decision_rules_evidence.md`, `scenario_matrix.md`), errata (`errata/errata_log.md`). Every claim there carries a
 `file:line` citation into the clone `sources/source/cryofm/` at `6448681`. When a user asks "where does that come from"
-and the references here do not answer it, point at the maintainer's archive.
+and the references here do not answer it, ask the maintainer.
 
 ## 4. How to cite
 
