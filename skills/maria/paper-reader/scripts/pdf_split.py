@@ -15,6 +15,8 @@ Modes:
 Dependencies: PyMuPDF (fitz)
 """
 
+from __future__ import annotations
+
 import argparse
 import json
 import os
@@ -242,7 +244,12 @@ def _dehyphenate(text: str) -> str:
 def detect_sections(pages: list[dict]) -> list[dict]:
     """Detect section boundaries from text blocks."""
     sections = []
-    current_section = {"title": "Header", "level": 0, "content": []}
+    current_section = {
+        "title": "Header",
+        "level": 0,
+        "content": [],
+        "page": pages[0]["page"] if pages else 1,
+    }
 
     all_sizes = [b["font_size"] for p in pages for b in p["blocks"]]
     if not all_sizes:
@@ -437,7 +444,11 @@ def sections_to_markdown(metadata: dict, sections: list[dict], figures: list[dic
             continue
 
         hashes = "#" * min(level + 1, 4)
-        lines.append(f"{hashes} {title}")
+        sec_page = section.get("page") or (
+            section["content"][0].get("page") if section.get("content") else None
+        )
+        page_tag = f" [p. {sec_page}]" if sec_page else ""
+        lines.append(f"{hashes} {title}{page_tag}")
         lines.append("")
 
         # Build paragraphs from content blocks
@@ -449,17 +460,27 @@ def sections_to_markdown(metadata: dict, sections: list[dict], figures: list[dic
 
         paragraphs = []
         current_para = []
+        current_page = sec_page
 
         for block in content_blocks:
-            text = block["text"]
+            raw_text = block["text"]
+            text = raw_text
+            b_page = block.get("page")
 
             # Filter noise lines
-            if _is_noise_line(text):
+            if _is_noise_line(raw_text):
                 continue
+
+            # Insert inline page marker when a section crosses a PDF page boundary
+            if b_page and current_page and b_page != current_page:
+                current_page = b_page
+                text = f"[p. {b_page}] {raw_text}"
+            elif b_page and not current_page:
+                current_page = b_page
 
             # Paragraph break detection
             if current_para and (
-                text[0].isupper() and
+                raw_text[0].isupper() and
                 current_para[-1].rstrip().endswith(".")
             ):
                 paragraphs.append(" ".join(current_para))

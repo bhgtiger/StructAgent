@@ -15,6 +15,8 @@ Exit codes:
     2 — error (missing file, bad YAML, etc.)
 """
 
+from __future__ import annotations
+
 import re
 import sys
 from difflib import SequenceMatcher
@@ -94,11 +96,16 @@ def load_database_titles(db_path: str) -> list[dict]:
     """Load paper titles and keys from database.yaml."""
     with open(db_path) as f:
         db = yaml.safe_load(f) or {}
-    papers = db.get("papers", [])
+    if isinstance(db, list):
+        papers = db
+    elif isinstance(db, dict):
+        papers = db.get("papers", []) or []
+    else:
+        papers = []
     return [
         {"key": p.get("key", ""), "title": p.get("title", ""), "id": p.get("id")}
         for p in papers
-        if p.get("title")
+        if isinstance(p, dict) and p.get("title")
     ]
 
 

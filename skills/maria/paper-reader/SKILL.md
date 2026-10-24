@@ -1,230 +1,87 @@
 ---
 name: paper-reader
-description: Read academic papers (PDF) and produce structured digests. Use when asked to read, digest, summarize, or analyze a paper. Handles PDF extraction, section detection, metadata parsing, figure extraction, and digest generation following a structured template. Triggers on "read this paper", "digest this", "what does this paper say", or when a PDF path/URL is provided in the context of research work.
+description: "Academic paper PDF extraction, structured digest authoring, and YAML database filing (standard and Auto_build_v1 deposit-blind modes)."
 ---
 
 # Paper Reader
 
-Read a paper → extract → digest → file.
+Deterministic PDF-to-Markdown extraction (`[p. N]` page markers + figures) → full-text reading → structured digest → YAML database filing → deterministic validation.
 
-## Pipeline
+## Core Rules
 
-```
-PDF → pdf_split.py --compact (deterministic Python, ~1 sec)
-  ├── Sectioned markdown (5-15k tokens)
-  ├── Metadata (title, authors, DOI, journal, year, keywords)
-  └── Figures → disk
+- **Use `scripts/pdf_split.py --compact` first**, then read `<stem>_compact.md` directly. Use the built-in PDF viewer only as a fallback when extraction fails or is visibly corrupted.
+- **Select the target mode before writing:**
+  - **Standard Mode:** General research projects (`<project>/digests/YYYY-MM-DD_<first_author>_<short_title>.md`; PDFs and extractions under `<project>/database/`).
+  - **`Auto_build_v1` Deposit-Blind Mode (Zone A):** Live-runtime structural biology literature base (`knowledge/literature/digests/<key>.md` $\le 6,000$ B; raw PDFs and extractions in `$AB_SCRATCH/literature_raw/`; extended YAML schema; Zone-A regex phrasing rules; 2-session review).
 
-Read the markdown → produce digest (template below)
-  + image tool for key figures when needed
-  → file digest to project digests/ folder
-```
+## Workflow
 
-**Default rule:** use our local deterministic extraction pipeline first (`pdf_split.py` → read markdown directly). Do **not** call the built-in `pdf` tool by default for normal paper reading. Only use the built-in PDF tool as an explicit fallback when our extractor fails, the PDF is malformed in a way that breaks extraction, or there is a specific reason to compare outputs.
-
-**Why:** the local pipeline is cheaper, more deterministic, closer to source text, and avoids quality loss from intermediate summarization.
-
-## Step 0: Duplicate Check
-
-Before extracting, run the duplicate checker against the active project database:
+### Step 0: Duplicate Check
 
 ```bash
-python3 scripts/check_duplicate.py <pdf_path> <project_database_yaml_path>
+python3 scripts/check_duplicate.py <pdf_path> <database_yaml_path>
 ```
 
-- **Exit 0** → no duplicate, proceed to Step 1
-- **Exit 1** → likely duplicate found. Stop and report to the user. Only proceed if they explicitly say "re-read" or "force"
-- **Exit 2** → error (missing file, etc.). Warn but proceed — don't block on a broken check
+- **Exit 0:** No duplicate, proceed.
+- **Exit 1:** Duplicate detected — stop unless explicitly told to re-read/force.
+- **Exit 2:** Missing file or YAML error — warn and proceed if creating a new database.
 
-This costs ~0 tokens (just PyMuPDF page-1 read + YAML parse) and prevents wasting 100k+ tokens re-digesting a paper that's already indexed.
-
-## Step 1: Extract
-
-Run the bundled extractor:
+### Step 1: Extract Markdown & Figures (`[p. N]` Markers)
 
 ```bash
+# Standard mode:
 python3 scripts/pdf_split.py <pdf_path> --output-dir <project>/extractions/<paper_name> --compact
+
+# Auto_build_v1 mode (keep PDFs/extractions in $AB_SCRATCH to respect the 15 MB git repo cap):
+python3 scripts/pdf_split.py "$AB_SCRATCH/literature_raw/papers_incoming/<key>.pdf" \
+  --output-dir "$AB_SCRATCH/literature_raw/extractions/<key>" --compact
 ```
 
-Flags:
-- `--compact` — default for pipeline; drops references, acknowledgments, strips noise (~35-40% token savings)
-- `--no-refs` — only drop references section
-- `--no-figures` — skip figure extraction
-- `--json` — also output JSON structure (for programmatic use)
+- Outputs `<stem>_compact.md` with `[p. N]` page markers on section headers and inline page boundaries, plus `figures/`.
+- Flags: `--compact` (default; drops refs/acknowledgments), `--no-refs`, `--no-figures`, `--json`.
 
-Output: `<stem>_compact.md` (or `_extracted.md` without --compact), `figures/` dir.
+### Step 2: Read & Inspect Figures
 
-If extraction fails or PyMuPDF is missing: `pip3 install PyMuPDF` then retry.
+- Read `<stem>_compact.md` in full (for papers >15 pages: pass 1 = Abstract/Intro/Results/Discussion; pass 2 = Methods).
+- Inspect data figures (`figures/fig_p*.png`) with the image viewer when they carry plots, tables, or structural comparisons. Skip decorative figures.
 
-## Step 2: Read
+### Step 3: Author Digest
 
-Read the extracted markdown fully. This is the core intelligence step — no intermediate LLM.
+Load [`references/templates_and_schemas.md`](references/templates_and_schemas.md) for the exact Markdown template:
 
-Do not add a built-in `pdf` tool pass as a routine cross-check. If you want a cross-check, there must be a concrete reason: extraction corruption, suspicious metadata, missing sections/figures, or an explicit comparison request from the user.
+- **Standard Mode:** Save to `<project>/digests/YYYY-MM-DD_<first_author>_<short_title>.md`.
+- **`Auto_build_v1` Deposit-Blind Mode:** Save to `knowledge/literature/digests/<key>.md` and enforce all 6 Zone-A rules (details in [`references/auto_build_v1_mode.md`](references/auto_build_v1_mode.md)):
+  1. **Hard byte cap (`KB-P1`):** `fulltext` $\le 6,000$ bytes (`wc -c`); `abstract` $\le 1,200$ bytes (`abstract` digests cannot back `S1` cards).
+  2. **Mandatory locators (`[ALWAYS]`, `KB-P2`):** Every bullet in `## Key Quantitative & Method Claims (with Locators)` must cite `[p. X, Table Y / Fig. Z / §Y.Z]`.
+  3. **No residue or chain identifiers (`KB-P5`):** Never write `Pro308`, `His202`, `Pro7`, `A/247`, `B:562`, or `chain B residue 250`. Generalize to *"an Xaa–Pro dipeptide"* or *"a surface glutamate side chain"*. (Case-sensitive 3-letter AA + `\d{1,5}` allows lowercase `met 3 criteria` and `his 2 trials`.)
+  4. **Stoichiometry formatting (`KB-P5`):** Write `Zn(Cys)4` or `ZnCys3His1`, never bare `Cys4` or `His1`.
+  5. **Torsion angles & reported numbers (`KB-P5`):** Write canonical angles in words (*"omega near zero degrees"*, *"omega near 180 degrees"*), never `omega = 0` or `chi1 = -60`. Quote numbers *as reported* with locators; never write prescriptive gate language (`must be <= ...`, `accept only if ...`).
+  6. **No slash tokens, target IDs, absolute paths, or run refs (`KB-P1`, `KB-P8`):** Avoid `B/4`, `s/2`, `P2/1` in prose (`G-08` and `K-0001` are safe). Never include `state/targets.jsonl` PDB/EMDB IDs (`emd44497`, `8P79`), `/gpfs/...` or `/home/...` paths, or `reports/target...` references.
 
-For papers >15 pages, read in two passes:
-1. Abstract, intro, results, discussion (get the story)
-2. Methods in detail (get the protocol)
+### Step 4: File to YAML Database & Validate
 
-Use the `image` tool on extracted figures when they contain data (plots, charts, structural comparisons). Skip decorative figures.
+Add the paper entry to the YAML database following the schema in [`references/templates_and_schemas.md`](references/templates_and_schemas.md):
 
-## Step 3: Digest
+- Assign `id: max(existing IDs) + 1` (never reuse IDs).
+- Use exact snake_case `key` strings in `connections` (bidirectional when meaningful; never IDs or titles).
+- In `Auto_build_v1` mode (`knowledge/literature/database_structbio.yaml`), include all Maria base fields plus `publication_status`, `digest_basis`, `pdf: null`, `deposit_blind_safe: true`, `blocks`, canonical `problem_classes` (`state/vocab/problem_classes.tsv`), `topics` (`knowledge/cards/topics.tsv`), `tools`, and `verification`.
+- Run the deterministic validator before finishing:
+  ```bash
+  python3 scripts/validate_digest.py \
+    --digest knowledge/literature/digests/<key>.md \
+    --yaml knowledge/literature/database_structbio.yaml \
+    --key <key>
+  ```
 
-Produce a structured digest following the template. Save to: `<project>/digests/<YYYY-MM-DD>_<first_author>_<short_title>.md`
+### Step 5 (`Auto_build_v1` `KB-D3`): Two-Session Automatic Review
 
-### Reading Strategy by Paper Type
+- **Session 1 (Curator / Author):** Extracts PDF, writes `digests/<key>.md` and YAML entry, optionally drafts `knowledge/cards/candidates/SB-XXX-NNN.json`, and runs `scripts/validate_digest.py`.
+- **Session 2 (Independent Reviewer, `reviewer != author`):** A separate agent session runs `scripts/validate_digest.py`, `ab-kb lit check`, and `ab-kb verify`, verifies every cited `[p. X, Table Y / Fig. Z]` locator against `$AB_SCRATCH/literature_raw/extractions/<key>/<key>_compact.md`, and signs the acyclic `review_receipt_sha256`.
 
-**Method papers:** Focus on what the method does, whether it works, and where it breaks. Scrutinize benchmarks for fair comparisons. Look for unstated failure modes.
+## References & Scripts
 
-**Empirical papers:** Focus on evidence quality. Check controls, sample sizes, statistical methods. Are conclusions proportional to evidence?
-
-**Review papers:** Extract the taxonomy and landscape. Note which primary papers are leaned on most. Flag what's missing.
-
-**Computational papers:** Focus on assumptions and their sensitivity. Is there experimental validation?
-
-## Digest Template
-
-All fields marked [ALWAYS] are mandatory. [BEST-EFFORT] fields filled when possible, marked "unknown" when not.
-
-```markdown
-# {Title}
-
-## Metadata [ALWAYS]
-- **Authors:**
-- **Journal/Preprint:**
-- **Year:**
-- **DOI/URL:**
-- **Read date:** {YYYY-MM-DD}
-- **Project:** {project_name}
-- **Paper type:** method | empirical | review | computational | theoretical
-
-## TL;DR [ALWAYS]
-{2-3 sentences. What they did, what they found, does it hold up.}
-
-## The Claim [ALWAYS]
-{What the paper says it contributes. Their framing, not your assessment.}
-
-## Protocol [ALWAYS]
-### Principle
-{Core theory/concept behind the method or approach.}
-
-### Workflow
-{What they did, step by step. Tools, order, key parameters.}
-
-### Limitations & Failure Modes [ALWAYS]
-- **Acknowledged by authors:** {what they mention}
-- **Observed:** {what you notice}
-- **Failure modes:** {when would this NOT work?}
-
-## Reproducibility [BEST-EFFORT]
-- **Data availability:** deposited / on request / not mentioned
-- **Code/software:** link or not mentioned
-- **Key parameters reported:** yes / partially / no
-- **Sample sizes:** reported / buried / inadequate
-
-## Evaluation [ALWAYS]
-### Internal Validity
-{Does the evidence support THEIR conclusions?}
-
-### External Validity [BEST-EFFORT]
-{How generalizable? Tested on one system or many?}
-
-## Relevance to Project [ALWAYS when project active]
-- **Significance:** high / medium / low — {why}
-- **What it changes:**
-- **Gaps it leaves:**
-
-## Connections [BEST-EFFORT]
-- **Related to:** {other papers in project database}
-- **Contradicts:** {if any}
-- **Extends:** {if builds on prior work}
-
-## Tags [ALWAYS]
-{comma-separated keywords}
-
-## Raw Notes [BEST-EFFORT]
-{Specific numbers, key figures, notable quotes worth remembering.}
-```
-
-## Step 4: File to Database
-
-After producing the digest, add the paper to the project's YAML database. This completes the pipeline — no separate "database skill" needed for filing.
-
-### Directory Layout
-
-Each project database lives under its own configured project root (for example, `$PAPER_DB_ROOT/database/`). Typical structure:
-
-```
-database/
-├── database_<collection>.yaml    # Master index (one or more collections)
-├── digests/                       # Individual paper digests
-│   └── YYYY-MM-DD_<author>_<short>.md
-├── extractions/                   # pdf_split.py output
-│   └── <author_year_short>/
-│       ├── <stem>_compact.md
-│       └── figures/
-├── papers_incoming/               # Archived source PDFs
-│   └── <author_year_short>.pdf
-└── connections.md                 # Optional cross-reference notes
-```
-
-Paths are relative to the project database root. Do not hardcode absolute paths in the YAML.
-
-### YAML Schema
-
-Each entry in the `papers` list:
-
-```yaml
-# REQUIRED fields
-id: 74                              # Integer, unique. Assign max(existing IDs) + 1
-key: author_year_short_descriptor    # Unique snake_case key. Format: <first_author>_<year>_<short_descriptor>
-title: "Full paper title"
-authors: ["First Author", "Second Author"]
-year: 2024
-journal: "Journal Name"
-doi: "10.xxxx/xxxxx"
-paper_type: method                   # One of: method | empirical | review | benchmark | computational | theoretical | workshop_talk
-significance: high                   # One of: high | medium | low
-tags: ["keyword1", "keyword2"]
-digest: "digests/YYYY-MM-DD_author_short.md"   # Relative path from DB root
-maria_opinion: "1-2 sentence assessment"        # Your honest take
-connections: []                      # List of keys (see Connection Rules below)
-
-# OPTIONAL fields
-pdf: "papers_incoming/author_year_short.pdf"    # Relative path to archived PDF
-s2_paper_id: "abc123"               # Semantic Scholar ID if known
-```
-
-### Connection Rules
-
-1. **Always use `key` strings** — the exact `key` field of the target paper (e.g. `croll_2018_isolde_physically_realistic_environment`)
-2. **Cross-database references are OK** — a paper in `database_structural_model_building.yaml` can reference a key in `database_structural_biology.yaml`
-3. **Bidirectional when meaningful** — if A connects to B, B should connect to A (but don't force it for trivial links)
-4. **Never use IDs, titles, or partial strings** — only exact `key` values
-
-### Filing Checklist
-
-1. **Copy PDF** to `papers_incoming/<key>.pdf`
-2. **Write digest** to `digests/YYYY-MM-DD_<author>_<short>.md`
-3. **Add YAML entry** with all required fields
-4. **Update connections** — add the new paper's key to related existing entries' connection lists
-5. **Verify** — run a quick check that all connection keys resolve to real entries
-
-### ID Assignment
-
-IDs may have gaps (papers can be removed). Always assign `max(existing IDs across all collections) + 1`. Never reuse IDs.
-
-### Allowed Values Reference
-
-| Field | Allowed Values |
-|-------|---------------|
-| `paper_type` | `method`, `empirical`, `review`, `benchmark`, `computational`, `theoretical`, `workshop_talk` |
-| `significance` | `high`, `medium`, `low` |
-
-## Principles
-
-- **Read the full paper.** If you only read the abstract, say so.
-- **Be critical.** Flag weak stats, overclaimed conclusions, unfair comparisons.
-- **Separate reporting from opinion.** "The Claim" = their words. "Evaluation" = your assessment.
-- **Every method has failure modes.** If you can't find any, that's a flag about your understanding.
-- **Project context shapes the digest.** Weight attention toward project-relevant aspects.
+- [`references/templates_and_schemas.md`](references/templates_and_schemas.md) — Standard & `Auto_build_v1` digest templates, YAML schemas, and canonical vocabularies.
+- [`references/auto_build_v1_mode.md`](references/auto_build_v1_mode.md) — Scratch storage layout, Zone-A phrasing checklist, 2-session review protocol, and Stage `K0` 21-paper queue.
+- `scripts/pdf_split.py` — Deterministic PyMuPDF extractor emitting `[p. N]` page markers and figures.
+- `scripts/check_duplicate.py` — Pre-read title fuzzy-match duplicate checker.
+- `scripts/validate_digest.py` — Deterministic validator for byte caps, mandatory locators, YAML schema, and Zone-A regexes (`--self-test` for unit tests).
