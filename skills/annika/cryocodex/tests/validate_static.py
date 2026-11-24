@@ -392,6 +392,7 @@ python3 -I "$FAKE_WRITER" "$out" "$name" && for s in "" _out_score _in_mask _in_
 
     # 7. probe verdict ladder (fake Linux host) ----------------------------------------------------------------------
     import cryocodex_env_probe as probe_mod
+    probe_mod.SITE_CONFIG = os.path.join(td, "no_site_config.local.md")   # hermetic: ignore a configured install's site config
     fbin = os.path.join(td, "fakebin"); os.makedirs(fbin)
     with open(os.path.join(fbin, "nvidia-smi"), "w") as fh:
         fh.write("#!/bin/sh\necho '0, NVIDIA A100-SXM4-40GB, 40960 MiB, 40000 MiB, 550.54.15'\n")
@@ -490,7 +491,7 @@ TOKENS = [("/Us" + "ers/", False), ("/m" + "nt/", False), ("~/.claude/" + "skill
 _local = os.path.join(ROOT, "tests", "local_tokens.txt")
 if os.path.isfile(_local):
     TOKENS += [(t.strip(), True) for t in open(_local, encoding="utf-8") if t.strip() and not t.lstrip().startswith("#")]
-LOCAL_ONLY = {os.path.join("configs", "site_config.local.md"), os.path.join("tests", "local_tokens.txt")}
+LOCAL_ONLY = {os.path.join("configs", "site_config.local.md"), os.path.join("tests", "local_tokens.txt"), "INSTALLED_FROM.txt"}
 hits = []
 for dirpath, dirnames, filenames in os.walk(ROOT):
     dirnames[:] = [d for d in dirnames if d not in (".git", "__pycache__")]
