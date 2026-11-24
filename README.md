@@ -72,6 +72,11 @@ skills/maria/                 Reading/reasoning/database/review skills
   ├── distill/                Session distillation
   ├── paper-reader/           Primary paper reading and filing
   └── review-paper/           Review/tutorial paper reading
+skills/general_skill/         Agent-agnostic skills (Claude Code, Codex, agy)
+  ├── invoke-claude-cli/      Invoking the `claude` CLI headlessly from another agent
+  ├── scientific-tool-sourcing/  Collect, pin and verify the evidence pack for a future scientific-tool skill
+  ├── skill-creator/          Creating, validating and packaging skills
+  └── use-codex-cli/          Driving the OpenAI Codex CLI from an agent
 examples/                     Placeholder and reviewer-bundle notes only
 wrappers/                     Reserved for redistributable production-tool wrappers
 reviewer_bundle_manifest.md   What belongs in the confidential reviewer bundle
@@ -103,6 +108,15 @@ Connect them with an A2A JSON-RPC gateway or equivalent message bus. Use the tem
 See [`docs/full_system_implementation.md`](docs/full_system_implementation.md). Optional public PDB/PDBe lookup tools can be exposed via [`docs/pdbe_mcp_setup.md`](docs/pdbe_mcp_setup.md).
 
 ## Changelog
+
+### v16 (2026-11-24)
+- **Added** `skills/general_skill/scientific-tool-sourcing/`. It replaces the planning-only `scientific-tool-planner` (never published here) with a skill that collects the evidence needed to build a scientific-tool skill later. The workflow has four steps: a source plan with a user checkpoint; delegated gathering (shared gatherer rules plus brief templates for pinned source, wrappers/forks, docs/terms/papers/community, live capture and cross-check, run inline, by Claude Code subagents or by Codex workers); verification; and a `HANDOFF.md` evidence pack. It covers 13 source classes, including canonical-upstream checks, weights terms, default data egress and wrapper parity. It ships stdlib scripts:
+  - a citation checker that resolves `path:line` and checks that verbatim excerpts match their source lines;
+  - a SHA-256 manifest builder that flags HTML saved as `.pdf` and files over 50 MB;
+  - a gathering-host probe;
+  - a logged Codex task runner.
+
+  Its pitfalls come from the openfold3, modelangelo, namdinator, boltz, cryoatom and cryodrgn projects. It does not build the target skill, install the tool, or download weights or databases.
 
 ### v15 (2026-10-08)
 - **Added** `skills/annika/cryofm/` — config-first CryoFM2 skill (ByteDance-Seed/cryofm, CLI `cfm`): flow posterior sampling of half maps with `cfm denoise` (`--op denoise`, `denoise inpaint` with particle poses, `non-uniform`), EMhancer-/EMReady-style restyling with `cfm enhance`, and the RELION `--external_reconstruct` wrapper, with the upstream documented-command errata, map-header gates and output caveats (3 Å band limit, origin reset, outputs are not gold-standard half maps). Grounded in the pinned upstream commit `6448681` and HF weights revision `4e308f7f`; historical GPU validation of `cfm denoise` and both `cfm enhance` styles on an A100 40 GB (2026-10-08). Ships a read-only host probe, an MRC header/geometry inspector, a trap-refusing command builder, an output checker, an origin restorer, a guarded Slurm template, a RELION template and a static validator; ships no CryoFM code or weights; local/private site configs are intentionally not bundled.

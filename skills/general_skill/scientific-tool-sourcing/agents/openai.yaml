@@ -1,0 +1,9 @@
+# Codex UI metadata and invocation policy (spec: Codex skill-creator references/openai_yaml.md).
+# Triggering uses the SKILL.md frontmatter name/description, which Claude Code, Codex and agy all read.
+interface:
+  display_name: "Scientific Tool Sourcing"
+  short_description: "Collect, pin and verify sources before building a scientific-tool skill"
+  default_prompt: "Use $scientific-tool-sourcing to plan and gather a cited evidence pack for a future skill about <tool>."
+
+policy:
+  allow_implicit_invocation: true
