@@ -49,6 +49,7 @@ skills/annika/                Execution-side structural-biology skills/protocols
   ├── coot/                   Coot model building and local refinement
   ├── cryoatom/               Portable CryoAtom2 setup, configuration, planning, and gated execution
   ├── cryoatom-advisor/       Read-only CryoAtom/CryoAtom2 readiness and static CLI guidance
+  ├── cryocodex/              Config-first CryoCodex map enhancement + local-quality score maps + molecular mask (predict.sh), sourced from v1.0.0, not yet validated
   ├── cryofm/                 Config-first CryoFM2 map denoising/anisotropy/non-uniform posterior sampling and EMhancer/EMReady-style enhancement (cfm), RELION wrapper, validated on A100
   ├── cryodrgn-skill/         cryoDRGN heterogeneity reconstruction, validated against cryoDRGN 4.2.1
   ├── cryolo-skill/           crYOLO particle picking, validated against crYOLO 1.9.9
@@ -108,6 +109,9 @@ Connect them with an A2A JSON-RPC gateway or equivalent message bus. Use the tem
 See [`docs/full_system_implementation.md`](docs/full_system_implementation.md). Optional public PDB/PDBe lookup tools can be exposed via [`docs/pdbe_mcp_setup.md`](docs/pdbe_mcp_setup.md).
 
 ## Changelog
+
+### v17 (2026-11-24)
+- **Added** `skills/annika/cryocodex/` — config-first CryoCodex skill (YangLab-SDU/CryoCodex `v1.0.0` = `a35e73a`, `./predict.sh`): one network that turns a single cryo-EM map into an enhanced map, local-quality score maps for the input and the enhanced map (predicted local SSIM, not local resolution) and a binary molecular mask. Covers correct `predict.sh` commands (explicit `True|False` booleans, fast vs normal mode, `--keep_size` / `--reverse_interpolation` output grids, batch/stride/GPU), the first-run 471 MB weights download (also triggered by `--version`), unverified pickled weights with no published checksum or terms, `-g` overwriting the scheduler's `CUDA_VISIBLE_DEVICES`, `--crop_check` being terminal-only, host-RAM sizing, ChimeraX score colouring, the preprint's benchmarks and limits, and the Colab route as a privacy warning only (Scipion plugin deferred). Built from a cited evidence pack made with `scientific-tool-sourcing`; **sourced from code, README and preprint, not yet validated on a GPU host** — it ships the server runbook (R0–R20) for that. Ships a read-only host probe (never reports VALIDATED), an MRC header/geometry inspector, a trap-refusing command builder, an output checker, a guarded one-GPU Slurm template and a static validator; ships no CryoCodex code or weights; local/private site configs are intentionally not bundled.
 
 ### v16 (2026-11-24)
 - **Added** `skills/general_skill/scientific-tool-sourcing/`. It replaces the planning-only `scientific-tool-planner` (never published here) with a skill that collects the evidence needed to build a scientific-tool skill later. The workflow has four steps: a source plan with a user checkpoint; delegated gathering (shared gatherer rules plus brief templates for pinned source, wrappers/forks, docs/terms/papers/community, live capture and cross-check, run inline, by Claude Code subagents or by Codex workers); verification; and a `HANDOFF.md` evidence pack. It covers 13 source classes, including canonical-upstream checks, weights terms, default data egress and wrapper parity. It ships stdlib scripts:

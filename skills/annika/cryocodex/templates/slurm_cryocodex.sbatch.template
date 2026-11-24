@@ -1,0 +1,101 @@
+#!/bin/bash
+# ==========================================================================
+# CryoCodex v1.0.0 one-GPU Slurm job (cryocodex skill): generic TEMPLATE -- not run as shipped, NOT VALIDATED on any
+# site yet. Copy it, fill every <...> placeholder, `bash -n <copy>`, show the user templates/run_plan.md, then `sbatch <copy>`.
+# scripts/build_cryocodex_command.py --sbatch writes a filled copy (paths, options, the #SBATCH values it was given).
+#
+# Why it looks like this (references/05 section 4):
+# - ONE GPU. CryoCodex computes on cuda:0 only, and -g overwrites CUDA_VISIBLE_DEVICES (default "0"), so the job hands
+#   the scheduler's value back: -g "${CUDA_VISIBLE_DEVICES:-0}" (derived from predict.py:82 and :194; runbook R16c
+#   confirms it on a real site).
+# - Never --crop_check True here: it waits for terminal input (crop_check.py:415-450). stdin is /dev/null below, so a
+#   stray one fails fast instead of hanging; the guard below refuses it anyway.
+# - The weights must already be at <clone>/model_state_dicts/CryoCodex.pth: compute nodes often have no internet, and
+#   predict.sh would otherwise try to download 471 MB first. The job refuses to start without them.
+# - Host RAM grows with the number of 48^3 windows (about 2.2 MB each, predict.py:92): size --mem from
+#   scripts/inspect_map.py (its normal-mode estimate is the upper bound; the default fast mode crops first).
+# - SITE_ENV_CMD must leave an EXECUTABLE conda (predict.sh:57-63): sourcing etc/profile.d/conda.sh exports CONDA_EXE.
+# - No `set -e`: a failing run must still leave the rc, the peak GPU memory and the output check in the log.
+# - Exit status 0 from predict.sh does not prove that maps were written (a non-orthogonal input exits early, code
+#   reading): scripts/check_outputs.py decides.
+# ==========================================================================
+#SBATCH --account=<ACCOUNT>
+#SBATCH --partition=<GPU_PARTITION>
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --gpus=1
+#SBATCH --cpus-per-task=<CPUS>
+#SBATCH --mem=<MEM>
+#SBATCH --time=<TIME>
+#SBATCH --job-name=cryocodex_<JOB_NAME>
+#SBATCH --output=%x-%j.out
+
+# ---- settings (fill; absolute paths) ------------------------------------------------------------------------------
+CC_HOME="<CRYOCODEX_HOME>"                 # CryoCodex clone at v1.0.0 (holds predict.sh and model_state_dicts/)
+IN_MAP="<ABS_INPUT_MAP>"                   # uncompressed, name ends in lower-case mrc or map (grid_utils.py:215)
+OUT="<OUTPUT_ROOT>/cryocodex_<JOB_NAME>_${SLURM_JOB_ID:-manual$$}"   # NEW directory per run (same-name outputs are overwritten)
+OUT_NAME="cryocodex"                       # -n: output base name
+SKILL_DIR="<SKILL_DIR>"                    # this skill's folder (scripts/inspect_map.py, scripts/check_outputs.py)
+SITE_ENV_CMD=""                            # e.g. "source /abs/miniconda3/etc/profile.d/conda.sh" or "module load miniconda3"
+export CRYOCODEX_ENV="cryocodex_env"      # conda env name read by predict.sh:8
+OPTS=()                                    # extra options in README spelling, e.g. (--keep_size True --reverse_interpolation True -b 4)
+CHECK_OPTS=()                              # matching check_outputs.py flags, e.g. (--keep-size --reverse-interpolation)
+# -------------------------------------------------------------------------------------------------------------------
+
+refuse() { echo "REFUSED: $*" >&2; exit 2; }
+for name in CC_HOME IN_MAP OUT SKILL_DIR; do
+    case "${!name}" in ''|*'<'*'>'*) refuse "unfilled setting $name='${!name}'" ;; esac
+done
+for p in "$CC_HOME" "$IN_MAP" "$OUT" "$SKILL_DIR"; do
+    case "$p" in /*) ;; *) refuse "not an absolute path: $p" ;; esac
+done
+case "$IN_MAP" in *map|*mrc) ;; *) refuse "input name must end in lower-case mrc/map (decompress/rename first): $IN_MAP" ;; esac
+case "$OUT_NAME" in ''|*/*) refuse "OUT_NAME must be a plain name: '$OUT_NAME'" ;; esac
+k=0
+while [ "$k" -lt "${#OPTS[@]}" ]; do
+    opt="${OPTS[$k]}"; val="${OPTS[$((k + 1))]:-}"
+    case "$opt" in
+        --crop_check|-c)
+            case "$val" in [Ff][Aa][Ll][Ss][Ee]) ;; *) refuse "--crop_check True needs a terminal; never in a batch job" ;; esac ;;
+        -g|--gpu|-m|--model_path|-i|-o|-n|--in_map_path|--out_dir|--out_name)
+            refuse "$opt is set by this job, not in OPTS" ;;
+    esac
+    k=$((k + 1))
+done
+[ -x "$CC_HOME/predict.sh" ] || refuse "$CC_HOME/predict.sh missing or not executable (chmod +x predict.sh)"
+[ -s "$CC_HOME/model_state_dicts/CryoCodex.pth" ] || refuse "weights missing: place $CC_HOME/model_state_dicts/CryoCodex.pth first (references/02 section 4)"
+[ -f "$IN_MAP" ] || refuse "input not found: $IN_MAP"
+[ -e "$OUT" ] && [ -n "$(ls -A "$OUT" 2>/dev/null)" ] && refuse "$OUT exists and is not empty: use a NEW directory"
+
+# site environment first (no strict mode around site scripts), then strict mode
+[ -n "$SITE_ENV_CMD" ] && eval "$SITE_ENV_CMD"
+conda_exe="${CONDA_EXE:-$(command -v conda || true)}"
+{ [ -n "$conda_exe" ] && [ -x "$conda_exe" ]; } || refuse "no executable conda after SITE_ENV_CMD='$SITE_ENV_CMD' (export CONDA_EXE)"
+set -uo pipefail
+case "${CUDA_VISIBLE_DEVICES:-}" in *,*) refuse "several GPUs visible ($CUDA_VISIBLE_DEVICES): CryoCodex uses only the first; request one GPU" ;; esac
+[ -n "${CUDA_VISIBLE_DEVICES:-}" ] || echo "WARN: CUDA_VISIBLE_DEVICES not set by the scheduler; -g falls back to 0"
+mkdir -p "$OUT" || exit 1
+echo "host=$(hostname) job=${SLURM_JOB_ID:-none} $(date -Iseconds) CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-unset}"
+nvidia-smi --query-gpu=index,name,driver_version,memory.total --format=csv,noheader 2>/dev/null || echo "nvidia-smi: no GPU visible"
+( cd "$CC_HOME" && git rev-parse HEAD 2>/dev/null ) || echo "clone commit: unknown (no git)"
+
+# header gates before spending GPU time (rc 1 = a gate failed; stop)
+python3 "$SKILL_DIR/scripts/inspect_map.py" "$IN_MAP" || { echo "input gates failed (see above)"; exit 3; }
+
+# peak GPU memory sampler (device level, all visible GPUs; compare only with other nvidia-smi numbers)
+nvidia-smi --query-gpu=index,memory.used --format=csv,noheader,nounits -lms 500 > "$OUT/gpumem.log" 2>/dev/null &
+SMI=$!
+TIME_CMD=()
+/usr/bin/time -v true >/dev/null 2>&1 && TIME_CMD=(/usr/bin/time -v)   # GNU time: max resident set size = host RAM used
+
+t0=$(date +%s)
+${TIME_CMD[@]+"${TIME_CMD[@]}"} "$CC_HOME/predict.sh" -i "$IN_MAP" -o "$OUT" -n "$OUT_NAME" -g "${CUDA_VISIBLE_DEVICES:-0}" --no_logo True ${OPTS[@]+"${OPTS[@]}"} < /dev/null 2>&1 | tee "$OUT/run.log"
+rc=${PIPESTATUS[0]}
+echo "predict.sh rc=$rc wall=$(( $(date +%s) - t0 ))s"      # 0 = finished (outputs still checked below); 1 = launcher/Python error; 2 = argparse
+
+kill "$SMI" 2>/dev/null
+echo "peak GPU memory used (index, MiB): $(sort -t, -k2 -n "$OUT/gpumem.log" 2>/dev/null | tail -1)"
+python3 "$SKILL_DIR/scripts/check_outputs.py" "$OUT" -n "$OUT_NAME" --input "$IN_MAP" --log "$OUT/run.log" ${CHECK_OPTS[@]+"${CHECK_OPTS[@]}"}
+crc=$?
+[ "$rc" -eq 0 ] && rc=$crc
+exit "$rc"
