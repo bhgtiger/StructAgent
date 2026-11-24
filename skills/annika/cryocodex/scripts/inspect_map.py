@@ -4,7 +4,7 @@
     python3 inspect_map.py MAP [MAP ...] [-s 12] [-b 9] [--json]
 
 Reads only the 1024-byte header (also inside .gz, for inspection; CryoCodex itself rejects .gz). Reports, per file,
-what predict.sh would do (SOURCED from the code at a35e73a, not observed):
+what predict.sh would do (SOURCED from the code at a35e73a; matched the 2026-11-24 live runs):
   gates   : path ends in lower-case 'map'/'mrc' (grid_utils.py:215); CELLB angles all 90 (grid_utils.py:160-167);
             MAP id, axis order, mode and file size as mrcfile will need them; some positive density (header DMAX)
   geometry: voxel size, origin used by CryoCodex (ORIGIN + NSTART*voxel, both summed), whether cubic resampling to
@@ -35,7 +35,7 @@ def report(h, g, stride, batch):
     L.append(f"   {'PASS' if g['name_ok'] else 'FAIL'}: file name -- {g['name_reason']}")
     L.append(f"   {'PASS' if g['orthogonal'] else 'FAIL'}: cell angles "
              + ("90/90/90" if g["orthogonal"] else f"{tri(h['cellb'], '{:g}')} -> prints '# Input grid is not orthogonal. EXIT.' and exits"
-                " (bare exit(): status 0 expected, no outputs -- code reading)"))
+                " (bare exit(): status 0, no outputs -- verified 2026-11-24)"))
     if not g["mapid_ok"]:
         L.append("   FAIL: no 'MAP ' id at byte 208 -> mrcfile (non-permissive) refuses the file")
     if not g["axis_ok"]:
@@ -67,10 +67,10 @@ def report(h, g, stride, batch):
         L.append(f"   resample: none (voxel exactly 1.0 and origin on the 1 A lattice); box {tri(g['dims_1A'])}")
     if g["small_axis"]:
         L.append(f"   NOTE: an axis of the 1 A box is < 48 -> zero-padded to 48 at the far end; outputs are at least 48 per axis."
-                 " --keep_size True may then fail (pastes a 48-voxel crop into a smaller canvas; code reading, runbook R12b)")
+                 " --keep_size True may then fail (pastes a 48-voxel crop into a smaller canvas; verified 2026-11-24: ValueError, exit 1)")
     L.append(f"   normal mode (--normal True): box {tri(g['box_normal'])} at 1.0 A, {g['windows_normal']} windows of 48^3 "
              f"(stride {stride}), {g['batches_normal']} batches at -b {batch}")
-    L.append(f"   host RAM, normal mode (derived, rough): ~{mh.fmt_bytes(g['ram_normal_bytes'])} "
+    L.append(f"   host RAM, normal mode (≈ 1.4 GB + 2.2 MB/window + 20 B/voxel; fitted to live runs): ~{mh.fmt_bytes(g['ram_normal_bytes'])} "
              f"({g['windows_normal']} windows x 2.2 MB + whole-grid copies); fast mode (default) crops to the molecule first -> less")
     L.append("   fast mode (default): crop = auto-mask bounding box +-5 voxels (data-dependent; each axis between 48 and "
              f"{tri(g['box_normal'])}); outputs at 1.0 A, placement in NXSTART/NYSTART/NZSTART, ORIGIN 0")
@@ -114,12 +114,12 @@ def main(argv=None):
             rc = 1
     if a.json:
         out = {"files": [{"header": {k: v for k, v in h.items() if k != "labels"}, "geometry": g} for h, g in results], "rc": rc,
-               "label": "SOURCED from CryoCodex a35e73a code reading; not observed on a real install"}
+               "label": "SOURCED from CryoCodex a35e73a code reading; matched live runs 2026-11-24"}
         print(json.dumps(out, indent=1, default=str))
     else:
         for h, g in results:
             print("\n".join(report(h, g, a.stride, a.batch)))
-        print(f">> GATES: {'PASS' if rc == 0 else 'FAIL'} (rc {rc})  [derived from the pinned code, not observed]")
+        print(f">> GATES: {'PASS' if rc == 0 else 'FAIL'} (rc {rc})  [derived from the pinned code; matched live runs 2026-11-24]")
     return rc
 
 

@@ -3,6 +3,7 @@
 downloads nothing; never calls predict.sh, so it can never trigger the 471 MB weights download).
 
     python3 cryocodex_env_probe.py [--home /abs/CryoCodex] [--env-name cryocodex_env] [--env-check] [--hash]
+                                   [--env-prefix /abs/env --launcher /abs/site_launcher.sh]
                                    [--out-root DIR] [--json] [--output FILE]
 
 Run it ON THE NODE THAT WILL RUN CryoCodex (a login node and a GPU node differ). Checks: OS/arch, NVIDIA GPU via
@@ -14,6 +15,12 @@ disk, and configs/site_config.local.md. --home defaults to `home:` in the site c
   --env-check  runs `conda run -n ENV python -c ...` once: imports torch (reports version, CUDA build, cuda available,
                device) and the pinned packages. No download, no CryoCodex import.
   --hash       sha256 of the 471 MB checkpoint (ASK FIRST: reads the whole file); compared with the site record.
+  --env-prefix / --launcher  a SITE route: a shared env given by path and a wrapper script that runs
+               <env>/bin/python predict.py -m <checkpoint> directly (no predict.sh, no conda run, no download). conda is
+               then not required; the env check runs <env>/bin/python directly. --launcher alone takes the env from
+               --env-prefix or the site config (env_prefix:, launcher:).
+The env check also reports packages imported from the user site (~/.local/lib/pythonX.Y/site-packages): conda envs do
+not isolate it, so it can shadow the env's numba/scipy at run time; export PYTHONNOUSERSITE=1 (verified 2026-11-24).
 Verdicts: BLOCKED (not Linux, no NVIDIA GPU visible, or no executable conda) / NOT_INSTALLED (no clone or no env) /
 PARTIAL (installed but something is missing or unchecked) / READY_TO_VALIDATE (all present, env imports torch with
 CUDA). VALIDATED is never printed: only a passed fixture run (references/validation_runbook.md) recorded in
@@ -38,8 +45,10 @@ SITE_CONFIG = os.path.join(os.path.dirname(HERE), "configs", "site_config.local.
 PINNED_PKGS = {"torch": "2.5.1", "mrcfile": "1.5.4", "numba": "0.61.2", "einops": "0.8.1", "timm": "1.0.24",
                "numexpr": "2.10.0", "numpy": "1.26.4", "scipy": "1.16.0", "tqdm": "4.67.1"}
 ENV_CHECK = r"""
-import importlib, json, sys
-r = {"python": sys.version.split()[0]}
+import importlib, json, os, site, sys
+r = {"python": sys.version.split()[0], "user_site_enabled": bool(site.ENABLE_USER_SITE)}
+usr = os.path.realpath(site.getusersitepackages()) if site.ENABLE_USER_SITE else None
+shadow = []
 try:
     import torch
     r["torch"] = torch.__version__; r["torch_cuda_build"] = torch.version.cuda
@@ -49,11 +58,17 @@ try:
         r["device0"] = "%s %.1f GiB cc %d.%d" % (p.name, p.total_memory / 2**30, p.major, p.minor)
 except Exception as e:
     r["torch_error"] = repr(e)[:300]
-for n in ["mrcfile", "numba", "einops", "timm", "numexpr", "numpy", "scipy", "tqdm", "PIL", "torchvision"]:
+for n in ["torch", "mrcfile", "numba", "einops", "timm", "numexpr", "numpy", "scipy", "tqdm", "PIL", "torchvision"]:
     try:
-        r[n] = getattr(importlib.import_module(n), "__version__", "?")
+        m = importlib.import_module(n)
+        if n != "torch":
+            r[n] = getattr(m, "__version__", "?")
+        if usr and os.path.realpath(getattr(m, "__file__", "") or "").startswith(usr + os.sep):
+            shadow.append(n)
     except Exception as e:
-        r[n] = "IMPORT-ERROR " + repr(e)[:120]
+        if n != "torch":
+            r[n] = "IMPORT-ERROR " + repr(e)[:120]
+r["user_site_shadowed"] = shadow
 print("CRYOCODEX_ENV_CHECK " + json.dumps(r))
 """
 
@@ -172,7 +187,39 @@ def probe(a):
                              "a login/CPU node can only inspect headers and draft commands")
     if cvd is not None:
         r["notes"].append(f"CUDA_VISIBLE_DEVICES={cvd!r} is set: predict.py overwrites it with -g (default \"0\"); "
-                          "pass -g \"${CUDA_VISIBLE_DEVICES:-0}\" under a scheduler (derived, runbook R16)")
+                          "pass -g \"${CUDA_VISIBLE_DEVICES:-0}\" under a scheduler (verified 2026-11-24: without it a job given GPU 1 ran on GPU 0)")
+    # site route: a shared env given by path + a launcher that runs predict.py directly (no predict.sh / conda run)
+    env_prefix = a.env_prefix or site.get("env_prefix")
+    launcher = a.launcher or site.get("launcher")
+    site_route = bool(launcher)
+    r["site_route"] = {"launcher": launcher, "env_prefix": env_prefix}
+    launcher_txt = ""
+    if launcher:
+        r["site_route"]["launcher_executable"] = os.path.isfile(launcher) and os.access(launcher, os.X_OK)
+        try:
+            launcher_txt = open(launcher, encoding="utf-8", errors="replace").read()
+        except OSError:
+            launcher_txt = ""
+        if not r["site_route"]["launcher_executable"]:
+            r["install_gaps"].append(f"site launcher {launcher} missing or not executable")
+        else:
+            r["site_route"]["runs_predict_py"] = "predict.py" in launcher_txt
+            r["site_route"]["sets_pythonnousersite"] = "PYTHONNOUSERSITE=1" in launcher_txt
+            r["site_route"]["passes_scheduler_gpu"] = "CUDA_VISIBLE_DEVICES" in launcher_txt
+            if not r["site_route"]["runs_predict_py"]:
+                r["gaps"].append(f"site launcher {launcher} does not mention predict.py: is it the CryoCodex wrapper?")
+            if not r["site_route"]["sets_pythonnousersite"]:
+                r["notes"].append("site launcher does not export PYTHONNOUSERSITE=1: user-site packages (~/.local) can shadow the env")
+            if not r["site_route"]["passes_scheduler_gpu"]:
+                r["notes"].append("site launcher does not handle CUDA_VISIBLE_DEVICES: under a scheduler pass -g \"$CUDA_VISIBLE_DEVICES\" yourself")
+        if not env_prefix:
+            r["gaps"].append("--launcher given without --env-prefix: the env behind the launcher is not checked")
+    if env_prefix:
+        py = os.path.join(env_prefix, "bin", "python")
+        r["site_route"]["env_python"] = py
+        r["site_route"]["env_python_exists"] = os.path.isfile(py) and os.access(py, os.X_OK)
+        if not r["site_route"]["env_python_exists"]:
+            r["install_gaps"].append(f"no executable {py} (--env-prefix)")
     # conda as predict.sh finds it
     conda_exe = os.environ.get("CONDA_EXE") or shutil.which("conda")
     r["conda"]["exe"] = conda_exe
@@ -195,11 +242,16 @@ def probe(a):
         else:
             r["conda"]["env_list_error"] = (err or out)[:200]
         r["conda"]["env_exists"] = env_exists
-        if env_exists is False:
+        if env_exists is False and site_route and env_prefix:
+            r["notes"].append(f"conda env '{env_name}' not found by name: fine for the site launcher route (env by path)")
+        elif env_exists is False:
             r["install_gaps"].append(f"conda env '{env_name}' not found (README: conda create -y -n cryocodex_env python=3.11; "
                                      "or set CRYOCODEX_ENV)")
         elif env_exists is None:
             r["gaps"].append("could not list conda envs; env presence unknown")
+    elif site_route:
+        r["notes"].append("no executable conda: fine for the site launcher route (it runs the env's python directly); "
+                          "predict.sh itself would stop with 'ERROR: Conda was not found.'")
     else:
         msg = "no executable conda (CONDA_EXE unset and no `conda` executable on PATH; predict.sh:57-63)"
         if shutil.which("mamba") or shutil.which("micromamba"):
@@ -223,7 +275,7 @@ def probe(a):
         if not (r["clone"]["predict_sh"] and r["clone"]["predict_py"]):
             r["install_gaps"].append(f"{home} does not look like a CryoCodex clone (predict.sh/predict.py missing)")
         else:
-            if not r["clone"]["predict_sh_executable"]:
+            if not r["clone"]["predict_sh_executable"] and not site_route:
                 r["gaps"].append("predict.sh is not executable (stored as 100644 in git): run `chmod +x predict.sh` in the clone")
             try:
                 m = re.search(r'__version__\s*=\s*"([^"]+)"', open(py, encoding="utf-8", errors="replace").read())
@@ -265,8 +317,16 @@ def probe(a):
                              "(including --version) downloads 471 MB from yanglab.qd.sdu.edu.cn -- ask first, or place the file")
     # env check (optional, runs python inside the env)
     if a.env_check:
-        if r["conda"]["executable"] and env_exists:
-            rc, out, err = run([conda_exe, "run", "-n", env_name, "python", "-c", ENV_CHECK], timeout=600)
+        cmd = None
+        if env_prefix and r["site_route"].get("env_python_exists"):
+            cenv = dict(os.environ)
+            if site_route and r["site_route"].get("sets_pythonnousersite"):
+                cenv["PYTHONNOUSERSITE"] = "1"      # as the launcher runs it
+            cmd = ([os.path.join(env_prefix, "bin", "python"), "-c", ENV_CHECK], cenv, "env python " + env_prefix)
+        elif r["conda"]["executable"] and env_exists:
+            cmd = ([conda_exe, "run", "-n", env_name, "python", "-c", ENV_CHECK], None, "conda run -n " + env_name)
+        if cmd:
+            rc, out, err = run(cmd[0], timeout=600, env=cmd[1])
             res = None
             for line in out.splitlines():
                 if line.startswith("CRYOCODEX_ENV_CHECK "):
@@ -276,6 +336,7 @@ def probe(a):
                         res = None
             r["env_check"] = res or {"error": (err or out)[-300:], "rc": rc}
             if res:
+                res["via"] = cmd[2]
                 mism = {k: (res.get(k), v) for k, v in PINNED_PKGS.items() if str(res.get(k, "")).split("+")[0] != v}
                 res["pin_mismatch"] = mism
                 if "torch_error" in res:
@@ -286,12 +347,17 @@ def probe(a):
                 if mism:
                     r["gaps"].append("packages differ from requirements.txt pins: "
                                      + ", ".join(f"{k} {v[0]} (pin {v[1]})" for k, v in mism.items()))
+                if res.get("user_site_shadowed"):
+                    r["gaps"].append("packages imported from the USER site (~/.local), not the env: "
+                                     + ", ".join(res["user_site_shadowed"]) + ". conda envs do not isolate it; "
+                                     "export PYTHONNOUSERSITE=1 before predict.sh (and before pip install: pip can "
+                                     "uninstall user-site copies otherwise)")
                 if not str(res.get("python", "")).startswith("3.11"):
                     r["notes"].append(f"env Python {res.get('python')}: the README uses 3.11 (3.12 untested)")
             else:
                 r["gaps"].append(f"--env-check failed (rc {rc}); see env_check.error")
         else:
-            r["env_check"] = {"skipped": "no executable conda or env missing"}
+            r["env_check"] = {"skipped": "no executable conda / env missing (or no --env-prefix python)"}
     elif not r["blockers"] and not r["install_gaps"]:
         r["gaps"].append("env not checked: re-run with --env-check (imports torch inside the env; no download)")
     # disk
@@ -301,7 +367,7 @@ def probe(a):
             r["disk"][label] = {"path": path, "free_bytes": du.free}
     # site config
     r["site_config"]["path"] = SITE_CONFIG if os.path.exists(SITE_CONFIG) else None
-    for k in ("host", "state", "date_probed", "date_validated", "home", "env", "expires_when", "weights.sha256"):
+    for k in ("host", "state", "date_probed", "date_validated", "home", "env", "env_prefix", "launcher", "expires_when", "weights.sha256"):
         if site.get(k):
             r["site_config"][k] = site[k]
     # verdict
@@ -334,6 +400,11 @@ def human(r):
     c = r["conda"]
     L.append(f"conda    : {c.get('exe') or 'NOT FOUND'} ({c.get('source')}, executable {c.get('executable')}) {c.get('version') or ''}"
              f"  env '{c['env_name']}': {({True: 'present', False: 'MISSING', None: 'unknown'})[c.get('env_exists')]}")
+    sr = r.get("site_route") or {}
+    if sr.get("launcher") or sr.get("env_prefix"):
+        L.append(f"site     : launcher {sr.get('launcher') or '-'} (executable {sr.get('launcher_executable')}, "
+                 f"PYTHONNOUSERSITE {sr.get('sets_pythonnousersite')}, scheduler GPU {sr.get('passes_scheduler_gpu')})  "
+                 f"env {sr.get('env_prefix') or '-'}")
     cl = r["clone"]
     if cl.get("home"):
         L.append(f"clone    : {cl['home']} ({cl['home_source']})  HEAD {(cl.get('head') or 'unknown')[:12]}"
@@ -351,7 +422,9 @@ def human(r):
         if "torch" in ec or "torch_error" in ec:
             L.append(f"env check: python {ec.get('python')}  torch {ec.get('torch')} (CUDA build {ec.get('torch_cuda_build')})  "
                      f"cuda_available {ec.get('cuda_available')}  {ec.get('device0') or ''}"
-                     + (f"  pin mismatches {ec['pin_mismatch']}" if ec.get("pin_mismatch") else "  packages = requirements.txt pins"))
+                     + (f"  pin mismatches {ec['pin_mismatch']}" if ec.get("pin_mismatch") else "  packages = requirements.txt pins")
+                     + (f"  USER-SITE: {','.join(ec['user_site_shadowed'])}" if ec.get("user_site_shadowed") else "")
+                     + (f"  [{ec['via']}]" if ec.get("via") else ""))
         else:
             L.append(f"env check: {ec}")
     for k, d in r["disk"].items():
@@ -378,13 +451,16 @@ def main(argv=None):
     ap.add_argument("--env-name", help="conda env name (default: env: in the site config, else cryocodex_env)")
     ap.add_argument("--env-check", action="store_true", help="import torch and the pinned packages inside the env (no download)")
     ap.add_argument("--hash", action="store_true", help="sha256 of the 471 MB checkpoint (ask first)")
+    ap.add_argument("--env-prefix", help="site route: absolute path of the env (default: env_prefix: in the site config)")
+    ap.add_argument("--launcher", help="site route: absolute path of a wrapper that runs predict.py directly (default: launcher: in the site config)")
     ap.add_argument("--out-root", help="directory where outputs will go (reports free space)")
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--output", help="also write the report to this file (refuses to overwrite)")
     a = ap.parse_args(argv)
-    if a.home and not os.path.isabs(a.home):
-        print("usage error: --home must be an absolute path", file=sys.stderr)
-        return 2
+    for opt in ("home", "env_prefix", "launcher"):
+        if getattr(a, opt) and not os.path.isabs(getattr(a, opt)):
+            print(f"usage error: --{opt.replace('_', '-')} must be an absolute path", file=sys.stderr)
+            return 2
     r = probe(a)
     text = json.dumps(r, indent=1, default=str) if a.json else human(r)
     print(text)

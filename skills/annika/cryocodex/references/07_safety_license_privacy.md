@@ -6,7 +6,7 @@ Facts from the code at `a35e73a` and the sources gathered on 2026-11-24. No lega
 
 | Route | Outbound | Inbound | Does the user's map leave the host? |
 |---|---|---|---|
-| `predict.sh` with weights already in place | nothing found in the code (no telemetry, update or version check; third-party libraries unverified — runbook R17) | — | **no** |
+| `predict.sh` with weights already in place | nothing: no telemetry, update or version check in the code, and a full run under `strace` opened no AF_INET/AF_INET6 connection (verified) | — | **no** |
 | `predict.sh`, first call without weights (anything but `-h`/`-h advanced`, incl. `--version`) | one HTTPS GET to `yanglab.qd.sdu.edu.cn` | `CryoCodex.pth`, 470,938,660 B, `curl -fL --retry 2` (`predict.sh:76-91`) | no |
 | README install | github.com, the host's conda channels, PyPI | env (torch 2.5.1 + CUDA 12 wheels, ~1 GB+), clone | no |
 | Colab notebook ("Online inference") | user's Colab session, PyPI, download.pytorch.org, GitHub, the lab server, jsdelivr (browser) | env + weights on the VM | **yes — uploaded to a Google Colab VM** |
@@ -26,8 +26,10 @@ download attempt (it only tests "file exists and is non-empty", `predict.sh:77`)
   `sha256sum` (probe `--hash`) in `configs/site_config.local.md` as `weights.sha256`; load it once with
   `torch.load(path, map_location="cpu", weights_only=True)` and expect a dict with key `model_state_dict`. If that safe
   load fails, stop and decide with the user before running CryoCodex.
-- Compare the sha256 across hosts. A changed size, ETag or Last-Modified on the server means a new, unannounced file:
-  treat it as a new version (re-validate).
+- Compare the sha256 across hosts. Reference value recorded on the validation host (2026-11-24, file downloaded that
+  day; safe load passes): `dfb814c63ed2dbdca99d0e3803e408d88775217a48d72a4fbb60618f8feda380`. This is an observation,
+  not a published checksum. A changed size, sha256, ETag or Last-Modified means a new, unannounced file: treat it as a
+  new version (re-validate).
 
 ## 3. Licences and terms (as published; 2026-11-24)
 

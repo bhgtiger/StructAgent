@@ -6,13 +6,39 @@
 > **How this skill uses this runbook.** It is the validation procedure for a GPU host. Run it once per host (R0–R16 are
 > needed; optional steps as wanted), fill in `Observed:` and a status per step, then record the result in
 > `configs/site_config.local.md` (state `VALIDATED` only if R11 and R12 pass) and anything surprising in `lessons.md`.
-> All "Expected" values are derived from code and documents — **not observations** — until a host has run them.
+> The "Expected" values were derived from code and documents; §0 lists what the first host observed. On a new host
+> they are still expectations until that host has run them.
+
+## §0 — First run: 2026-11-24 (one Linux Slurm cluster)
+
+Host: Ubuntu 24.04.5, glibc 2.39, conda 23.7.4; GPU steps as Slurm jobs on an RTX 2070 SUPER 8 GB node (driver 595.99,
+CUDA 13.2) and an RTX 2080 Ti 11 GB node (driver 580.178) (GPUs not fenced per job). README route (personal clone + env)
+and a shared site launcher (02 §2b) were both run. Evidence: the maintainers' evidence pack, `sources/live/`.
+
+| Step | Status | Observation (short; details in the references marked "verified") |
+|---|---|---|
+| R1–R3 | PASS | pin and file hashes as recorded; `-h` identical to the heredoc without conda |
+| R4 | DIFFERS (site) | shared conda cache not writable → `CONDA_PKGS_DIRS`; **pip uninstalled numba/llvmlite/scipy from `~/.local`** → rebuilt with `PYTHONNOUSERSITE=1`; NFS left a stale env skeleton → `rm -rf`. Then clean: 5.7 GB, 3 min |
+| R4b, R5, R6 | PASS | error texts; versions = pins, torch 2.5.1+cu124, Pillow 12.3.0 |
+| R7 | PASS (2nd try) | first try: lab server unreachable (~50 min outage) → ~7 min of timeouts, exit 1, no `.part`; R7-alt (copy) PASS; after the server returned: HEAD = recorded values, `--version` downloaded in 53 s, same sha256 |
+| R8 | PASS | 470,938,660 B, sha256 `dfb814c6…a380`, `weights_only=True` load OK |
+| R9 | PASS | all argparse texts and exit codes (03 §6) |
+| R10–R12, R12b, R13, R13b | PASS | grids, NSTART, value ranges, scores > 1 after reverse, 40³ broadcast error, normal 156³, 432³ map 3:05 |
+| R14a–e | PASS | name gate; non-orthogonal → exit **0**, no files; a user `-m` wins |
+| R15a–d | PASS | conda forwards stdin; EOF → RuntimeError; silent stdin → hangs; pty Enter → continues |
+| R16a–c | PASS | `-g ""` honoured; without `-g` a job given GPU 1 ran on GPU 0; with `-g "$CUDA_VISIBLE_DEVICES"` on GPU 1 |
+| R17 | PASS | no AF_INET connect during a run |
+| R18 | PASS | author result reproduced (enhanced and `in_score` Pearson 1.000000, `out_score` 0.999997; 52 mask voxels differ) |
+| R19 | SKIPPED | Scipion route out of scope |
+| extra | PASS | `-b 9` repeat bit-identical, `-b 1` ≈ `-b 9`, `-b 18` OOM on 8 GB; `-s 46` zero planes; site launcher and filled launcher template bit-identical to README route on the same GPU model (float-level differences between GPU models); Slurm template end to end (both routes) |
+
+Lessons from this run are folded into the steps below (marked ★).
 
 # CryoCodex v1.0.0 — live-verification runbook for the GPU server (Task E)
 
-Written 2026-11-24 (UTC) by Task E. **Nothing below has been run** (Task D skipped: no host with CryoCodex;
-`plan/source_plan.md:68-69`). Every step's status is `NOT RUN` until the user runs it on the server and fills in
-`Observed:`.
+Written 2026-11-24 (UTC) by Task E before any host had run it (Task D skipped: no host with CryoCodex;
+`plan/source_plan.md:68-69`). The `Status: NOT RUN` lines are the blank form for a new host; the first host's results
+are in §0, and the step texts below carry ★ notes from that run.
 
 ## What this validates
 Every statement in `sources/crosscheck/cli_parity.md` and `sources/crosscheck/io_parity.md` that only a real install can
@@ -20,7 +46,7 @@ confirm (coverage table at the end): install per README, help texts, first-run w
 argparse errors, input acceptance, the four outputs (grid, voxel size, origin, value ranges), `--keep_size` /
 `--reverse_interpolation`, `--crop_check` behaviour without a terminal, GPU selection, and (optional) the Scipion plugin.
 
-## Prerequisites (as claimed by the sources — none verified)
+## Prerequisites (as claimed by the sources; the first host confirmed Linux x86_64 + NVIDIA + conda + Python 3.11)
 - **Linux + CUDA-enabled GPU + Python 3.11** (`README.md:113`); "Mainly tested on CentOS 7. For GPUs
   with limited memory, reduce the batch size using `-b`." (`README.md:115`); badges PyTorch 2.5.1,
   CUDA 12.4 (`README.md:8-9`).
@@ -55,6 +81,8 @@ export WORK="$HOME/cryocodex_live"     # change if $HOME is small; record free s
 export HOST="$(hostname -s)"; export DAY="$(date -u +%Y%m%d)"
 export LIVE="$WORK/live/${HOST}_${DAY}"; export CC="$WORK/CryoCodex"
 export FIX="$WORK/fixtures"; export RUNS="$LIVE/runs"
+export PYTHONNOUSERSITE=1              # ★ keep ~/.local packages out of the env (R4, R5, all runs)
+# ★ shared conda installs: export CONDA_PKGS_DIRS=<writable dir> (and CONDA_ENVS_DIRS=<dir> for a private env location)
 mkdir -p "$LIVE/tools" "$FIX" "$RUNS"
 printf 'export WORK=%q HOST=%q DAY=%q LIVE=%q CC=%q FIX=%q RUNS=%q\n' \
   "$WORK" "$HOST" "$DAY" "$LIVE" "$CC" "$FIX" "$RUNS" > "$WORK/session.env"
@@ -117,13 +145,17 @@ conda env list | tee "$LIVE/R04_env_list_before.log"   # if cryocodex_env alread
                                                       # pick another name, `export CRYOCODEX_ENV=<name>`, and use that name in every
                                                       # later `conda run -n …` line of this runbook
 { conda create -y -n cryocodex_env python=3.11; echo "exit=$?"; } 2>&1 | tee "$LIVE/R04_conda_create.log"
-{ conda run --no-capture-output -n cryocodex_env python -m pip install -r requirements.txt; echo "exit=$?"; } 2>&1 | tee "$LIVE/R04_pip_install.log"
+ls ~/.local/lib/python3.11/site-packages 2>/dev/null | tee "$LIVE/R04_user_site_before.log"   # ★ must be unchanged after the install
+{ PYTHONNOUSERSITE=1 conda run --no-capture-output -n cryocodex_env python -m pip install -r requirements.txt; echo "exit=$?"; } 2>&1 | tee "$LIVE/R04_pip_install.log"
+grep -E 'Found existing|already satisfied: (torch|timm|numba|scipy)' "$LIVE/R04_pip_install.log"   # ★ expect nothing in a fresh env
 df -h "$WORK" | tee -a "$LIVE/R04_pip_install.log"
 ```
 Expected (from sources): the README commands (`README.md:137-141`) succeed; pip resolves `torch==2.5.1`
 from PyPI with `nvidia-*-cu12` dependencies on Linux x86_64 (`sources/source/install_environment.md:77-84`); a `torchvision` is
 pulled in by `timm` (`sources/source/install_environment.md:85-88`) — version UNVERIFIED, record it. — confirms
-`sources/source/install_environment.md:151-153` (gap), contradictions C8. Status: NOT RUN
+`sources/source/install_environment.md:151-153` (gap), contradictions C8. ★ First run: without `PYTHONNOUSERSITE=1` pip uninstalled same-named packages from `~/.local`;
+if an env has to be removed on NFS, `rm -rf` the prefix (a skeleton with stale dist-info made pip skip timm).
+Status: NOT RUN
 
 ### R4b — `CRYOCODEX_ENV` / `CONDA_EXE` error paths (no download happens)
 ```bash
@@ -197,7 +229,9 @@ cd "$CC" && mkdir -p model_state_dicts && curl -fL --retry 2 -o model_state_dict
 ```
 Expected (from sources): HEAD `HTTP/1.1 200 OK`, `Content-Length: 470938660`, `Last-Modified: Thu, 01 Oct 2026 02:13:30 GMT`,
 `ETag: "1c11f424-65cbdf6493754"` (`sources/web/evidence/weights_head_2026-11-24.txt:6-12`) — any difference means the server
-file changed since gathering: record and flag. `--version` (no checkpoint yet) prints
+file changed since gathering: record and flag. ★ The server can be unreachable for a while (~50 min on the first run): an empty HEAD and
+~7 min of curl timeouts in the `--version` call (exit 1) still confirm the trigger; then use R7-alt with a copy from
+another install or a later download, and compare the sha256 in R8. `--version` (no checkpoint yet) prints
 `Downloading the model weights to '<CC>/model_state_dicts/CryoCodex.pth' ...` (`predict.sh:84`), curl
 progress, then `CryoCodex v1.0.0` (`predict.py:16`, `predict.py:161`),
 `exit=0`, no `.part` left (`predict.sh:85-90`). — confirms
@@ -217,7 +251,8 @@ print("n_entries", len(sd), "| n_elements", sum(v.numel() for v in sd.values() i
 EOF
 { conda run -n cryocodex_env python "$LIVE/tools/check_ckpt.py" "$W"; echo "exit=$?"; } 2>&1 | tee -a "$LIVE/R08_weights_identity.txt"
 ```
-Expected (from sources): size 470938660 (`sources/web/evidence/weights_head_2026-11-24.txt:12`); there is **no published
+Expected (from sources): size 470938660 (`sources/web/evidence/weights_head_2026-11-24.txt:12`); sha256
+`dfb814c63ed2dbdca99d0e3803e408d88775217a48d72a4fbb60618f8feda380` (★ recorded on the first host); there is **no published
 checksum** to compare (`sources/web/license_and_terms.md:97-100`) — the SHA-256 printed here becomes the project's reference
 value; the `weights_only=True` load returns a `dict` with key `model_state_dict` — the same check the Scipion installer requires
 (`sources/scipion_plugin/scipion-em-cryocodex/cryocodex/scripts/install_runtime.py:83-86`). If this load fails, stop and decide
@@ -467,7 +502,8 @@ Expected (from sources): (a) prints `stdin: 'hello\n'` if conda forwards stdin �
 if (a) showed no forwarding: same `RuntimeError` as (b) quickly. — confirms `sources/source/cli_reference_extracted.md:147-148`,
 `sources/source/cli_reference_extracted.md:423-428`; contradictions C2. Status: NOT RUN
 
-R15d — *optional*, interactive terminal only (records a typescript):
+R15d — *optional*, interactive terminal only (records a typescript). ★ Without a person at the terminal, a small
+Python `pty.fork()` helper that waits for `Edit bounds:` and sends Enter works the same way (used on the first run):
 ```bash
 script -q -c "\"$CC/predict.sh\" -i \"$FIX/emd_10387.map\" -o \"$RUNS/r15d_interactive\" --crop_check True --no_logo True" "$LIVE/R15d_interactive.typescript"
 # at the prompt: open the PNGs listed, then press Enter (or type c + Enter)
@@ -511,7 +547,10 @@ index 1 (`predict.py:82`, `predict.py:182`, `predict.py:194`).
 
 R16c — *optional*, Slurm sites: inside a 1-GPU allocation (`srun --gres=gpu:1 --pty bash`), record
 `echo "$CUDA_VISIBLE_DEVICES"; nvidia-smi -L`, then run R11 once with `-g "$CUDA_VISIBLE_DEVICES"` and once without `-g`; note
-which physical GPU each used (R16b sampler). Expected: not stated anywhere — UNVERIFIED; decides the skill's Slurm template.
+which physical GPU each used (R16b sampler). ★ To get an allocation whose GPU is not 0, first submit a placeholder job
+(`sbatch --gres=gpu:1 -w <node> --wrap 'sleep 3000'`) on the same node, and cancel it afterwards. On nodes that fence GPUs
+per job (cgroups) the job sees one GPU as index 0 and both runs land on it; on unfenced nodes the first run lands on
+GPU 0 — another job's card (★ first run: exactly that). Expected: decides the skill's Slurm template.
 Status: NOT RUN
 
 ### R17 — *optional*: network egress during inference (weights present)
@@ -531,7 +570,8 @@ mkdir -p "$FIX/author_10387" && unzip -o -d "$FIX/author_10387" emd_10387.zip
 find "$FIX/author_10387" -name '*.mrc' -o -name '*.map' | xargs conda run -n cryocodex_env python "$LIVE/tools/mrc_dump.py" 2>&1 | tee -a "$LIVE/R18_author_zip.log"
 ```
 Expected (from sources): size 6,514,577 B (`sources/web/evidence/fixture_candidates_probe_2026-11-24.tsv:3`); contents UNVERIFIED
-(`sources/web/fixture_candidates.md:63-64`). Compare grid/voxel/origin and value ranges with R11; whether the paper's results were
+(`sources/web/fixture_candidates.md:63-64`) — ★ first run: four maps `CryoCodex_emd_10387/CryoCodex{,_in_score,_in_mask,_out_score}.mrc`
+on the default-run grid (see 08 §3). Compare grid/voxel/origin and value ranges with R11; whether the paper's results were
 made with the released checkpoint is unknown (`sources/web/fixture_candidates.md:68`). Status: NOT RUN
 
 ### R19 — *optional*: Scipion plugin (only if the user wants the Scipion route)

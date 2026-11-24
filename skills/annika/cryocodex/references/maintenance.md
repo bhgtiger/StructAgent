@@ -39,14 +39,18 @@ Update the citation (01 §2), the trust wording in [00](00_scope_and_trust.md) a
 ("not peer reviewed" → journal reference), re-read Methods for changed preprocessing (resampling kernel C16,
 normalisation) and new statements on input maps, limitations or downstream use.
 
-## 5. After a live validation run (first GPU host)
+## 5. After a live validation run (done for the first host on 2026-11-24; repeat for each new host)
 
 1. Copy the runbook's `live/<host>_<date>/` evidence back to the evidence pack; write `RESULTS.md` (one line per step).
 2. In this skill: paste the live help texts into [03 §6](03_cli_reference.md); turn confirmed rows from "derived/source"
    into "verified on <host>, <date>"; correct any expectation that differed (scripts too); add the measured GPU memory,
    host RSS and wall time for EMD-10387 to [05](05_core_workflows.md); record the weights sha256 in 01 §1 and 07 §2.
 3. Record the host in `configs/site_config.local.md` (git-ignored) and lessons in `lessons.md` (no host names).
-4. Update the SKILL.md status block and description ("SOURCED … NOT yet validated") only for what was actually run.
+4. Update the SKILL.md status block and description only for what was actually run.
+5. First host (2026-11-24): evidence in the pack's `sources/live/<host>_20261124/` (RESULTS.md, logs, job files);
+   summary in [validation_runbook.md](validation_runbook.md) §0; facts marked "verified" in 01–10; lessons.md.
+   For a new host: run the runbook (R0–R18), record it in that host's `configs/site_config.local.md`, and add to the
+   references only what is new (another GPU class, OS, driver or scheduler behaviour).
 
 ## 6. Always
 

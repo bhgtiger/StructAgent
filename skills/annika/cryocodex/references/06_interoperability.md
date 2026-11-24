@@ -32,7 +32,8 @@ Notes (ours, not the README's):
   `in_score` with `out_score`, or two maps, pin the range with ChimeraX's `range 0,1` option of `color sample`
   (a ChimeraX option, not in the CryoCodex README — check `usage color sample` in your ChimeraX).
 - `color sample` samples by position, so the score map may be on a different grid (1 Å, cropped) than the coloured map;
-  it relies on both maps being placed correctly. CryoCodex stores placement only in NXSTART/NYSTART/NZSTART
+  it relies on both maps being placed correctly (the NSTART placement was verified numerically against the input in
+  runbook R12; the ChimeraX commands themselves were not run during validation). CryoCodex stores placement only in NXSTART/NYSTART/NZSTART
   ([04 §6](04_data_model_and_formats.md)): check once that the score map overlays the map before trusting the colours.
 - Scores are predicted local SSIM against a model-simulated map, not resolution in Å; do not label a colour key "Å".
 - Show the mask as a surface at level 0.5 (it is 0/1).

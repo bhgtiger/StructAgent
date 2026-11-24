@@ -8,8 +8,11 @@ date_validated:  <YYYY-MM-DD or empty>
 state:           UNCONFIGURED | PROBED | VALIDATED      # VALIDATED only after the runbook's R11 + R12 passed on THIS host
 home:            </abs/path/to/CryoCodex>                # the clone; the probe uses it when --home is not given
 env:             cryocodex_env                           # conda env name (CRYOCODEX_ENV if not the default)
+env_prefix:      </abs/path/to/env or empty>             # site route: env by path (probe --env-prefix reads this)
+launcher:        </abs/path/to/site launcher or empty>   # site route: wrapper around predict.py (references/02 section 2b)
 conda_exe:       </abs/path/to/bin/conda>                # if conda is not on PATH as an executable
 site_env_cmd:    <what makes conda visible in a batch job, e.g. "source /abs/miniconda3/etc/profile.d/conda.sh">
+pythonnousersite: <yes: export PYTHONNOUSERSITE=1 for installs and runs (the launcher sets it); note any ~/.local packages>
 
 clone:
   commit:        a35e73a72f9cbc2b13cf6f8d95cf963cb704ca17   # v1.0.0; change only after re-review (references/maintenance.md)
@@ -19,7 +22,7 @@ clone:
 weights:
   path:          <home>/model_state_dicts/CryoCodex.pth
   bytes:         470938660                               # server HEAD 2026-11-24
-  sha256:        <from probe --hash / runbook R8; no published checksum exists>
+  sha256:        <from probe --hash / runbook R8; reference value on the first validated host: dfb814c63ed2dbdca99d0e3803e408d88775217a48d72a4fbb60618f8feda380>
   safe_load:     <weights_only=True load passed? yes/no (runbook R8)>
   obtained:      <date; downloaded by predict.sh | curl by hand | copied from another host (which)>
 
@@ -30,8 +33,9 @@ compute:
 
 scheduler:
   type:          slurm | none | other
-  account:       <account>
-  submit:        <sbatch flags for one GPU, e.g. --gpus=1 or --gres=gpu:1>
+  account:       <account, or "none needed">
+  submit:        <sbatch flags for one GPU, e.g. --gpus=1 or --gres=gpu:1 (builder --gres)>
+  gpu_fencing:   <yes (cgroups: the job sees one GPU as 0) | no (nvidia-smi lists all cards; CUDA_VISIBLE_DEVICES = global index)>
   gpu_selection: <runbook R16c result: does -g "${CUDA_VISIBLE_DEVICES:-0}" land on the assigned GPU?>
   network_on_compute_nodes: <yes/no (weights must be pre-placed if no)>
   outputs:       <where outputs may live>

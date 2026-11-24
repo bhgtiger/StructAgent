@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# ==========================================================================
+# CryoCodex v1.0.0 site launcher (cryocodex skill): TEMPLATE for a shared install (references/02 section 2b).
+# This template, filled with real paths, ran on the validation cluster on 2026-11-24: its four outputs were
+# bit-identical to the README route (predict.sh + conda run) on the fixture, and with no checkpoint it stopped with the
+# error below (exit 1) before starting Python.
+#
+# Why a launcher instead of predict.sh for a shared install:
+# - predict.sh runs `conda run -n <name>`: the env must be findable by NAME for every user, and conda must be an
+#   executable on PATH. A launcher calls <env>/bin/python directly, so `conda activate` is not needed.
+# - predict.sh downloads 471 MB into the clone when the checkpoint is missing; a launcher never downloads.
+# - PYTHONNOUSERSITE=1: users' ~/.local packages (numba, scipy, ...) otherwise shadow the env's (observed).
+# - PYTHONDONTWRITEBYTECODE=1: no .pyc files written into the shared code tree.
+# - predict.py writes -g (default "0") into CUDA_VISIBLE_DEVICES. On clusters that do not fence GPUs per job, a run
+#   without -g lands on GPU 0 even when the scheduler gave the job another card (observed). The launcher therefore
+#   appends -g "$CUDA_VISIBLE_DEVICES" when the scheduler set it and the user gave no -g.
+#
+# Fill the three paths, chmod 755, and optionally symlink it into <env>/bin/ so `conda activate <env>; cryocodex ...`
+# also works. Options are exactly those of predict.sh (references/03 section 3), e.g.
+#   cryocodex.sh -i /abs/map.mrc -o /abs/out_dir [--keep_size True --reverse_interpolation True]
+# ==========================================================================
+
+CRYOCODEX_HOME="<ABS_PATH_TO_CryoCodex_CLONE>"                  # git clone at tag v1.0.0
+CRYOCODEX_PY="<ABS_PATH_TO_ENV>/bin/python"                     # env built per README (python 3.11 + requirements.txt)
+CHECKPOINT="$CRYOCODEX_HOME/model_state_dicts/CryoCodex.pth"   # placed once; size 470938660 B; record its sha256
+
+unset PYTHONPATH PYTHONHOME LD_PRELOAD LD_LIBRARY_PATH    # keep site modules (Phenix, CCP4, CUDA toolkits) out of the env
+export PYTHONNOUSERSITE=1
+export PYTHONDONTWRITEBYTECODE=1
+export CRYOCODEX_PROG="${0##*/}"          # name shown in the usage line
+
+[ -s "$CHECKPOINT" ] || { echo "ERROR: CryoCodex weights missing at $CHECKPOINT (ask the maintainer)" >&2; exit 1; }
+
+args=("$@")
+if [ -n "${CUDA_VISIBLE_DEVICES:-}" ]; then
+    gpu_given=false
+    for a in "$@"; do
+        case "$a" in -g|-g?*|--gpu|--gpu=*) gpu_given=true ;; esac
+    done
+    $gpu_given || args+=(-g "$CUDA_VISIBLE_DEVICES")
+fi
+
+exec "$CRYOCODEX_PY" "$CRYOCODEX_HOME/predict.py" -m "$CHECKPOINT" "${args[@]}"

@@ -15,8 +15,9 @@ cover the Scipion plugin beyond a pointer (deferred in v0, see [06](06_interoper
 
 ## 2. Trust ladder (highest first)
 
-1. **Live behaviour on a validated host** — none yet. The runbook ([validation_runbook.md](validation_runbook.md))
-   produces it; record it in `configs/site_config.local.md` and `lessons.md`.
+1. **Live behaviour on a validated host** — one Linux Slurm cluster, 2026-11-24 ([01 §4](01_source_map.md),
+   [validation_runbook.md](validation_runbook.md) §0). It ranks first **for what was run there**; a new host repeats the
+   runbook and records it in `configs/site_config.local.md` and `lessons.md`.
 2. **Code at the pinned commit** `a35e73a` (`predict.sh`, `predict.py`, `grid_utils.py`, `data_processor.py`,
    `crop_check.py`): flags, defaults, file names, headers, messages. Wins over everything below.
 3. **README at the same commit** (the only documentation; no docs site). Right on intent, wrong in places
@@ -40,7 +41,9 @@ config does. Stale after host, GPU/driver, env, clone commit or weights change, 
 
 - "Runs on CPU / Apple Silicon / macOS / Windows / AMD" — device is hard-coded `cuda:0`; README requires Linux + CUDA GPU.
 - "`-g 0,1` uses two GPUs" or "`-g` respects the scheduler's GPU" — only the first visible device is used and `-g`
-  overwrites `CUDA_VISIBLE_DEVICES`.
+  overwrites `CUDA_VISIBLE_DEVICES` (verified: a job given GPU 1 ran on GPU 0 without `-g`).
+- "A conda env isolates CryoCodex from `~/.local`" — it does not (verified both at install and at run time).
+- "The weights checksum is published" — the sha256 in 01 is our recorded observation, not an authors' value.
 - "The weights are MIT / redistributable / free for commercial use" — no terms are published for the checkpoint.
 - "The download is checksum-verified" or "the server ETag is a hash" — neither (the ETag's first field is the size).
 - "`--version` is side-effect free" — it triggers the first-run download through `predict.sh`.
@@ -55,8 +58,9 @@ config does. Stale after host, GPU/driver, env, clone commit or weights change, 
 - "The paper is peer reviewed", "the paper's numbers will be reproduced on your map", "trained up to date X"
   (no cutoff stated; check the published train/valid lists instead, [08](08_validation_and_benchmarks.md)).
 - "`pip install cryocodex` exists", "Python 3.12 / aarch64 / micromamba are supported", "training is supported".
-- Runtime, VRAM or RAM figures for a GPU other than the paper's A800 (8 GB cap, batch 9) unless measured on the host.
-- Anything from the expected values in the runbook as if observed — they are all NOT RUN until a host runs them.
+- Runtime, VRAM or RAM figures for a GPU other than the ones measured (paper's A800; RTX 2070 SUPER, 2080 Ti in 05 §4)
+  unless measured on the host.
+- A runbook result from one host as valid on another — each host runs the runbook itself.
 
 ## 5. Licences and terms (texts only; no legal advice)
 

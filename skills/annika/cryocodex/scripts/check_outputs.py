@@ -11,7 +11,8 @@ MAP id, axis order 1/2/3, ORIGIN 0 with the placement in NXSTART/NYSTART/NZSTART
 (with --input), that the output box lies inside the input's extent, mask binary and scores >= 0 (header min/max).
 --stats reads the data (stdlib; slow for very large maps): exact mask values, score range and count > 1, zero
 fraction of the enhanced map, non-finite voxels, outer 2-voxel shell. --log scans a run log for known failures.
-Expectations are SOURCED from the code at a35e73a / DERIVED, not yet observed. Exit 0 = OK, 1 = problems, 2 = usage.
+Expectations are derived from the code at a35e73a and matched every live run of the 2026-11-24 validation (default,
+--keep_size, keep + reverse, normal, 40^3 padding, 432^3 map). Exit 0 = OK, 1 = problems, 2 = usage.
 """
 import argparse
 import glob
@@ -24,10 +25,16 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import mrcheader as mh  # noqa: E402
 
 LOG_PATTERNS = [
+    ("Crop inspection needs terminal input", "--crop_check True without a terminal (never use it in batch)"),
+    ("could not broadcast input array", "--keep_size True on a map whose 1 A box has an axis < 48: drop --keep_size"),
+    ("cannot import name 'DropPath'", "broken env (stale timm): rm -rf the env prefix and reinstall (references/09)"),
+    ("Attempting to deserialize object on a CUDA device", "no visible GPU: check -g / CUDA_VISIBLE_DEVICES / node"),
+    ("Failed to connect to yanglab", "weights server unreachable: retry later or place the checkpoint by hand"),
+    ("FileNotFoundError", "a path does not exist (input map, or a -m you passed)"),
     ("Traceback", "Python traceback"),
     ("out of memory", "CUDA out of memory -> lower -b (references/09)"),
     ("OutOfMemoryError", "CUDA out of memory -> lower -b (references/09)"),
-    ("Input grid is not orthogonal", "non-orthogonal input: CryoCodex exited without outputs (exit status likely 0)"),
+    ("Input grid is not orthogonal", "non-orthogonal input: CryoCodex exited without outputs (exit status 0, verified)"),
     ("Crop inspection needs terminal input", "--crop_check True without a terminal (never use it in batch)"),
     ("is not a cryo-em density map file format", "input name must end in lower-case mrc/map"),
     ("ERROR: Conda was not found", "conda not found by predict.sh (export CONDA_EXE)"),
@@ -65,7 +72,7 @@ def main(argv=None):
         print("usage error: --keep_size True is fast-mode only (predict.py:191-192); a run cannot have both", file=sys.stderr)
         return 2
     lines, problems, notes = [], [], []
-    res = {"out_dir": a.out_dir, "files": {}, "label": "expectations SOURCED/DERIVED from CryoCodex a35e73a; not observed"}
+    res = {"out_dir": a.out_dir, "files": {}, "label": "expectations derived from CryoCodex a35e73a; matched live runs 2026-11-24 (fast, keep, keep+reverse, normal)"}
 
     def bad(msg):
         problems.append(msg)
@@ -284,7 +291,7 @@ def main(argv=None):
         print(json.dumps(res, indent=1, default=str))
     else:
         print("\n".join(lines))
-        print(f">> OUTPUT CHECK: {'OK' if rc == 0 else 'PROBLEMS (' + str(len(problems)) + ')'}  [expectations derived from the pinned code]")
+        print(f">> OUTPUT CHECK: {'OK' if rc == 0 else 'PROBLEMS (' + str(len(problems)) + ')'}  [expectations derived from the pinned code; matched live runs 2026-11-24]")
     return rc
 
 

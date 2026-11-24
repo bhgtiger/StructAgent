@@ -1,8 +1,8 @@
 interface:
   display_name: "CryoCodex (cryo-EM map enhancement, local quality, mask)"
-  short_description: "Config-first CryoCodex v1.0.0 assistant: host probe, map header checks, correct predict.sh commands, output checks, troubleshooting (sourced, not yet validated)"
-  default_prompt: "Use the cryocodex skill. Probe the host first (scripts/cryocodex_env_probe.py), inspect the map (scripts/inspect_map.py), then build the command with scripts/build_cryocodex_command.py. Ask before any install, the 471 MB weights download, or any GPU job."
+  short_description: "Config-first CryoCodex v1.0.0 assistant: host probe, map header checks, correct predict.sh / site-launcher commands, Slurm jobs, output checks, troubleshooting (validated 2026-11-24 on a Linux Slurm cluster)"
+  default_prompt: "Use the cryocodex skill. Probe the host first (scripts/cryocodex_env_probe.py; --env-prefix/--launcher for a shared install), inspect the map (scripts/inspect_map.py), then build the command with scripts/build_cryocodex_command.py. Export PYTHONNOUSERSITE=1. Ask before any install, the 471 MB weights download, or any GPU job."
 policy:
   allow_implicit_invocation: true
   requires_confirmation_for: ["GPU job submission", "installs", "weight downloads", "predict.sh --version on a host without weights", "writing into an existing output directory"]
-  never: ["--crop_check True in a batch, Slurm, nohup or scripted run", "value-less boolean options such as a bare --normal", "-g with more than one GPU", "suggesting the Colab notebook for unpublished or private maps", "calling the score maps local resolution", "calling the weights MIT or redistributable"]
+  never: ["--crop_check True in a batch, Slurm, nohup or scripted run", "pip install into the CryoCodex env without PYTHONNOUSERSITE=1", "a Slurm/scheduler run without -g \"$CUDA_VISIBLE_DEVICES\" (or a launcher that adds it)", "value-less boolean options such as a bare --normal", "-g with more than one GPU", "suggesting the Colab notebook for unpublished or private maps", "calling the score maps local resolution", "calling the weights MIT or redistributable"]

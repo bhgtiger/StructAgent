@@ -20,6 +20,7 @@
 Exit 0 = all good, 1 = failures (listed).
 """
 import argparse
+import shutil
 import glob
 import json
 import os
@@ -362,6 +363,27 @@ python3 -I "$FAKE_WRITER" "$out" "$name" && for s in "" _out_score _in_mask _in_
     check(r.returncode == 2 and "--crop_check True needs a terminal" in r.stderr, "job refuses --crop_check True in OPTS")
     r = run(["bash", job + "2"], env=dict(env, CUDA_VISIBLE_DEVICES="0,1"), timeout=60)
     check(r.returncode == 2, "job refuses (crop_check or several GPUs) before running")
+    # site-launcher route: RUNNER = a wrapper, no conda on the host; --gres instead of --gpus; no account given
+    lau_job = os.path.join(td, "job_launcher.sbatch"); outl = os.path.join(td, "out_launcher")
+    site_launcher = os.path.join(td, "site_cryocodex.sh")
+    with open(site_launcher, "w") as fh:
+        fh.write(fake_predict)
+    os.chmod(site_launcher, 0o755)
+    p = run(PY + [BUILD, "-i", fix, "-o", outl, "--home", cc, "--launcher", site_launcher, "--sbatch", lau_job,
+                  "--partition", "gpu", "--cpus", "4", "--time", "00:30:00", "--gres", "gpu:1"])
+    ltxt = open(lau_job).read() if os.path.exists(lau_job) else ""
+    check(p.returncode == 0 and "#SBATCH --gres=gpu:1" in ltxt and "##SBATCH --account=" in ltxt and "##SBATCH --mem=" in ltxt
+          and not re.search(r"<[A-Z_]+>", ltxt) and run(["bash", "-n", lau_job]).returncode == 0,
+          "builder --launcher --gres: RUNNER set, --gres line, unset account/mem disabled, no placeholders")
+    r = run(["bash", lau_job], env=dict(env, PATH="/usr/bin:/bin", CONDA_EXE="", CUDA_VISIBLE_DEVICES="2"), timeout=300)
+    check(r.returncode == 0 and "-g 2 --no_logo True" in r.stdout + r.stderr and "OUTPUT CHECK: OK" in r.stdout + r.stderr,
+          "launcher job runs without any conda and passes the scheduler GPU")
+    if r.returncode != 0 or "OUTPUT CHECK: OK" not in r.stdout:
+        print((r.stdout + r.stderr)[-1500:])
+    p = run(PY + [BUILD, "-i", fix, "-o", outl + "_x", "--launcher", "/abs/l.sh", "--env", "x"])
+    check(p.returncode == 2, "builder refuses --env with --launcher")
+    p = run(PY + [BUILD, "-i", fix, "-o", outl + "_y", "--home", cc, "--sbatch", lau_job + "y", "--gres", "gpu:2"])
+    check(p.returncode == 2, "builder refuses --gres asking for more than one GPU")
     two = txt.replace(outj, outj + "_3")
     with open(job + "3", "w") as fh:
         fh.write(two)
@@ -395,7 +417,8 @@ python3 -I "$FAKE_WRITER" "$out" "$name" && for s in "" _out_score _in_mask _in_
         os.environ["PATH"] = fbin + os.pathsep + "/usr/bin:/bin"
         os.environ["CONDA_EXE"] = os.path.join(fbin, "conda")
         os.environ.pop("CUDA_VISIBLE_DEVICES", None)
-        A = lambda **k: argparse.Namespace(**dict(dict(home=home, env_name=None, env_check=False, hash=False, out_root=None), **k))  # noqa: E731
+        A = lambda **k: argparse.Namespace(**dict(dict(home=home, env_name=None, env_check=False, hash=False, out_root=None,
+                                                       env_prefix=None, launcher=None), **k))  # noqa: E731
         with open(envs_file, "w") as fh:
             json.dump({"envs": ["/opt/conda"]}, fh)
         v1 = probe_mod.probe(A())["verdict"]
@@ -406,6 +429,29 @@ python3 -I "$FAKE_WRITER" "$out" "$name" && for s in "" _out_score _in_mask _in_
             fh.truncate(mh.WEIGHTS_BYTES)            # sparse file of the published size; nothing is downloaded
         r3 = probe_mod.probe(A(env_check=True))
         v4 = probe_mod.probe(A())["verdict"]
+        # site route: prefix env + launcher, no conda at all; then a user-site-shadowed env
+        pfx = os.path.join(td, "site_env"); os.makedirs(os.path.join(pfx, "bin"))
+        envpy = os.path.join(pfx, "bin", "python")
+        good = ('CRYOCODEX_ENV_CHECK {"python": "3.11.10", "user_site_enabled": false, "user_site_shadowed": [], "torch": "2.5.1",'
+                ' "torch_cuda_build": "12.4", "cuda_available": true, "device_count": 1, "device0": "A100", "mrcfile": "1.5.4",'
+                ' "numba": "0.61.2", "einops": "0.8.1", "timm": "1.0.24", "numexpr": "2.10.0", "numpy": "1.26.4",'
+                ' "scipy": "1.16.0", "tqdm": "4.67.1", "PIL": "11.0.0", "torchvision": "0.20.1"}')
+        with open(envpy, "w") as fh:
+            fh.write("#!/bin/sh\necho '%s'\n" % good)
+        os.chmod(envpy, 0o755)
+        lau = os.path.join(td, "site_launcher.sh")
+        with open(lau, "w") as fh:
+            fh.write('#!/bin/bash\nexport PYTHONNOUSERSITE=1\n[ -n "$CUDA_VISIBLE_DEVICES" ] && G=(-g "$CUDA_VISIBLE_DEVICES")\n'
+                     'exec %s %s/predict.py -m %s/model_state_dicts/CryoCodex.pth "$@" "${G[@]}"\n' % (envpy, home, home))
+        os.chmod(lau, 0o755)
+        os.environ.pop("CONDA_EXE", None); os.environ["PATH"] = "/usr/bin:/bin"
+        shutil.move(os.path.join(fbin, "conda"), os.path.join(td, "conda_hidden"))
+        os.environ["PATH"] = fbin + os.pathsep + "/usr/bin:/bin"
+        r6 = probe_mod.probe(A(env_check=True, env_prefix=pfx, launcher=lau))
+        r6b = probe_mod.probe(A(env_check=True))
+        with open(envpy, "w") as fh:
+            fh.write("#!/bin/sh\necho '%s'\n" % good.replace('"user_site_shadowed": []', '"user_site_shadowed": ["numba", "scipy"]'))
+        r7 = probe_mod.probe(A(env_check=True, env_prefix=pfx, launcher=lau))
         platform.system = lambda: "Darwin"
         v5 = probe_mod.probe(A(env_check=True))["verdict"]
     finally:
@@ -416,6 +462,10 @@ python3 -I "$FAKE_WRITER" "$out" "$name" && for s in "" _out_score _in_mask _in_
     check(r3["verdict"] == "READY_TO_VALIDATE", f"probe: all present + env check -> READY_TO_VALIDATE (got {r3['verdict']}; gaps {r3['gaps']})")
     check(v4 == "PARTIAL", f"probe: env not checked -> PARTIAL (got {v4})")
     check(v5 == "BLOCKED", f"probe: macOS -> BLOCKED (got {v5})")
+    check(r6["verdict"] == "READY_TO_VALIDATE", f"probe: site launcher + prefix env, no conda -> READY_TO_VALIDATE (got {r6['verdict']}; {r6['blockers'] + r6['gaps']})")
+    check(r6b["verdict"] == "BLOCKED", f"probe: same host on the predict.sh route without conda -> BLOCKED (got {r6b['verdict']})")
+    check(r7["verdict"] == "PARTIAL" and any("USER site" in g for g in r7["gaps"]),
+          f"probe: user-site shadowing -> PARTIAL with a PYTHONNOUSERSITE gap (got {r7['verdict']})")
 src = open(os.path.join(SCRIPTS, "cryocodex_env_probe.py")).read()
 check('"VALIDATED"' not in src.replace('"VALIDATED is', ""), "probe source never assigns a VALIDATED verdict")
 
@@ -433,9 +483,14 @@ check("configs/site_config.local.md" in gi, ".gitignore lists configs/site_confi
 for t in sorted(glob.glob(os.path.join(ROOT, "templates", "*.template"))):
     p = run(["bash", "-n", t])
     check(p.returncode == 0, f"bash -n {os.path.relpath(t, ROOT)}")
-TOKENS = [("/Us" + "ers/", False), ("x." + "guo", False), ("next" + "cloud", False), ("mac_" + "mini", False),
-          ("Maria_" + "projects", False), ("sources/source/" + "CryoCodex", False), ("~/.claude/" + "skills", False),
-          ("~/.codex/" + "skills", False), ("bhg" + "tiger", False)]
+# Generic guards against absolute site paths and the evidence pack. Site-specific names (hosts, users, accounts,
+# private folders) belong in the git-ignored tests/local_tokens.txt (one per line, '#' comments), never in this file.
+TOKENS = [("/Us" + "ers/", False), ("/m" + "nt/", False), ("~/.claude/" + "skills", False), ("~/.codex/" + "skills", False),
+          ("sources/source/" + "CryoCodex", False)]
+_local = os.path.join(ROOT, "tests", "local_tokens.txt")
+if os.path.isfile(_local):
+    TOKENS += [(t.strip(), True) for t in open(_local, encoding="utf-8") if t.strip() and not t.lstrip().startswith("#")]
+LOCAL_ONLY = {os.path.join("configs", "site_config.local.md"), os.path.join("tests", "local_tokens.txt")}
 hits = []
 for dirpath, dirnames, filenames in os.walk(ROOT):
     dirnames[:] = [d for d in dirnames if d not in (".git", "__pycache__")]
@@ -445,14 +500,18 @@ for dirpath, dirnames, filenames in os.walk(ROOT):
         if fn.endswith((".pyc", ".pdf", ".tsv")) or fn == "MANIFEST.tsv":
             hits.append(f"{rel}: evidence-pack-like file shipped")
             continue
+        if rel in LOCAL_ONLY:
+            continue                       # git-ignored, host-local by design
         try:
             text = open(path, encoding="utf-8").read()
         except (OSError, UnicodeDecodeError):
             continue
+        if rel == "SKILL.md" and "\n## Local site" in text:
+            text = text.split("\n## Local site", 1)[0]   # an installed copy's local section is not part of the package
         for ln, line in enumerate(text.splitlines(), 1):
             for tok, _ in TOKENS:
                 if tok in line:
-                    hits.append(f"{rel}:{ln}: forbidden token #{TOKENS.index((tok, _)) + 1}")
+                    hits.append(f"{rel}:{ln}: forbidden token #{TOKENS.index((tok, _)) + 1}" + (" (local list)" if _ else ""))
 for h in hits[:30]:
     fail(h)
 if not hits:

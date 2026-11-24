@@ -20,8 +20,8 @@ evidence level on this host: <validated by the fixture run (date) | this option 
 
 **Weights**: present, 470,938,660 B, sha256 <recorded / not yet> — or: **the run will download 471 MB first** (ask).
 
-**Resources**: 1 GPU; batch `-b <n>` (9 fitted 8 GB on an A800 in the preprint; unmeasured here); windows <n> (normal-mode
-upper bound) → host RAM ≈ <n> GB (derived); walltime <…> (preprint mean 75 s/map on an A800 + start-up). Slurm:
+**Resources**: 1 GPU; batch `-b <n>` (`-b 9` peaks at ~7,330 MiB; lower it on cards with less free memory); windows <n> (normal-mode
+estimate) → host RAM ≈ <n> GB; walltime <…> (measured on the validation host: 150³ map ~1 min, 432³ map ~3 min, fast mode; references/05 §4). Slurm:
 account <…>, partition <…>, `--mem <…>`.
 
 **Outputs**: `<OUT>/<n>.mrc`, `<n>_out_score.mrc`, `<n>_in_mask.mrc`, `<n>_in_score.mrc`, float32, <grid>, ORIGIN 0 with

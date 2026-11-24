@@ -6,7 +6,8 @@ voxel data, except read_data() which check_outputs.py --stats uses. Re-implement
 (commit a35e73a, files grid_utils.py / data_processor.py / predict.py), what predict.py will do to a map:
 the input-name gate, the orthogonal-cell gate, the regridding to 1.0 A, the 48^3 window grid, the box padding, the
 reverse interpolation box, and a host-RAM estimate. Everything here is SOURCED (code reading) or DERIVED (arithmetic),
-not observed on a real install. Float32 rounding of the voxel size is emulated so boundary cases match NumPy.
+matched by the 2026-11-24 live runs (150^3 at 1.043 A -> 156^3; 432^3 at 0.86 A -> 371^3; 40^3 -> 41^3 padded to
+48^3; reverse boxes). Float32 rounding of the voxel size is emulated so boundary cases match NumPy.
 """
 import gzip
 import math
@@ -193,10 +194,15 @@ def interior_gaps(n, stride=DEFAULT_STRIDE):
     return [j for j in uncovered_voxels_per_axis(n, stride) if MARGIN <= j < n - MARGIN]
 
 
+RUNTIME_BASE_BYTES = 1.4e9       # Python + torch + CUDA context, fitted to max RSS of live runs (2026-11-24)
+BYTES_PER_VOXEL_1A = 20          # working copies of the 1 A grid, fitted (150^3 fast/normal, 432^3 fast within ~5 %)
+
+
 def ram_estimate_bytes(n_windows, n_voxels_1A):
-    """Derived, rough: the window arrays dominate (predict.py:90-92) plus ~60 B per voxel of the 1 A working grid for
-    whole-grid copies (blending buffers, mask, padded cube for the low-pass). A lower-bound-style estimate."""
-    return n_windows * BYTES_PER_WINDOW + 60 * n_voxels_1A
+    """Host RAM (max RSS) estimate: runtime base + the window arrays (predict.py:90-92) + working copies of the 1 A grid.
+    Fitted on 2026-11-24 live runs: 150^3 fast 1.8 GB (175 windows), 150^3 normal 3.9 GB (1000 windows), 432^3 fast
+    4.1 GB (693 windows) -- all within ~5 %. Normal mode on big maps is extrapolated (derived)."""
+    return int(RUNTIME_BASE_BYTES + n_windows * BYTES_PER_WINDOW + BYTES_PER_VOXEL_1A * n_voxels_1A)
 
 
 def geometry(h, stride=DEFAULT_STRIDE, batch=DEFAULT_BATCH):

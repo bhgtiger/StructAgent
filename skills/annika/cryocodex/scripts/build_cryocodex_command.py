@@ -5,9 +5,9 @@
         [--normal True|False] [--keep_size True|False] [--reverse_interpolation True|False]
         [--crop_check True|False --interactive] [--no_logo True|False]
         [-n NAME] [-s STRIDE] [-b BATCH] [-g GPU_INDEX | --slurm]
-        [--env CONDA_ENV_NAME] [--conda-exe /abs/conda] [--no-check] [--allow-existing-out]
+        [--env CONDA_ENV_NAME] [--conda-exe /abs/conda] [--launcher /abs/site_launcher.sh] [--no-check] [--allow-existing-out]
         [--sbatch JOBFILE [--account A] [--partition P] [--cpus 8] [--mem 32G] [--time 01:00:00]
-                          [--job-name NAME] [--site-env "source /abs/etc/profile.d/conda.sh"]]
+                          [--gres gpu:1] [--job-name NAME] [--site-env "source /abs/etc/profile.d/conda.sh"]]
 
 CryoCodex options are given exactly as in the README (`--keep_size True`); the builder emits only spellings from
 references/03 section 3 and REFUSES (exit 2): value-less booleans or values other than True/False; --normal True with
@@ -15,7 +15,7 @@ references/03 section 3 and REFUSES (exit 2): value-less booleans or values othe
 outside 1-44; batch < 1; a -g that is not one GPU index; an input name not ending in lower-case mrc/map; a header that
 fails the gates (non-orthogonal cell, no MAP id, truncated file); --keep_size True when the 1 A box has an axis < 48;
 code-only aliases (-a, -c, --in_map_path, ...), the hidden -m and options that do not exist. --slurm emits
--g "${CUDA_VISIBLE_DEVICES:-0}" (derived from predict.py:82,194; not yet observed). Prints the command labelled
+-g "${CUDA_VISIBLE_DEVICES:-0}" (predict.py:82,194; verified 2026-11-24 on a Slurm node). Prints the command labelled
 "template -- not run"; with --sbatch also fills templates/slurm_cryocodex.sbatch.template. stdlib only; runs nothing.
 """
 import argparse
@@ -90,11 +90,13 @@ def main(argv=None):
     ap.add_argument("--slurm", action="store_true", help='use the scheduler GPU: -g "${CUDA_VISIBLE_DEVICES:-0}"')
     ap.add_argument("--env", help="conda env name if not cryocodex_env (prefixes CRYOCODEX_ENV=...)")
     ap.add_argument("--conda-exe", help="absolute path of conda if it is not on PATH as an executable (prefixes CONDA_EXE=...)")
+    ap.add_argument("--launcher", help="site route: a wrapper that runs predict.py with the same options (used instead of <home>/predict.sh)")
     ap.add_argument("--no-check", action="store_true", help="skip reading the input header")
     ap.add_argument("--allow-existing-out", action="store_true", help="allow an output dir that already holds outputs with this -n (they are overwritten)")
     ap.add_argument("--sbatch", metavar="JOBFILE", help="also write a filled copy of templates/slurm_cryocodex.sbatch.template")
     ap.add_argument("--account"); ap.add_argument("--partition"); ap.add_argument("--cpus"); ap.add_argument("--mem")
     ap.add_argument("--time"); ap.add_argument("--job-name"); ap.add_argument("--site-env", help="command that makes an executable conda visible in the job")
+    ap.add_argument("--gres", help="request the GPU as '#SBATCH --gres=<value>' (e.g. gpu:1) instead of '--gpus=1'; must ask for ONE GPU")
     a = ap.parse_args(argv)
 
     notes = []
@@ -157,7 +159,7 @@ def main(argv=None):
                 die(f"-i {a.map}: header DMAX <= 0 (no positive density): the percentile normalisation fails")
             if keep == "True" and g["small_axis"]:
                 die(f"--keep_size True with a 1 A box {g['dims_1A']} that has an axis < 48: the padded 48-voxel crop does not fit "
-                    "the canvas (predict.py:67-72, data_processor.py:59-61; derived, runbook R12b). Drop --keep_size.")
+                    "the canvas (predict.py:67-72, data_processor.py:59-61; verified: ValueError, exit 1). Drop --keep_size.")
             notes.append(f"input: {g['dims_xyz']} @ {tuple(round(v, 4) for v in h['voxel'])} A -> 1 A box {g['dims_1A']}; "
                          f"normal mode {g['windows_normal']} windows (~{mh.fmt_bytes(g['ram_normal_bytes'])} host RAM, rough); "
                          "fast mode crops first (less)")
@@ -186,9 +188,9 @@ def main(argv=None):
         if not os.path.isabs(a.home):
             die(f"--home {a.home!r} must be absolute")
         if os.path.isdir(a.home):
-            if not os.path.isfile(os.path.join(a.home, "predict.sh")):
-                notes.append(f"WARN: {a.home}/predict.sh not found: is this the CryoCodex clone?")
-            elif not os.access(os.path.join(a.home, "predict.sh"), os.X_OK):
+            if not os.path.isfile(os.path.join(a.home, "predict.py")):
+                notes.append(f"WARN: {a.home}/predict.py not found: is this the CryoCodex clone?")
+            elif not a.launcher and not os.access(os.path.join(a.home, "predict.sh"), os.X_OK):
                 notes.append(f"WARN: {a.home}/predict.sh is not executable: run 'chmod +x predict.sh' in the clone (README step)")
             ck = os.path.join(a.home, "model_state_dicts", "CryoCodex.pth")
             if not (os.path.isfile(ck) and os.path.getsize(ck) > 0):
@@ -199,6 +201,13 @@ def main(argv=None):
         else:
             notes.append(f"NOTE: --home {a.home} not found here (fine if the command is for another host)")
 
+    if a.launcher:
+        if not os.path.isabs(a.launcher):
+            die(f"--launcher {a.launcher!r} must be absolute")
+        if a.env or a.conda_exe:
+            die("--env/--conda-exe apply to predict.sh (conda run); a site launcher chooses its own env")
+        if os.path.exists(a.launcher) and not os.access(a.launcher, os.X_OK):
+            notes.append(f"WARN: {a.launcher} is not executable")
     env_prefix = []
     if a.conda_exe:
         env_prefix.append(f"CONDA_EXE={shlex.quote(a.conda_exe)}")
@@ -221,7 +230,8 @@ def main(argv=None):
     if a.batch is not None:
         opts += ["-b", str(a.batch)]
 
-    cmd = env_prefix + [shlex.quote(os.path.join(home, "predict.sh")), "-i", shlex.quote(a.map), "-o", shlex.quote(a.out)]
+    runner = a.launcher or os.path.join(home, "predict.sh")
+    cmd = env_prefix + [shlex.quote(runner), "-i", shlex.quote(a.map), "-o", shlex.quote(a.out)]
     if a.name is not None:
         cmd += ["-n", shlex.quote(name)]
     cmd += opts
@@ -233,7 +243,8 @@ def main(argv=None):
         cmd += ["--no_logo", nologo]
     line = " ".join(cmd)
 
-    print("# template -- not run. SOURCED from CryoCodex v1.0.0 (a35e73a) code; not validated on this host."
+    print("# template -- not run here. CryoCodex v1.0.0 (a35e73a); options verified on the 2026-11-24 validation host;"
+          " run it only on a host whose site config says VALIDATED (or after the runbook)."
           + (" Replace /abs/path/to/CryoCodex (or pass --home)." if template else ""))
     print(line)
     mode = "normal mode (whole map)" if normal == "True" else "fast mode (background cropped)"
@@ -264,10 +275,23 @@ def main(argv=None):
                 subs[key] = val
         for k, v in subs.items():
             txt = txt.replace(k, v)
+        # optional directives the user did not give: disable them (##SBATCH is ignored by sbatch) instead of
+        # leaving a placeholder; many sites need no account, and --mem is only a node filter on some clusters
+        for key, flag in (("<ACCOUNT>", "--account"), ("<MEM>", "--mem")):
+            txt = re.sub(r"^#SBATCH " + re.escape(flag) + "=" + re.escape(key) + r"\s*$",
+                         f"##SBATCH {flag}=  (not set; pass {flag} to the builder if your site needs it)",
+                         txt, flags=re.M)
+        if a.gres:
+            if not re.fullmatch(r"gpu(:[A-Za-z0-9_.-]+)?:1", a.gres):
+                die(f"--gres {a.gres!r}: request exactly one GPU, e.g. gpu:1 or gpu:a100:1")
+            txt = re.sub(r"^#SBATCH --gpus=1\s*$", f"#SBATCH --gres={a.gres}", txt, count=1, flags=re.M)
         txt = re.sub(r'^OUT=".*$', f'OUT={shlex.quote(a.out)}   # NEW directory for this run', txt, count=1, flags=re.M)
         txt = re.sub(r'^OUT_NAME=".*$', f'OUT_NAME={shlex.quote(name)}', txt, count=1, flags=re.M)
         if a.site_env:
             txt = re.sub(r'^SITE_ENV_CMD="".*$', "SITE_ENV_CMD=" + shlex.quote(a.site_env), txt, count=1, flags=re.M)
+        if a.launcher:
+            txt = re.sub(r'^RUNNER=".*$', "RUNNER=" + shlex.quote(a.launcher) + "   # site launcher (same options as predict.sh)",
+                         txt, count=1, flags=re.M)
         if a.env:
             txt = re.sub(r'^export CRYOCODEX_ENV=".*$', f'export CRYOCODEX_ENV="{a.env}"', txt, count=1, flags=re.M)
         txt = re.sub(r"^OPTS=\(\).*$", "OPTS=(" + " ".join(shlex.quote(o) for o in opts) + ")", txt, count=1, flags=re.M)

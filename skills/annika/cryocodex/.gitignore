@@ -1,5 +1,6 @@
 # Host-specific config: holds real paths, accounts and partitions. Never commit.
 configs/site_config.local.md
+tests/local_tokens.txt
 
 # Eval/run scratch
 *-workspace/

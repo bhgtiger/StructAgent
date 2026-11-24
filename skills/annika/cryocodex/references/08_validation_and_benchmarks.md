@@ -53,6 +53,14 @@ Test set: 126 deposited EMDB **primary** maps (FSC-0.5 on the 120 with valid res
   EMReady2 106.69 s, CryoTEN 44.80 s (pp l.796-807); EMD-10387: 17.87 s (Supplementary Data 7).
 - Evaluation detail: all methods except CryoTEN ran on maps resampled to 1 Å (pp l.1240-1243).
 
+**Reproduction with the released checkpoint (verified 2026-11-24).** The lab site publishes per-map author results
+(`benchmark/results/emd_<id>.zip`). For EMD-10387 the zip (`CryoCodex_emd_10387/CryoCodex{,_in_score,_in_mask,_out_score}.mrc`)
+is on the same grid as a default v1.0.0 run (93×86×113 at 1.0 Å, NSTART 29 35 34). Against our run: enhanced map
+Pearson 1.000000 (max |Δ| 0.24 = 1.1 % of the map maximum), `in_score` 1.000000, `out_score` 0.999997, mask differs in
+52 of 903,774 voxels. So the released `CryoCodex.pth` produced the published result for this map; small differences
+are GPU floating point. This says nothing about other maps or about the paper's metrics (FSC/Q-score were not
+recomputed). The same comparison is runbook R18; any other map in the published results can be checked the same way.
+
 Baselines were CryoTEN, DEMO-EMReF, EMReady, EMReady2 and CryoRes. **DeepEMhancer and LocScale were not benchmarked.**
 
 ## 4. What the results mean — and what they do not

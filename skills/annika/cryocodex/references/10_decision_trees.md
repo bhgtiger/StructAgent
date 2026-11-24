@@ -21,11 +21,13 @@ Want: enhanced map + local-quality maps + molecular mask from ONE cryo-EM map?
 probe verdict
 ├─ BLOCKED (macOS / Windows / no NVIDIA GPU visible / no executable conda)
 │    → explain, inspect headers, draft commands labelled "template — not run"; never the Colab route for private maps
-├─ NOT_INSTALLED → README install (02 §2), one confirmation per step
-├─ PARTIAL       → fix the named gap (weights with confirmation, chmod +x, git checkout v1.0.0, --env-check)
+├─ NOT_INSTALLED → README install (02 §2) or a shared install with a site launcher (02 §2b), one confirmation per step
+├─ PARTIAL       → fix the named gap (weights with confirmation, chmod +x, git checkout v1.0.0, --env-check,
+│                  PYTHONNOUSERSITE=1 when the probe shows user-site packages)
 └─ READY_TO_VALIDATE → validation_runbook.md once on this host → site config state VALIDATED → jobs with per-job confirmation
 ```
-A login node is not the GPU node: probe where the job will run.
+A login node is not the GPU node: probe where the job will run. A site that already has a shared install: use its
+launcher (probe with `--env-prefix --launcher`), do not build a second env.
 
 ## 3. Which map to feed
 
@@ -58,24 +60,28 @@ Need …
 
 ```text
 GPU memory free (nvidia-smi)
-├─ ≥ 8 GB  → 9 (only data point: 9 fitted an 8 GB cap on an A800)
-├─ < 8 GB  → lower proportionally (e.g. 4 on ~4 GB) — unmeasured, verify with the first run
-└─ OOM     → halve and rerun; check for other processes on the GPU
+├─ ≥ 7,400 MiB → 9 (verified: 7,328 MiB peak on an 8 GB card for a 150³ and a 432³ map; 7,164 MiB on an 11 GB card)
+├─ less      → ≈ 0.67 GiB + 0.72 GiB per window: ~4 on 4 GiB, 1 on 2 GiB (-b 1 = 1,420 MiB, verified)
+├─ ≥ 16 GiB  → larger -b is possible but untested for speed; -b 18 needs > 7.6 GiB (OOM on an 8 GB card, verified)
+└─ OOM      → halve and rerun; check for other processes on the GPU (and, on unfenced nodes, that you are on your GPU)
 ```
-Larger than 9 is untested. The network normalises per sample only (InstanceNorm / LayerNorm / GroupNorm in
-`VQUnet.py`, `quant.py`; no BatchNorm), so `-b` should change speed and memory, not results — up to GPU
-floating-point non-determinism (code reading, not verified).
+The network normalises per sample only (InstanceNorm / LayerNorm / GroupNorm; no BatchNorm), so `-b` changes speed and
+memory, not results: `-b 1` vs `-b 9` differed by ≤ 0.012 on the enhanced map and in one mask voxel; the same `-b`
+repeated on the same GPU model is bit-identical, and two GPU models (RTX 2070 SUPER vs 2080 Ti) differed at the same
+float level (verified).
 
 ## 7. Stride (`-s`, default 12)
 
 Keep 12 (paper and code default). Larger strides (≤ 44) cut windows and RAM roughly by (s/12)³ but less overlap; the
-effect on quality is undocumented. > 44 leaves gaps: refused. Smaller than 12 costs more and is untested.
+effect on quality is undocumented. > 44 leaves gaps (`-s 46`: all-zero planes inside the molecule, verified): refused.
+Smaller than 12 costs more and is untested.
 
 ## 8. Where to run
 
 ```text
-workstation with an NVIDIA GPU ..... direct, in a terminal (log with tee)
-cluster ............................ Slurm template (one GPU, weights pre-placed, -g "${CUDA_VISIBLE_DEVICES:-0}")
+workstation with an NVIDIA GPU ..... direct, in a terminal (log with tee; PYTHONNOUSERSITE=1)
+cluster ............................ Slurm template (one GPU, weights pre-placed, -g "${CUDA_VISIBLE_DEVICES:-0}",
+                                     --launcher for a shared install; verified end to end)
 login node / laptop / Mac .......... only -h, header inspection, command drafting
 Google Colab ........................ not supported; privacy warning (map is uploaded)
 ```
